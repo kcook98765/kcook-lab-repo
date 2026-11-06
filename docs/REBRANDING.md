@@ -7,6 +7,68 @@ users and requests no old-URL migration service. Preserve historical artifacts.
 Run local tests and production build/verification/independent audit; present the
 diff and exact evidence before any source push or Pages deployment.
 
+## Publication outcome (2026-11-06)
+
+The owner authorized publication after presentation of the frozen packet and
+explicitly instructed the operator to verify the appended independent reviewer
+decision and complete that publication. The reviewer decision was **PASS WITH
+WARNINGS**, bound to the exact source map, plan, inputs, installer and complete
+site. Its report SHA-256 at execution was
+`feed7fbda6a7637aed9a8b8a98753f7d44adeeacd4560974b47b46726767f3fe`.
+The operator freshly reconstructed the source/diff binding, rechecked retained
+approval validity and ran two builds, verification, the independent production
+auditor, deterministic qualification and preflight before remote writes.
+
+- Reviewed source/tag commit:
+  [`95d56f38649e5d3c4240b0db075b5a22e6897a31`](https://github.com/kcook98765/kcook-lab-repo/commit/95d56f38649e5d3c4240b0db075b5a22e6897a31).
+- Published Pages commit:
+  [`31a5a61be5d2b7af1224257f6ee3ae215057074e`](https://github.com/kcook98765/kcook-lab-repo/commit/31a5a61be5d2b7af1224257f6ee3ae215057074e).
+- Release: [`repository-0.1.1`](https://github.com/kcook98765/kcook-lab-repo/releases/tag/repository-0.1.1).
+- Live File manager source: `https://kcook98765.github.io/kcook-lab-repo/`.
+- Original reviewed/published plan SHA-256:
+  `fc8d94fa4e1b9cd76eedb40f077d413f8e2c88fcdc97157b22b0db5b01fdda5a`.
+- Published complete site-manifest SHA-256:
+  `93a163a71af469cb61d04d8c4ae7095ed89a9a31438142182108d8f80db7a83b`.
+- Public installer 0.1.1: 2609 bytes, SHA-256
+  `e1dda80a7f734681553583592fb993295b60a5457b066aab059dadcc96b39aee`.
+
+All seven Release assets (three ZIPs, their sidecars and SHA256SUMS) were
+downloaded and compared byte/hash-for-byte both as a draft and after publication.
+The prior Tastemade Release/assets were not replaced. Pages promotion retained
+all 22 prior site files and added the four current installer mirrors/sidecars;
+the resulting inventory is exactly the reviewed 26 files. Both branch pushes were
+normal fast-forwards; no history was removed, settings/security changed or
+credentials exposed. No runtime/add-on code was executed.
+
+The documented `check_publication.py --https` then passed: all 26 deployed files
+plus the root-directory response matched the expected hashes in 27 HEAD/GET pairs,
+with HTML bootstrap MIME and no unexpected redirect. Four excluded fixture and
+candidate paths returned HTTP 404. The Pages API reported the exact Pages commit
+built successfully. Public byte verification is not native Kodi installation,
+refresh/update, playback or other-feature acceptance. Existing provider/runtime
+limitations and the optional InputStream Adaptive warning remain unchanged.
+
+The retention ledger now appends the published installer 0.1.1 tuple without
+changing or reordering prior tuples. This post-publication ledger/status update
+is metadata-only, not part of the earlier independently reviewed source snapshot;
+the tag remains bound to the reviewed commit above. Regenerated local plans bind
+the updated ledger and therefore have a different plan digest while retaining
+the exact published site/artifact bytes. The old plan and review evidence remain
+frozen in ignored reports; offline authority flags are not rewritten as approvals.
+
+Execution evidence is retained privately under `reports/publication-approved/`,
+including the exact reviewer copy/binding, preflight receipts, upload/download
+hash maps, prior/staged Pages inventories and full public HTTPS receipt. Two local
+staging details are retained in the session history: the old local Pages branch
+was fast-forwarded to the observed remote baseline before staging, and an initial
+staging enumeration stopped on an empty trailing path before any site write;
+the corrected enumeration verified the complete inventory. Neither is a hidden
+production-check or public-verification failure.
+
+The sections below preserve the earlier preparation chronology and its failed
+attempts. Their not-published/missing-review statements describe those phases,
+not the current published state or a continuing request for owner authorization.
+
 ## Observed operator outcome (2026-11-05)
 
 The native GitHub API renamed the existing repository successfully and confirmed

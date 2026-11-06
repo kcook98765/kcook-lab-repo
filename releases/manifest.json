@@ -9,6 +9,11 @@
       "id": "plugin.video.tastemade",
       "sha256": "d21af0f89c118c2a4c789b656b27d6211a086cce961dc3501fa4ad00564fce87",
       "version": "0.1.0"
+    },
+    {
+      "id": "repository.ai.kodi",
+      "sha256": "e1dda80a7f734681553583592fb993295b60a5457b066aab059dadcc96b39aee",
+      "version": "0.1.1"
     }
   ],
   "schema": 1

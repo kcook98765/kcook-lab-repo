@@ -1,23 +1,19 @@
 # kcook-lab-repo
 
 Version-aware distribution infrastructure for independently developed Kodi
-add-ons. Prepared repository installer: **`repository.ai.kodi` 0.1.1**.
+add-ons. Published repository installer: **`repository.ai.kodi` 0.1.1**.
 
-The project is being rebranded from `ai-kodi-repository`. The new installer and
-Pages output are local proposals, not yet pushed or deployed. Historical 0.1.0
-installer bytes and add-on releases are retained unchanged. See the
-[rename record](docs/REBRANDING.md) for status, scope and remaining review limits.
-With the original Tastemade intake restored, fresh local production build,
-verification, independent audit, deterministic qualification and publication
-preflight pass. This is preparation, not publication or new native acceptance.
+The project was renamed from `ai-kodi-repository`. Installer 0.1.1 and the
+rebranded Pages feed are published and their public HTTPS bytes verified.
+Historical 0.1.0 installer bytes and add-on releases are retained unchanged.
+See the [publication and rename record](docs/REBRANDING.md) for exact source/site
+identities, independent review, verification and remaining native limitations.
 
 Install entirely inside Kodi, using this HTTPS File manager source:
 
 ```text
 https://kcook98765.github.io/kcook-lab-repo/
 ```
-
-After the reviewed site is deployed:
 
 1. Open **Settings → File manager → Add source**, enter the URL, and name it **kcook-lab-repo**.
 2. Open **Settings → Add-ons → Install from zip file**. If prompted, enable

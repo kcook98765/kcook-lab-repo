@@ -1,14 +1,16 @@
 # Public hosting
 
 Source: `https://github.com/kcook98765/kcook-lab-repo`, default branch `main`.
-Intended static site: `https://kcook98765.github.io/kcook-lab-repo/`, generated
+Static site: `https://kcook98765.github.io/kcook-lab-repo/`, generated
 `gh-pages` branch, root directory, `.nojekyll`, HTTPS enforced. Branch publication
 uses GitHub's Pages build. There is no repository-owned automatic publisher.
 Only reviewed production output belongs on that branch.
 
-The rebrand's source and 0.1.1 site are not yet pushed/deployed. The URL above is
-the intended destination, not a delivery or deployment-success claim. See
-[the rename record](REBRANDING.md). No old-URL migration service is requested.
+The rebranded source, installer 0.1.1 Release and complete 26-file site were
+published on 2026-11-06. Public HTTPS GET/HEAD checks matched all reviewed bytes,
+including the root bootstrap and retained installers. See
+[the publication record](REBRANDING.md) for exact commits, digests and limits.
+No old-URL migration service is requested or claimed.
 
 ```
 index.html                         # current installer link only
