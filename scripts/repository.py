@@ -212,7 +212,7 @@ def load_config(profile=None):
 
 def installer(config, profile):
     root = ET.Element('addon', {'id': config['addon_id'], 'version': config['fixture_version'] if profile == 'fixture' else config['version'],
-        'name': 'AI Kodi Repository' + (' LOCAL FIXTURE' if profile == 'fixture' else
+        'name': 'kcook-lab-repo' + (' LOCAL FIXTURE' if profile == 'fixture' else
                  ' LOCAL CANDIDATE' if 'candidate_context' in config else ''),
         'provider-name': config['provider']})
     requires = ET.SubElement(root, 'requires')
@@ -276,6 +276,35 @@ def runtime_notice(approval):
                   '; exception expires: ' + value['expires_at'])
 
 
+def retained_installers(config, inputs, ledger):
+    """Restore only exact ledger-pinned historical infrastructure, never new intake.
+
+    This is not an ordinary add-on approval route. Historical installers have no
+    catalog lanes and carry no invented rights, runtime or release decisions.
+    """
+    packages = []
+    seen = set()
+    for item in inputs.get('retained_installers', []):
+        require(set(item) == {'id', 'version', 'sha256', 'zip'}, 'Malformed retained installer')
+        key = (item['id'], item['version'])
+        require(item['id'] == config['addon_id'] and key not in seen and
+                version(item['version']) < version(config['version']), 'Not a historical installer')
+        require(item['zip'] == f'{key[0]}-{key[1]}.zip', 'Retained installer filename mismatch')
+        require(sum(old == {k: item[k] for k in ('id', 'version', 'sha256')}
+                    for old in ledger['packages']) == 1, 'Retained installer not pinned in ledger')
+        blob = safe_path(ROOT/'incoming', item['zip']).read_bytes()
+        require(sha(blob) == item['sha256'], 'Retained installer checksum mismatch')
+        manifest, files = inspect_zip(blob)
+        require((manifest.get('id'), manifest.get('version')) == key and
+                manifest.find("extension[@point='xbmc.addon.repository']") is not None,
+                'Retained installer identity mismatch')
+        seen.add(key)
+        packages.append({'blob': blob, 'lanes': [], 'fixture_only': False,
+                         'provenance': {'source': 'ledger-pinned historical repository installer',
+                                        'runtime_files': {n: sha(v) for n, v in files.items()}}})
+    return packages
+
+
 def production_packages(config, profile='production'):
     require(profile in ('production', 'candidate'), 'Invalid intake profile')
     inputs = json.loads((ROOT/f'config/{profile}.json').read_text())
@@ -323,6 +352,7 @@ def production_packages(config, profile='production'):
                             for old in ledger['packages']), 'Empty v3 lanes require retained release')
         packages.append({'blob': blob, 'lanes': item['lanes'], 'fixture_only': False,
                          'provenance': record, 'approval': approval, 'release_blockers': blockers})
+    packages.extend(retained_installers(config, inputs, ledger))
     current = {}
     for item in packages:
         manifest, _ = inspect_zip(item['blob'])
@@ -455,7 +485,7 @@ def build(profile):
                       +'</pre></section>' for r in records
                       if r.get('approval', {}).get('schema_version') == 3)
     if profile == 'fixture':
-        page = ('<!doctype html><title>AI Kodi repository: local draft</title>'
+        page = ('<!doctype html><title>kcook-lab-repo: local draft</title>'
                 '<p>Not published. Fixture artifacts must never be deployed.</p><ul>'+links+'</ul>\n')
     elif profile == 'candidate':
         page = ('<!doctype html><title>Private Kodi candidate</title>'
@@ -463,8 +493,8 @@ def build(profile):
     else:
         page = ('<!doctype html><html lang="en"><meta charset="utf-8">'
                 '<meta name="viewport" content="width=device-width, initial-scale=1">'
-                '<title>AI Kodi Repository</title><h1>AI Kodi Repository</h1>'
-                '<p>Add this HTTPS source in Kodi File manager and name it AI Kodi. '
+                '<title>kcook-lab-repo</title><h1>kcook-lab-repo</h1>'
+                '<p>Add this HTTPS source in Kodi File manager and name it kcook-lab-repo. '
                 'Use Install from zip file to select the repository installer below. '
                 'Then use Install from repository to browse compatible add-ons by category.</p><ul>'+links+'</ul>'
                 '<p>Each ZIP has a SHA-256 sidecar at the same URL plus .sha256.</p>'

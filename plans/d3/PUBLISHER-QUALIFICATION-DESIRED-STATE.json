@@ -21,7 +21,7 @@
   },
   "production_denylist": {
     "repository_ids": [1428864210],
-    "repositories": ["kcook98765/ai-kodi-repository"],
+    "repositories": ["kcook98765/kcook-lab-repo"],
     "origins": ["https://kcook98765.github.io"],
     "installer_ids": ["repository.ai.kodi"]
   },

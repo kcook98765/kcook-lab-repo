@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://kcook98765.github.io/ai-kodi-repository/review-record.schema.json",
-  "title": "AI Kodi Repository review record v1, v2 and v3",
+  "$id": "https://kcook98765.github.io/kcook-lab-repo/review-record.schema.json",
+  "title": "kcook-lab-repo review record v1, v2 and v3",
   "$comment": "Structural interchange schema. scripts/approval_contract.py additionally enforces decision consistency, real UTC dates, exact intake lane scope, risk IDs, and production eligibility. Evidence references require independent human review; this schema does not authenticate actors or prove rights. No network schema retrieval is needed.",
   "type": "object",
   "required": [

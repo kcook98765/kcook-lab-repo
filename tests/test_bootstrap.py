@@ -23,7 +23,7 @@ class BootstrapTests(unittest.TestCase):
         self.site = self.root/'dist/production/site'
         self.plan_path = self.root/'dist/production/release-plan.json'
         self.plan = json.loads(self.plan_path.read_text())
-        self.filename = 'repository.ai.kodi-0.1.0.zip'
+        self.filename = f'repository.ai.kodi-{r.load_config()["version"]}.zip'
         return self.site
 
     def forge_manifest(self):
@@ -38,6 +38,10 @@ class BootstrapTests(unittest.TestCase):
         self.admit(self.files(aid='plugin.video.second', floor='3.0.0'), lanes=['matrix'])
         self.build()
         page = (self.site/'index.html').read_text()
+        self.assertIn('<title>kcook-lab-repo</title><h1>kcook-lab-repo</h1>', page)
+        self.assertIn('name it kcook-lab-repo.', page)
+        self.assertIn('https://github.com/kcook98765/kcook-lab-repo', page)
+        self.assertNotIn('AI Kodi', page)
         self.assertEqual(q.bootstrap_listing(page, 'production'),
                          {str(m):[self.filename] for m in (19, 20, 21, 22)})
         self.assertNotIn('plugin.video.example', page)
@@ -183,7 +187,7 @@ class BootstrapTests(unittest.TestCase):
         old_blob = (self.site/self.filename).read_bytes()
         self.admit(r.installer(r.load_config(), 'production'), lanes=[])
         (self.root/'releases/manifest.json').write_bytes(r.json_bytes({'schema':1, 'packages':[
-            {'id':'repository.ai.kodi', 'version':'0.1.0', 'sha256':r.sha(old_blob)}]}))
+            {'id':'repository.ai.kodi', 'version':r.load_config()['version'], 'sha256':r.sha(old_blob)}]}))
         config = r.load_config(); config['version'] = '0.2.0'
         (self.root/'config/repository.json').write_bytes(r.json_bytes(config))
         source = self.root/'packages/repository.ai.kodi/addon.xml'

@@ -94,7 +94,7 @@ class LiveTransportTests(unittest.TestCase):
         e=enrolled()
         for updates in ({'repository_id':True},{'repository_id':github.PRODUCTION_ID},
                         {'base_url':'https://attacker.example/'},{'base_url':github.QUAL_ORIGIN.replace('.io/','.io:443/')},
-                        {'repository':'kcook98765/ai-kodi-repository'},{'owner_id':900002}):
+                        {'repository':'kcook98765/kcook-lab-repo'},{'owner_id':900002}):
             with self.subTest(updates=updates),self.assertRaises(ValueError):
                 self.client([],dict(e,**updates))
 
@@ -236,7 +236,7 @@ class LiveTransportTests(unittest.TestCase):
     def test_malformed_expanded_or_overlong_installation_token_never_accepted(self):
         changes=[{'permissions':{'contents':'write','actions':'write','metadata':'read'}},
                  {'permissions':{'contents':'read','metadata':'read'}},{'repository_selection':'all'},
-                 {'repositories':[{'id':github.PRODUCTION_ID,'full_name':'kcook98765/ai-kodi-repository'}]},
+                 {'repositories':[{'id':github.PRODUCTION_ID,'full_name':'kcook98765/kcook-lab-repo'}]},
                  {'expires_at':core.utc(NOW)},{'expires_at':core.utc(NOW+timedelta(hours=2))},
                  {'token':'PRIVATE SENTINEL\nINJECT'},{'expires_at':'PRIVATE_SENTINEL'}]
         for changeset in changes:

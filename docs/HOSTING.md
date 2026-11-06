@@ -1,17 +1,23 @@
 # Public hosting
 
-Source: `https://github.com/kcook98765/ai-kodi-repository`, default branch `main`.
-Static site: `https://kcook98765.github.io/ai-kodi-repository/`, generated
+Source: `https://github.com/kcook98765/kcook-lab-repo`, default branch `main`.
+Intended static site: `https://kcook98765.github.io/kcook-lab-repo/`, generated
 `gh-pages` branch, root directory, `.nojekyll`, HTTPS enforced. Branch publication
 uses GitHub's Pages build. There is no repository-owned automatic publisher.
 Only reviewed production output belongs on that branch.
 
+The rebrand's source and 0.1.1 site are not yet pushed/deployed. The URL above is
+the intended destination, not a delivery or deployment-success claim. See
+[the rename record](REBRANDING.md). No old-URL migration service is requested.
+
 ```
 index.html                         # current installer link only
-repository.ai.kodi-0.1.0.zip[.sha256] # byte-identical bootstrap copy
+repository.ai.kodi-0.1.1.zip[.sha256] # current byte-identical bootstrap copy
+repository.ai.kodi-0.1.0.zip[.sha256] # unchanged retained predecessor
 .nojekyll
 catalogs/{matrix,nexus,omega,piers}/addons.xml[.sha256]
 packages/repository.ai.kodi/repository.ai.kodi-0.1.0.zip[.sha256]
+packages/repository.ai.kodi/repository.ai.kodi-0.1.1.zip[.sha256]
 packages/plugin.video.tastemade/plugin.video.tastemade-0.1.0.zip[.sha256]
 artwork/{matrix,nexus,omega,piers}/repository.ai.kodi/resources/icon.png
 artwork/omega/plugin.video.tastemade/resources/{icon.png,fanart.jpg}
@@ -21,7 +27,7 @@ The root index is the permanent Kodi File manager bootstrap source. Its single
 installer anchor uses a relative filename with exactly matching text:
 
 ```html
-<a href="repository.ai.kodi-0.1.0.zip">repository.ai.kodi-0.1.0.zip</a><br>
+<a href="repository.ai.kodi-0.1.1.zip">repository.ai.kodi-0.1.1.zip</a><br>
 ```
 
 Keep anchors attribute-free for Matrix, with double quotes and trailing markup.

@@ -1,10 +1,14 @@
 # Bootstrap verification and native acceptance
 
-The permanent source is `https://kcook98765.github.io/ai-kodi-repository/`.
-Users add it in File manager as AI Kodi, install the repository ZIP from that
+The intended rebranded source is `https://kcook98765.github.io/kcook-lab-repo/`.
+After reviewed deployment, users add it in File manager as kcook-lab-repo, install the repository ZIP from that
 source, then install compatible add-ons through Install from repository.
 Read README.md for the complete instructions and Kodi's Unknown sources step.
 No new server, custom installer or external browser is needed.
+
+The record below is historical evidence for the old `ai-kodi-repository` URL and
+AI Kodi Repository display name, not native acceptance of the renamed URL or
+installer 0.1.1. See [the rename record](REBRANDING.md); no new runtime tests were run.
 
 ## Current acceptance record — owner-reported Kodi 21.2 Omega
 
@@ -85,10 +89,10 @@ Use a distinct fixture repository identity for staged update tests; never replac
 the production repository with a fixture under its real ID.
 
 1. On fresh Omega 21.3, enter the documented HTTPS URL using native File manager.
-   Save as AI Kodi, reopen, and browse it. Record the warning/Unknown sources
+    Save as kcook-lab-repo, reopen, and browse it. Record the warning/Unknown sources
    flow and the visible installer filename. No preinstalled repository or ZIP.
 2. Select the installer from Install from zip file. Verify notification, installed
-   ID/version and appearance in Install from repository as AI Kodi Repository.
+    ID/version and appearance in Install from repository as kcook-lab-repo.
 3. Open Video add-ons. Confirm Tastemade 0.1.0, install it through the repository,
    and verify version and origin. Its required Python API is provided by Kodi;
    optional InputStream Adaptive absence must not block installation. This test

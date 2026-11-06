@@ -213,7 +213,7 @@ class GitHub:
         opener = build_opener(ProxyHandler({}), Redirects(*(archive or (None, None))))
         try:
             with opener.open(Request(url, method="GET", headers={
-                    "User-Agent": "ai-kodi-repository-local-intake",
+                    "User-Agent": "kcook-lab-repo-local-intake",
                     "Accept": "application/vnd.github+json",
                     "X-GitHub-Api-Version": "2022-11-28"}), timeout=25) as response:
                 require(response.status == 200, "GitHub GET did not succeed")

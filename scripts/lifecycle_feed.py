@@ -85,7 +85,7 @@ def build(store,binding,state,out):
             write_new(stage/relative,path_at(store.root,relative).read_bytes())
     config = read_json(stage/'config/repository.json')
     config = {**config,'addon_id':'repository.ai.kodi.candidate.'+binding['task_id'],
-              'base_url':binding['candidate_feed']['base_url'],'provider':'AI Kodi LOCAL CANDIDATE',
+              'base_url':binding['candidate_feed']['base_url'],'provider':'kcook-lab-repo LOCAL CANDIDATE',
               'candidate_context':{'task_id':binding['task_id'],
                   'production_config_sha256':binding['baseline']['config/repository.json'],
                   'production_ledger_sha256':binding['baseline']['releases/manifest.json']}}

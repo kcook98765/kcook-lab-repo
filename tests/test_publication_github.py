@@ -71,7 +71,7 @@ class GitHubTransportTests(unittest.TestCase):
         self.assertFalse(any(r["method"] not in ("GET", "HEAD") for r in sender.requests))
 
     def test_fixed_qualification_destination_rejects_production_and_aliases(self):
-        cases = [{"repository": "kcook98765/ai-kodi-repository"}, {"repository_id": 1428864210},
+        cases = [{"repository": "kcook98765/kcook-lab-repo"}, {"repository_id": 1428864210},
                  {"repository_id": True}, {"owner_id": True}, {"human_owner_id": True},
                  {"origin": "https://kcook98765.github.io/other-project/"},
                  {"origin": github.QUAL_ORIGIN.replace("https://", "http://")},

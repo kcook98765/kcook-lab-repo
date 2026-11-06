@@ -5,7 +5,7 @@ roles enter through [the standing workflow contract](AGENT-INTEGRATION.md),
 which references this architecture and the release/approval procedures rather
 than defining a separate repository policy.
 
-The public GitHub identity is `kcook98765/ai-kodi-repository`, explicitly
+The public GitHub identity is `kcook98765/kcook-lab-repo`, explicitly
 selected by the owner. `repository.ai.kodi` follows Kodi's `repository.*` type prefix,
 lowercase dotted ID and manifest/folder equality conventions. This is a local
 identity choice, not a globally reserved ID or official Kodi endorsement.
@@ -128,7 +128,7 @@ inputs. This context accepts pending strict-v2 records only, cannot activate
 first-release exceptions using an empty test history, and cannot pass publication
 preflight. No hosting, native operation or production approval is granted.
 
-Use GitHub Pages at `https://kcook98765.github.io/ai-kodi-repository/` for
+Use GitHub Pages at `https://kcook98765.github.io/kcook-lab-repo/` for
 `catalogs/<lane>/addons.xml[.sha256]`, `packages/<id>/<id>-<version>.zip[.sha256]`
 and `artwork/<lane>/<id>/<asset>`. Deploy a generated static artifact with
 `.nojekyll`. Stable paths make Kodi's datadir concatenation and artwork resolution
@@ -142,7 +142,7 @@ Generation, independent inventory/page reconstruction, publication preflight and
 source-matched parser qualification all cover this bootstrap contract.
 
 Retain identical reviewed ZIPs and SHA256SUMS as GitHub Release assets. A pinned
-asset URL is `https://github.com/kcook98765/ai-kodi-repository/releases/download/<tag>/<id>-<version>.zip`;
+asset URL is `https://github.com/kcook98765/kcook-lab-repo/releases/download/<tag>/<id>-<version>.zip`;
 the release page and GitHub blob/source browsing return HTML. GitHub source
 archives include development files and are not Kodi installers. `latest/download`
 is a mutable alias; tag-pinned downloads are preferable, with immutable releases
@@ -170,7 +170,12 @@ prevent removal or replacement of retained historical inputs. Clean restoration
 must reacquire all ledger packages from approved pinned Releases and verify them
 before building. Installer updates follow the same version/byte policy. The
 current generated installer is included before its ledger hash is checked;
-historical installer versions enter as reviewed packages with no current lanes.
+historical installer versions enter with no current lanes. Infrastructure-only
+`retained_installers` entries in production intake must identify an older version
+of the configured repository ID, exactly match one existing ledger entry, and
+provide its unchanged ZIP hash. Both builder and auditor independently verify
+the archive identity and bytes. This restoration route cannot admit new versions
+or ordinary add-ons and supplies no invented package/runtime approvals.
 The ledger remains operator-maintained; these tools do not add entries for you.
 
 # Reproducibility and security

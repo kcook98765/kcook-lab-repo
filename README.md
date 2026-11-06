@@ -1,20 +1,30 @@
-# AI Kodi Repository
+# kcook-lab-repo
 
 Version-aware distribution infrastructure for independently developed Kodi
-add-ons. Repository installer: **`repository.ai.kodi` 0.1.0**.
+add-ons. Prepared repository installer: **`repository.ai.kodi` 0.1.1**.
+
+The project is being rebranded from `ai-kodi-repository`. The new installer and
+Pages output are local proposals, not yet pushed or deployed. Historical 0.1.0
+installer bytes and add-on releases are retained unchanged. See the
+[rename record](docs/REBRANDING.md) for status, scope and remaining review limits.
+With the original Tastemade intake restored, fresh local production build,
+verification, independent audit, deterministic qualification and publication
+preflight pass. This is preparation, not publication or new native acceptance.
 
 Install entirely inside Kodi, using this HTTPS File manager source:
 
 ```text
-https://kcook98765.github.io/ai-kodi-repository/
+https://kcook98765.github.io/kcook-lab-repo/
 ```
 
-1. Open **Settings → File manager → Add source**, enter the URL, and name it **AI Kodi**.
+After the reviewed site is deployed:
+
+1. Open **Settings → File manager → Add source**, enter the URL, and name it **kcook-lab-repo**.
 2. Open **Settings → Add-ons → Install from zip file**. If prompted, enable
    **Unknown sources** under System → Add-ons and acknowledge Kodi's warning.
-3. Select **AI Kodi**, then **repository.ai.kodi-0.1.0.zip** (or the current
+3. Select **kcook-lab-repo**, then **repository.ai.kodi-0.1.1.zip** (or the current
    approved installer shown there).
-4. After the installed notification, open **Install from repository → AI Kodi Repository**.
+4. After the installed notification, open **Install from repository → kcook-lab-repo**.
 5. Browse the normal Kodi categories and install the desired compatible add-on.
    On Omega, **Video add-ons → Tastemade 0.1.0** is published. Other current lanes
    contain the repository installer only; Aura and disposable fixtures are not published.
@@ -28,12 +38,13 @@ No browser, SMB share or ZIP transfer is required. Unknown sources is a standard
 Kodi requirement; a bootstrap sidecar is not automatically verified by manual ZIP
 installation. Repository-driven downloads retain the configured SHA-256 checks.
 
-The bootstrap is published. Core repository installation and Tastemade discovery
+The previous-name bootstrap was published. Core repository installation and Tastemade discovery
 and installation are accepted on **Kodi 21.2 Omega**, based on the owner's manual
 native PASS report. Native updates and native acceptance on other Kodi versions
 remain pending. The owner reports a Tastemade launch error, deferred to separate
 add-on debugging; its cause is unresolved and is not attributed to Kodi 21.2. See the
-[acceptance record and remaining tests](docs/NATIVE-ACCEPTANCE.md).
+[acceptance record and remaining tests](docs/NATIVE-ACCEPTANCE.md). That historical
+report does not establish native acceptance of the renamed source or 0.1.1 installer.
 
 The installer selects Matrix 19, Nexus 20, Omega 21 or Piers 22 catalogs by the
 `xbmc.addon` API version. Pages serves stable metadata, artwork and nested package
@@ -48,6 +59,7 @@ python3 -B -m unittest discover -s tests -v
 python3 -B scripts/repository.py build --profile production
 python3 -B scripts/repository.py verify --profile production
 python3 -B scripts/audit_candidate.py --profile production
+python3 -B scripts/qualify.py --profile production
 python3 -B scripts/check_publication.py
 ```
 

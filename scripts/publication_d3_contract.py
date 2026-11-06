@@ -64,7 +64,7 @@ def tree(files):
 
 def fixture_files(version):
     base.require(version in ("1.0.0", "1.1.0"), "Unsupported D3 fixture version")
-    xml = (f'<addon id="{ADDON_ID}" version="{version}" name="D3 transport fixture" provider-name="AI Kodi qualification">'
+    xml = (f'<addon id="{ADDON_ID}" version="{version}" name="D3 transport fixture" provider-name="kcook-lab-repo qualification">'
            '<requires><import addon="xbmc.python" version="3.0.1"/></requires>'
            '<extension point="xbmc.python.script" library="default.py"/>'
            '<extension point="xbmc.addon.metadata"><summary>D3 inert transport qualification</summary>'

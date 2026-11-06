@@ -183,11 +183,15 @@ class CandidateFeedTests(unittest.TestCase):
 
     def test_original_production_installer_bytes_unchanged(self):
         import repository as repo
-        config=repo.load_config()
-        blob=repo.zip_bytes(repo.installer(config,'production'))
-        ledger=json.loads((fixtures.ROOT/'releases/manifest.json').read_text())
-        expected=next(v['sha256'] for v in ledger['packages'] if v['id']=='repository.ai.kodi' and v['version']==config['version'])
-        self.assertEqual(repo.sha(blob),expected)
+        # A prepared successor need not be published in the ledger yet. Candidate
+        # generation must preserve the actual production baseline, either way.
+        paths = [fixtures.ROOT/name for name in ('config/repository.json', 'releases/manifest.json',
+                                                 'packages/repository.ai.kodi/addon.xml')]
+        before = {p: p.read_bytes() for p in paths}
+        blob = repo.zip_bytes(repo.installer(repo.load_config(), 'production'))
+        self.feed()
+        self.assertEqual({p: p.read_bytes() for p in paths}, before)
+        self.assertEqual(repo.zip_bytes(repo.installer(repo.load_config(), 'production')), blob)
 
     def test_cached_lane_receipt_rechecks_index_bytes(self):
         import lifecycle as lc

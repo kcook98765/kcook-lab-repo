@@ -32,9 +32,9 @@ class PublicationSecurityTests(unittest.TestCase):
                 proposal.canonical(value)
 
     def test_destination_rejects_aliases_extra_fields_and_boolean_ids(self):
-        changes = [dict(repository="kcook98765/ai-kodi-repository"),
+        changes = [dict(repository="kcook98765/kcook-lab-repo"),
                    dict(repository_id=1428864210),
-                   dict(base_url="https://kcook98765.github.io/ai-kodi-repository/"),
+                   dict(base_url="https://kcook98765.github.io/kcook-lab-repo/"),
                    dict(base_url="https://publication.invalid.:443/ai-kodi-repository/"),
                    dict(repository_id=True), dict(owner_id=True), dict(force=False)]
         for mutation in changes:

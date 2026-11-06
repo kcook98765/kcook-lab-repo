@@ -1,12 +1,19 @@
-# AI Kodi repository
+# kcook-lab-repo
+
+When the selected primary is the separately installed `github-operator`, read
+`.opencode/GITHUB-OPERATOR.md` and load `kodi-repository-maintenance`. The operator
+uses native Git/GitHub and documented production commands for owner-requested
+intake, updates and repository maintenance. The restricted role workflow below
+continues to govern manager/tester/reviewer sessions. Capability setup does not
+authorize publication of a new candidate.
 
 Read docs/AGENT-INTEGRATION.md (Repository workflow contract v1) before work.
 The approved local Phases A-C path is described in docs/LIFECYCLE-PREPARATION.md;
 it supports task-bound static checks and isolated candidate feeds without changing role permissions.
 It is the standing role/workflow entry point and references the authoritative
-architecture, installation instructions and release-approval contract. Use the
-configured `kodi-repo-manager` and existing tester/reviewer children. No new
-agent, skill or temporary task prompt is needed to define repository policy.
+architecture, installation instructions and release-approval contract. Restricted
+role sessions use the configured `kodi-repo-manager` and existing tester/reviewer
+children; the local operator skill routes to this policy rather than replacing it.
 
 Only disposable Toolkit fixtures are admitted in fixture qualification.
 Determine current distribution state from config/production.json and

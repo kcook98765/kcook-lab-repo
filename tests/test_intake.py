@@ -224,7 +224,7 @@ class IntakeTests(unittest.TestCase):
     def test_current_installer_in_ledger_is_preserved_and_hash_checked(self):
         self.admit()
         blob = r.zip_bytes(r.installer(r.load_config(), 'production'))
-        ledger = {'packages': [{'id': 'repository.ai.kodi', 'version': '0.1.0', 'sha256': r.sha(blob)}]}
+        ledger = {'packages': [{'id': 'repository.ai.kodi', 'version': r.load_config()['version'], 'sha256': r.sha(blob)}]}
         path = self.root / 'releases/manifest.json'; path.write_bytes(r.json_bytes(ledger))
         r.build('production')
         self.assertEqual(audit.audit('production')['status'], 'PASS')
@@ -256,6 +256,56 @@ class IntakeTests(unittest.TestCase):
         plan['site_manifest_sha256'] = r.sha(r.json_bytes(plan['site_files']))
         path.write_bytes(r.json_bytes(plan))
         with self.assertRaises((AssertionError, ValueError)): audit.audit('production')
+
+    def retain_installer(self):
+        files = r.installer(r.load_config(), 'production')
+        manifest = r.parse_xml(files['addon.xml']); manifest.set('version', '0.0.9')
+        manifest.set('name', 'Historical name')
+        files['addon.xml'] = r.xml_bytes(manifest)
+        blob = r.zip_bytes(files)
+        entry = {'id': 'repository.ai.kodi', 'version': '0.0.9', 'sha256': r.sha(blob)}
+        item = {**entry, 'zip': 'repository.ai.kodi-0.0.9.zip'}
+        (self.root/'incoming'/item['zip']).write_bytes(blob)
+        (self.root/'releases/manifest.json').write_bytes(r.json_bytes({'packages': [entry]}))
+        inputs = {'packages': [], 'external_dependencies': {}, 'retained_installers': [item]}
+        (self.root/'config/production.json').write_bytes(r.json_bytes(inputs))
+        return item, inputs, blob
+
+    def test_ledger_pinned_installer_restored_without_fabricated_approval(self):
+        item, _, blob = self.retain_installer()
+        r.build('production')
+        self.assertEqual(audit.audit('production')['status'], 'PASS')
+        plan = json.loads((self.root/'dist/production/release-plan.json').read_text())
+        old = next(p for p in plan['packages'] if p['version'] == item['version'])
+        self.assertEqual(old['lanes'], [])
+        self.assertNotIn('approval', old)
+        site = self.root/'dist/production/site'
+        self.assertEqual((site/item['zip']).read_bytes(), blob)
+        self.assertEqual((site/old['path']).read_bytes(), blob)
+        self.assertNotIn(item['zip'], (site/'index.html').read_text())
+        self.assertEqual(publication.site_audit(plan)['status'], 'PASS')
+        self.assertEqual(q.urls('production', network=False)['status'], 'PASS')
+
+    def test_retained_installer_cannot_admit_new_or_ordinary_packages(self):
+        item, inputs, blob = self.retain_installer()
+        for changes in ({'id': 'plugin.video.example'}, {'version': r.load_config()['version']},
+                        {'sha256': '0'*64}, {'zip': '../outside.zip'}, {'lanes': ['omega']}):
+            changed = {**item, **changes}
+            inputs['retained_installers'] = [changed]
+            (self.root/'config/production.json').write_bytes(r.json_bytes(inputs))
+            with self.subTest(changes=changes):
+                with self.assertRaises((ValueError, KeyError)): r.build('production')
+                with self.assertRaises((AssertionError, ValueError, KeyError)):
+                    audit.reviewed_inputs(r.load_config(), 'production')
+        inputs['retained_installers'] = [item, item]
+        (self.root/'config/production.json').write_bytes(r.json_bytes(inputs))
+        with self.assertRaises(ValueError): r.build('production')
+        with self.assertRaises(AssertionError): audit.reviewed_inputs(r.load_config(), 'production')
+        inputs['retained_installers'] = [item]
+        (self.root/'config/production.json').write_bytes(r.json_bytes(inputs))
+        (self.root/'incoming'/item['zip']).write_bytes(blob + b'changed')
+        with self.assertRaisesRegex(ValueError, 'checksum'): r.build('production')
+        with self.assertRaises(AssertionError): audit.reviewed_inputs(r.load_config(), 'production')
 
 
 if __name__ == '__main__': unittest.main()

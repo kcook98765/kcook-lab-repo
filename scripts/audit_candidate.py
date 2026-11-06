@@ -359,7 +359,25 @@ def reviewed_inputs(config, profile):
         assert key not in expected
         expected[key] = {'blob': blob, 'files': files, 'lanes': item['lanes'],
                          'fixture_only': False, 'provenance': record, 'approval': approval}
-    for old in json.loads(configuration(profile)[2].read_text())['packages']:
+    # Independently restore historical infrastructure against the immutable
+    # ledger, without importing the builder or inventing add-on approvals.
+    history = json.loads(configuration(profile)[2].read_text())['packages']
+    for item in inputs.get('retained_installers', []):
+        assert set(item) == {'id', 'version', 'sha256', 'zip'}
+        key = (item['id'], item['version'])
+        assert key not in expected and key[0] == config['addon_id']
+        assert numeric(key[1]) < numeric(config['version'])
+        assert item['zip'] == f'{key[0]}-{key[1]}.zip'
+        assert sum(old == {k: item[k] for k in ('id', 'version', 'sha256')} for old in history) == 1
+        blob = path(ROOT/'incoming', item['zip']).read_bytes()
+        assert digest(blob) == item['sha256']
+        manifest, files = archive_files(blob)
+        assert (manifest.get('id'), manifest.get('version')) == key
+        assert manifest.find("extension[@point='xbmc.addon.repository']") is not None
+        expected[key] = {'blob': blob, 'files': files, 'lanes': [], 'fixture_only': False,
+                         'provenance': {'source': 'ledger-pinned historical repository installer',
+                                        'runtime_files': {n: digest(v) for n, v in files.items()}}}
+    for old in history:
         if (old['id'], old['version']) == (config['addon_id'], config['version']):
             continue  # Generated installer is checked with the complete inventory below.
         assert digest(expected[(old['id'], old['version'])]['blob']) == old['sha256']
@@ -520,7 +538,7 @@ def audit(profile='fixture'):
                            +runtime_text
                            +'</pre></section>')
     if profile == 'fixture':
-        expected_page = ('<!doctype html><title>AI Kodi repository: local draft</title>'
+        expected_page = ('<!doctype html><title>kcook-lab-repo: local draft</title>'
                          '<p>Not published. Fixture artifacts must never be deployed.</p><ul>'+links+'</ul>\n')
     elif profile == 'candidate':
         expected_page = ('<!doctype html><title>Private Kodi candidate</title>'
@@ -528,8 +546,8 @@ def audit(profile='fixture'):
     else:
         expected_page = ('<!doctype html><html lang="en"><meta charset="utf-8">'
                          '<meta name="viewport" content="width=device-width, initial-scale=1">'
-                         '<title>AI Kodi Repository</title><h1>AI Kodi Repository</h1>'
-                         '<p>Add this HTTPS source in Kodi File manager and name it AI Kodi. '
+                          '<title>kcook-lab-repo</title><h1>kcook-lab-repo</h1>'
+                          '<p>Add this HTTPS source in Kodi File manager and name it kcook-lab-repo. '
                          'Use Install from zip file to select the repository installer below. '
                          'Then use Install from repository to browse compatible add-ons by category.</p><ul>'+links+'</ul>'
                          '<p>Each ZIP has a SHA-256 sidecar at the same URL plus .sha256.</p>'

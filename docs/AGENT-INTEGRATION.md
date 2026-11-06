@@ -1,5 +1,17 @@
 # Repository workflow contract v1
 
+## Installed native operator supplement
+
+The owner separately enabled a native `github-operator` on Claw. When selected,
+read the ignored local `.opencode/GITHUB-OPERATOR.md` and explicitly load the
+project-local `kodi-repository-maintenance` skill for GitHub source intake,
+immutable add-on updates, lane-specific compatibility and production preparation.
+It uses native `bash` with `git`/`gh`, not the fixed GitHub GET adapter. Existing
+manager/tester/reviewer definitions, scopes and adapters remain unchanged. The
+fixture-only capability descriptions below apply to those restricted roles.
+Operator maintenance follows the current release/approval/retention contracts;
+actual publication requires the concrete owner-authorized result.
+
 For the explicitly approved Phases A-C **isolated local installation**, read
 [task-bound preparation](LIFECYCLE-PREPARATION.md). Its versioned templates extend
 the existing tool schemas for owner-enrolled public GitHub sources and candidate
@@ -67,7 +79,7 @@ report that evidence limitation; reading a successful receipt is not rerunning
 the audit. Never fabricate machine records or approvals.
 
 The GitHub GET adapter covers only its four existing upstream repositories;
-it does not include ai-kodi-repository or future add-on repositories. Missing
+it does not include kcook-lab-repo (formerly ai-kodi-repository) or future add-on repositories. Missing
 coverage/access is BLOCKED, not an empty result. Do not widen the allowlist,
 introduce arbitrary endpoints or infer GitHub write authority.
 
@@ -97,8 +109,9 @@ already deployed expected bytes. No production promotion is unattended.
 Reuse the five installed Toolkit skills: kodi-addon-development,
 kodi-addon-validation, kodi-version-compatibility, kodi-addon-debugging and
 kodi-mcp-testing. The first three support source-package and compatibility work;
-the others apply only when the separately authorized task needs them. No new
-repository skill or shared Toolkit change is necessary for bootstrap policy.
+the others apply only when the separately authorized task needs them. The native
+operator's local repository skill links these contracts and existing Toolkit
+skills; it does not replace bootstrap policy or change the shared Toolkit.
 
 Read a skill when applicable and permitted, then verify the actual local tool
 schema. Generic Toolkit context/compose/discover/validate examples do not give

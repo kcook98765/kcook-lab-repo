@@ -109,7 +109,7 @@ class ProposalTests(unittest.TestCase):
 
     def test_changed_destination_rejected_even_after_rehash(self):
         path = self.bundle(); file = path / "execution.json"; value = proposal.strict_load(file.read_bytes())
-        value["destination"]["repository"] = "kcook98765/ai-kodi-repository"; file.write_bytes(proposal.canonical(value))
+        value["destination"]["repository"] = "kcook98765/kcook-lab-repo"; file.write_bytes(proposal.canonical(value))
         with self.assertRaisesRegex(ValueError, "destination"):
             proposal.load_bundle(path, now=NOW)
 

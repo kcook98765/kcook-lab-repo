@@ -1,10 +1,10 @@
 {
   "schema": 1,
-  "github_repository": "kcook98765/ai-kodi-repository",
-  "base_url": "https://kcook98765.github.io/ai-kodi-repository/",
+  "github_repository": "kcook98765/kcook-lab-repo",
+  "base_url": "https://kcook98765.github.io/kcook-lab-repo/",
   "addon_id": "repository.ai.kodi",
-  "version": "0.1.0",
-  "provider": "AI Kodi repository maintainers",
+  "version": "0.1.1",
+  "provider": "kcook-lab-repo maintainers",
   "lanes": {
     "matrix": {
       "major": 19,

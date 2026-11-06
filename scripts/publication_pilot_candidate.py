@@ -70,8 +70,10 @@ def prepare_candidate(candidate_bundle, output, *, enrollment, previous=None, no
             base.write_new(stage / name, base.safe_read(current["root"] / name))
     production = json.loads(base.safe_read(stage / "config/repository.json", base.MAX_JSON))
     installer_id = "repository.ai.kodi.candidate." + enrollment["campaign_id"]
-    candidate_config = {**production, "addon_id": installer_id, "base_url": enrollment["base_url"],
-        "github_repository": enrollment["repository"], "provider": "AI Kodi qualification",
+    # The isolated transport qualification fixes its own installer version. A
+    # production successor must not implicitly change this separate campaign.
+    candidate_config = {**production, "version": "0.1.0", "addon_id": installer_id, "base_url": enrollment["base_url"],
+        "github_repository": enrollment["repository"], "provider": "kcook-lab-repo qualification",
         "candidate_context": {"task_id": enrollment["campaign_id"],
             "production_config_sha256": base.sha(base.safe_read(stage / "config/repository.json")),
             "production_ledger_sha256": base.sha(base.safe_read(stage / "releases/manifest.json"))}}

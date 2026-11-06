@@ -25,8 +25,10 @@ def build_d3_bundle(directory, version="1.0.0", previous=None, now=NOW, *, seal=
     (stage / "config/production.json").write_bytes(repo.json_bytes({"schema": 1, "external_dependencies": {}, "packages": []}))
     (stage / "releases/manifest.json").write_bytes(repo.json_bytes({"schema": 1, "packages": []}))
     production = json.loads((stage / "config/repository.json").read_text())
-    candidate = {**production, "addon_id": "repository.ai.kodi.candidate." + enrollment["campaign_id"],
-                 "base_url": enrollment["base_url"], "github_repository": enrollment["repository"], "provider": "AI Kodi D3 LOCAL QUALIFICATION",
+    # The disposable transport contract pins its installer independently of the
+    # current production installer; do not weaken its maintenance guard.
+    candidate = {**production, "version": "0.1.0", "addon_id": "repository.ai.kodi.candidate." + enrollment["campaign_id"],
+                 "base_url": enrollment["base_url"], "github_repository": enrollment["repository"], "provider": "kcook-lab-repo D3 LOCAL QUALIFICATION",
                  "candidate_context": {"task_id": enrollment["campaign_id"],
                   "production_config_sha256": base.sha((stage / "config/repository.json").read_bytes()),
                   "production_ledger_sha256": base.sha((stage / "releases/manifest.json").read_bytes())}}
@@ -109,7 +111,7 @@ class D3ContractTests(unittest.TestCase):
     def test_enrollment_rejects_unassigned_aliases_and_mistyped_identities(self):
         original = contract.mock_enrollment(now=NOW)
         for key, value in (("repository_id", contract.PRODUCTION_ID), ("owner_id", 56806582), ("app_id", True),
-                           ("repository", "kcook98765/ai-kodi-repository"), ("base_url", "https://kcook98765.github.io/other/"),
+                            ("repository", "kcook98765/kcook-lab-repo"), ("base_url", "https://kcook98765.github.io/other/"),
                            ("owner_type", "User"), ("repository_id", None), ("policy_sha256", "0" * 64)):
             changed = copy.deepcopy(original); changed[key] = value
             with self.subTest(key=key), self.assertRaises(ValueError): contract.validate_enrollment(changed)

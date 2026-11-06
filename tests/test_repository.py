@@ -95,6 +95,24 @@ class BoundaryTests(unittest.TestCase):
             with patch.object(r,'ROOT',root),self.assertRaisesRegex(ValueError,'Historical'):r.production_packages({})
 
 class PublicationTests(unittest.TestCase):
+    def test_rebrand_preserves_kodi_id_and_uses_new_origin(self):
+        config = r.load_config()
+        self.assertEqual(config['github_repository'], 'kcook98765/kcook-lab-repo')
+        self.assertEqual(config['base_url'], 'https://kcook98765.github.io/kcook-lab-repo/')
+        manifest = r.parse_xml(r.installer(config, 'production')['addon.xml'])
+        self.assertEqual(manifest.get('id'), 'repository.ai.kodi')
+        self.assertEqual(manifest.get('name'), 'kcook-lab-repo')
+        self.assertEqual(manifest.get('version'), '0.1.1')
+        self.assertEqual(manifest.get('provider-name'), 'kcook-lab-repo maintainers')
+        self.assertEqual(manifest.findtext("extension[@point='xbmc.addon.metadata']/source"),
+                         'https://github.com/kcook98765/kcook-lab-repo')
+        for directory, lane in zip(manifest.findall("extension[@point='xbmc.addon.repository']/dir"),
+                                   ('matrix', 'nexus', 'omega', 'piers')):
+            for tag, suffix in [('info', f'catalogs/{lane}/addons.xml'),
+                                ('checksum', f'catalogs/{lane}/addons.xml.sha256'),
+                                ('datadir', 'packages/'), ('artdir', f'artwork/{lane}/')]:
+                self.assertEqual(directory.findtext(tag), config['base_url'] + suffix)
+
     def test_installer_source_matches_generated_runtime(self):
         files=r.installer(r.load_config(),'production')
         self.assertEqual({p.relative_to(r.ROOT/'packages/repository.ai.kodi').as_posix():p.read_bytes()

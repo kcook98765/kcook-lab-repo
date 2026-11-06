@@ -140,6 +140,16 @@ supplying any actual release approval.
 
 ## Bootstrap promotion and future installers
 
+The 2026-11 rename prepares installer 0.1.1 without replacing 0.1.0. See
+[the rebranding record](REBRANDING.md). For exact historical infrastructure only,
+`config/production.json` may include `retained_installers` objects with exactly
+`id`, `version`, `sha256`, `zip`. Each must name the configured repository ID, an
+older version, its canonical ZIP filename and an exact existing ledger entry.
+Restore that ZIP to ignored `incoming/` and verify its digest. Builder and auditor
+independently inspect it and export it with no catalog lanes, unchanged root and
+Release mirrors, and no fabricated add-on approval. Ordinary add-ons still use
+their hashed review records; all other production and retention gates stay intact.
+
 The standard public entry point remains the root HTTPS File manager source.
 Each build derives its sole installer link from the configured installer version,
 creates byte-identical versioned root mirrors and SHA-256 sidecars, and retains
