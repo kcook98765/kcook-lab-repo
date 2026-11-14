@@ -1,0 +1,23 @@
+{
+  "agent": {
+    "github-operator": {
+      "permission": {
+        "skill": {
+          "kodi-repository-maintenance": "allow"
+        },
+        "bash": {
+          "gh repo view kcook98765/kcook-lab-repo --json nameWithOwner,viewerPermission": "allow",
+          "gh api --method GET repos/kcook98765/kcook-lab-repo/pages": "allow"
+        },
+        "external_directory": {
+          "${SOURCE_ROOT}": "allow",
+          "${SOURCE_ROOT}/**": "allow"
+        },
+        "edit": {
+          "${SOURCE_ROOT}": "deny",
+          "${SOURCE_ROOT}/**": "deny"
+        }
+      }
+    }
+  }
+}

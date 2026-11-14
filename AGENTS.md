@@ -5,7 +5,8 @@ When the selected primary is the separately installed `github-operator`, read
 uses native Git/GitHub and documented production commands for owner-requested
 intake, updates and repository maintenance. The restricted role workflow below
 continues to govern manager/tester/reviewer sessions. Capability setup does not
-authorize publication of a new candidate.
+authorize publication of a new candidate. Restore this integration using
+[the versioned templates and procedure](docs/OPENCODE-CROSS-REPOSITORY.md).
 
 Read docs/AGENT-INTEGRATION.md (Repository workflow contract v1) before work.
 The approved local Phases A-C path is described in docs/LIFECYCLE-PREPARATION.md;
@@ -17,8 +18,12 @@ children; the local operator skill routes to this policy rather than replacing i
 
 Only disposable Toolkit fixtures are admitted in fixture qualification.
 Determine current distribution state from config/production.json and
-releases/manifest.json, not historical readiness reports. Do not read or modify
-sibling add-on workspaces. Native
+releases/manifest.json, not historical readiness reports. Restricted roles must
+not read or modify sibling add-on workspaces. A separately configured operator may inspect an owner-enrolled source and this distribution
+checkout from the same selected add-on project; local filesystem permissions
+and exact operator enrollment are both required. Source edits remain separately
+scoped. Missing release prerequisites block production admission/publication,
+not truthful isolated private candidate preparation. Native
 role tools have no Kodi, MCP, Docker, Git mutation or publication authority.
 An operator may perform the exact source/hosting operations explicitly authorized
 by the user. Future add-on publication requires a separate reviewed approval.

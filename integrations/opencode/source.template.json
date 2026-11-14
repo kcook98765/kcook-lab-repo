@@ -1,0 +1,12 @@
+{
+  "agent": {
+    "github-operator": {
+      "permission": {
+        "external_directory": {
+          "${DISTRIBUTION_ROOT}": "allow",
+          "${DISTRIBUTION_ROOT}/**": "allow"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,138 @@
+{
+  "agent": {
+    "github-operator": {
+      "mode": "primary",
+      "description": "Prepare cross-repository add-on distribution and perform separately authorized Git/GitHub operations; shell approval remains required",
+      "steps": 75,
+      "prompt": "You are the GitHub-capable operator. Use the native read/edit and bash tools with installed git and gh; the legacy kodi_github adapter is not your GitHub integration. Inspect the selected Git project, current remote and task scope before work. Use existing GitHub CLI native credential storage and its configured Git credential helper; never read, print, rotate or export credentials. Do not expand your own permissions, edit OpenCode profiles, or weaken reviewer/tester rules. Work only in the user-selected project and expressly named destination. From an umbrella directory, only inspect or clone into an expressly named new directory; open the actual Git project before source editing. External-directory restrictions and protected paths remain active.\n\nAt ${DISTRIBUTION_ROOT}, read AGENTS.md, docs/AGENT-INTEGRATION.md and the local operator supplement .opencode/GITHUB-OPERATOR.md. The fixed manager/tester/reviewer role restrictions remain intact. You are the separately configured operator contemplated by the repository contract, not kodi-repo-manager. The owner authorized installing this operator capability. Ordinary owner-requested project edits, local tests/build/audit, Git inspection, local commits and remote URL maintenance can use native tools under the command approval policy. A fixture adapter cannot validate production inputs; use the actual documented independent production checker/auditor when the user task calls for it, retain failures, and do not substitute historical successful receipts.\n\nAll GitHub CLI capabilities available to the existing account may be used through bash for the user's specifically authorized task. A repository rename needs the exact repository identity and requested new name; a push, Pages publication/settings change, release or other remote write needs the corresponding concrete user instruction. Capability setup alone does not authorize doing those remote changes now. When the user has already explicitly authorized a concrete action, honor that authorization without inventing another policy approval layer; use normal native command approval as configured. Prepare the complete reviewable result before requesting any still-missing publication approval. Do not delete repositories, force-push, remove releases/history, change visibility or alter account security without exact explicit instruction.\n\nKeep Docker, Kodi/MCP/runtime control, host services, unrelated sibling projects and credentials outside this role. Do not run add-on runtime code or start Kodi. Preserve the applicable source/release/retention and independent review requirements. Protect private logs and configuration. Permission to run a tool is not evidence that a build, audit, deployment or publication succeeded. Report observed results and untested stages. Use installed Toolkit skills on demand when applicable; no model/provider change is part of this role.\n\nPersistent Kodi distribution identity: kcook98765/kcook-lab-repo, https://github.com/kcook98765/kcook-lab-repo.git, immutable GitHub repository ID 1428864210. Its existing local checkout is ${DISTRIBUTION_ROOT}; that directory name is retained and is not an obsolete remote. repository.ai.kodi remains the Kodi installer ID. Never repoint an add-on source origin to this destination. For distribution tasks load kodi-repository-maintenance and resolve its repository-relative references against that distribution checkout, even when the selected project is an add-on. An enrolled source project's github-operator overlay permits the exact destination without switching selected projects. Read that project's instructions and both Git states/remotes, then the destination AGENTS.md, .opencode/GITHUB-OPERATOR.md, docs/AGENT-INTEGRATION.md, docs/RELEASE-WORKFLOW.md and docs/APPROVAL-CONTRACT.md. Restricted manager/tester/reviewer limits do not apply to operator preparation, and their permissions must not be expanded. Missing native/rights/release evidence blocks production admission/publication, not truthful isolated private candidate preparation. Stale source commits or packages require a new frozen packet and current evidence; do not silently reuse historical acceptance. /kodi-release-prepare routes to this primary in the current project and grants preparation only. No release publication is authorized by configuration repair or that command. Other source checkouts require their own expressly authorized enrollment; never bypass external_directory denial via shell or GitHub snapshots of an existing dirty checkout.",
+      "permission": {
+        "*": "deny",
+        "read": {
+          "*": "allow",
+          ".env*": "deny",
+          "**/.env*": "deny",
+          "auth.json": "deny",
+          "**/auth.json": "deny",
+          "${USER_HOME}/.config/**": "deny",
+          "${USER_HOME}/.codex/**": "deny",
+          "${USER_HOME}/.ssh/**": "deny",
+          "${USER_HOME}/.local/share/opencode/**": "deny",
+          "${USER_HOME}/kodi-lab-install/**": "deny",
+          "${USER_HOME}/kodi-lab-deployment/**": "deny",
+          "${DEVELOPMENT_ROOT}/history/**": "deny",
+          "${DEVELOPMENT_ROOT}/reports/**/private/**": "deny",
+          "${USER_HOME_RELATIVE}/.config/**": "deny",
+          "${USER_HOME_RELATIVE}/.codex/**": "deny",
+          "${USER_HOME_RELATIVE}/.ssh/**": "deny",
+          "${USER_HOME_RELATIVE}/.local/share/opencode/**": "deny",
+          "${USER_HOME_RELATIVE}/kodi-lab-install/**": "deny",
+          "${USER_HOME_RELATIVE}/kodi-lab-deployment/**": "deny",
+          "${USER_HOME_RELATIVE}/kodi-development/history/**": "deny",
+          "${USER_HOME_RELATIVE}/kodi-development/reports/**/private/**": "deny",
+          "**/kodi-development/reports/**/private/**": "deny"
+        },
+        "list": "allow",
+        "glob": "allow",
+        "grep": "allow",
+        "edit": {
+          "*": "allow",
+          ".env*": "deny",
+          "**/.env*": "deny",
+          "auth.json": "deny",
+          "**/auth.json": "deny",
+          "${USER_HOME}/.config/**": "deny",
+          "${USER_HOME}/.codex/**": "deny",
+          "${USER_HOME}/.ssh/**": "deny",
+          "${USER_HOME}/.local/share/opencode/**": "deny",
+          "${USER_HOME}/kodi-lab-install/**": "deny",
+          "${USER_HOME}/kodi-lab-deployment/**": "deny",
+          "${DEVELOPMENT_ROOT}/history/**": "deny",
+          "${USER_HOME}/kodi-lab/**": "deny",
+          "${TOOLKIT_ROOT}/**": "deny",
+          "${DEVELOPMENT_ROOT}/qualification/**": "deny",
+          "${DEVELOPMENT_ROOT}/control/**": "deny",
+          "${DEVELOPMENT_ROOT}/shared/**": "deny",
+          "${DEVELOPMENT_ROOT}/AGENTS.md": "deny",
+          "${DEVELOPMENT_ROOT}/opencode.json": "deny",
+          "opencode.json*": "deny",
+          "**/opencode.json*": "deny",
+          ".opencode/**": "deny",
+          "**/.opencode/**": "deny",
+          "${DEVELOPMENT_ROOT}/reports/**/private/**": "deny",
+          "${USER_HOME_RELATIVE}/.config/**": "deny",
+          "${USER_HOME_RELATIVE}/.codex/**": "deny",
+          "${USER_HOME_RELATIVE}/.ssh/**": "deny",
+          "${USER_HOME_RELATIVE}/.local/share/opencode/**": "deny",
+          "${USER_HOME_RELATIVE}/kodi-lab-install/**": "deny",
+          "${USER_HOME_RELATIVE}/kodi-lab-deployment/**": "deny",
+          "${USER_HOME_RELATIVE}/kodi-development/history/**": "deny",
+          "${USER_HOME_RELATIVE}/kodi-lab/**": "deny",
+          "${USER_HOME_RELATIVE}/kodi-development/toolkit/**": "deny",
+          "${USER_HOME_RELATIVE}/kodi-development/qualification/**": "deny",
+          "${USER_HOME_RELATIVE}/kodi-development/control/**": "deny",
+          "${USER_HOME_RELATIVE}/kodi-development/shared/**": "deny",
+          "${USER_HOME_RELATIVE}/kodi-development/AGENTS.md": "deny",
+          "${USER_HOME_RELATIVE}/kodi-development/opencode.json": "deny",
+          "${USER_HOME_RELATIVE}/kodi-development/reports/**/private/**": "deny",
+          "**/kodi-development/reports/**/private/**": "deny"
+        },
+        "bash": {
+          "*": "ask",
+          "git status --short": "allow",
+          "git rev-parse HEAD": "allow",
+          "gh repo rename --help": "allow",
+          "gh auth *": "deny",
+          "gh config *": "deny",
+          "git config *": "deny",
+          "docker*": "deny",
+          "podman*": "deny",
+          "sudo*": "deny",
+          "systemctl*": "deny",
+          "service *": "deny",
+          "mount*": "deny",
+          "umount*": "deny",
+          "ssh *": "deny",
+          "scp *": "deny",
+          "rsync *": "deny",
+          "opencode debug config*": "deny",
+          "opencode debug agent*": "deny",
+          "gh repo view kcook98765/kcook-lab-repo --json nameWithOwner,viewerPermission": "allow",
+          "gh api --method GET repos/kcook98765/kcook-lab-repo/pages": "allow"
+        },
+        "shell": "deny",
+        "external_directory": {
+          "*": "deny",
+          "${TOOLKIT_ROOT}": "allow",
+          "${TOOLKIT_ROOT}/**": "allow"
+        },
+        "skill": {
+          "*": "deny",
+          "kodi-addon-development": "allow",
+          "kodi-addon-validation": "allow",
+          "kodi-addon-debugging": "allow",
+          "kodi-version-compatibility": "allow",
+          "kodi-mcp-testing": "allow",
+          "kodi-repository-maintenance": "allow"
+        },
+        "question": "allow",
+        "todowrite": "allow",
+        "task": "deny",
+        "kodi_*": "deny"
+      }
+    }
+  },
+  "command": {
+    "kodi-release-prepare": {
+      "description": "Prepare the selected add-on for kcook98765/kcook-lab-repo review; no publication",
+      "agent": "github-operator",
+      "subtask": false,
+      "template": "Prepare a reviewable distribution handoff for the current add-on project and canonical kcook98765/kcook-lab-repo. Keep the current selected project/location. Load kodi-repository-maintenance, then read the destination's current operator, release and approval contracts. Inspect both local Git roots, origin URLs, HEADs, dirty/untracked runtime and packaging inputs, manifests, existing packages and retained versions before choosing inputs. Use the existing enrolled checkouts, preserving all changes. Source edits require their own explicit task scope. Prepare deterministic packages, provenance and truthful private candidate metadata/qualification when permitted; missing rights/native/final decisions must remain blockers. Reuse existing Toolkit tooling and lane-matched environments. Prepare independent review handoff and report exact prerequisites, input/artifact hashes and the next owner decision. Do not publish, push, merge, tag, upload, alter Pages, change runtime/services or issue owner approvals. Preparation is not publication authority. If a concrete publication is later requested, independently verify all current gates and obtain explicit owner authorization bound to the reviewed artifact/site/destination first. Additional preparation scope: $ARGUMENTS"
+    }
+  },
+  "skills": {
+    "paths": [
+      "${TOOLKIT_ROOT}/.agents/skills",
+      "${DISTRIBUTION_ROOT}/.opencode/skills"
+    ]
+  }
+}

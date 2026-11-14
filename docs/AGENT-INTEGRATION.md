@@ -4,13 +4,27 @@
 
 The owner separately enabled a native `github-operator` on Claw. When selected,
 read the ignored local `.opencode/GITHUB-OPERATOR.md` and explicitly load the
-project-local `kodi-repository-maintenance` skill for GitHub source intake,
+`kodi-repository-maintenance` skill for GitHub source intake,
 immutable add-on updates, lane-specific compatibility and production preparation.
 It uses native `bash` with `git`/`gh`, not the fixed GitHub GET adapter. Existing
 manager/tester/reviewer definitions, scopes and adapters remain unchanged. The
 fixture-only capability descriptions below apply to those restricted roles.
 Operator maintenance follows the current release/approval/retention contracts;
-actual publication requires the concrete owner-authorized result.
+actual publication requires the concrete owner-authorized result. Versioned
+[restoration templates](OPENCODE-CROSS-REPOSITORY.md) reproduce the operator,
+preparation command, exact project enrollment and existing maintenance skill
+without storing credentials or replacing restricted-role definitions.
+
+The operator can prepare distribution from an explicitly enrolled add-on project
+without changing its selected project. The host integration must discover this
+skill and permit exactly that source and distribution checkout; a policy document
+does not grant filesystem/tool access. `/kodi-release-prepare`, when installed,
+selects the operator primary for preparation only. Read this checkout's policies
+explicitly and resolve distribution-relative paths against its verified Git root.
+Inspect both local HEADs, dirty state and remotes. Keep ordinary development and
+restricted manager/tester/reviewer permissions unchanged. Missing rights/native/
+release evidence blocks production admission and publication while truthful
+isolated private candidate preparation and review handoff remain supported.
 
 For the explicitly approved Phases A-C **isolated local installation**, read
 [task-bound preparation](LIFECYCLE-PREPARATION.md). Its versioned templates extend
