@@ -547,6 +547,8 @@ Separate owner package admission must bind both complete objects using
 `skin_alpha_evidence_sha256` and `original_assets_admission_sha256`, with all
 owner coverage/risk acknowledgments and independent decisions actually recorded.
 Policy approval cannot supply those actions. The request/receipt and all
-consumer/schema/policy files are included in toolchain pins. Final publication
+consumer/schema/policy files are included in toolchain pins for actual selected
+schema-5 inputs. Legacy fixed-tool candidates do not load this policy module or
+require its files; their permissions and copier stay unchanged. Final publication
 remains a later authorization against the complete qualified production-site
 digest and exact source/Release/Pages actions.

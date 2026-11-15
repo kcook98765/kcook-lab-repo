@@ -8,12 +8,12 @@ from pathlib import PurePosixPath
 import hashlib
 import json
 import re
-import original_assets
 
 POLICY = 'strict-v1'
 UNOFFICIAL_POLICY = 'unofficial-integration-v1'
 INITIAL_POLICY = 'unofficial-integration-initial-release-v1'
 SKIN_ALPHA_POLICY = 'initial-release-skin-alpha-v1'
+ORIGINAL_ASSETS_POLICY = 'aura-original-assets-alpha-v1'
 DECISION_FIELDS = {'status', 'actor', 'role', 'recorded_at', 'rationale', 'evidence'}
 V2_FIELDS = {'approval_policy', 'approval_lanes', 'rights_review',
              'owner_acknowledgment', 'technical_release', 'release_decision',
@@ -494,7 +494,7 @@ def assess(record, lanes, package_identity=None, release_history=None, package_m
     require(type(version) is int and version in (1, 2, 3, 4, 5), 'unsupported schema_version')
     require(version == 3 or 'unofficial_integration' not in record, 'v3 fields require schema_version=3')
     initial_policy = version == 3 and record.get('approval_policy') == INITIAL_POLICY
-    material_policy = version == 5 and record.get('approval_policy') == original_assets.POLICY
+    material_policy = version == 5 and record.get('approval_policy') == ORIGINAL_ASSETS_POLICY
     skin_policy = (version == 4 and record.get('approval_policy') == SKIN_ALPHA_POLICY) or material_policy
     require(material_policy or 'original_assets_admission' not in record,
             'original-assets evidence requires explicit schema-5 policy')
@@ -539,7 +539,7 @@ def assess(record, lanes, package_identity=None, release_history=None, package_m
     policy = record['approval_policy']
     require(policy in ((UNOFFICIAL_POLICY, INITIAL_POLICY) if version == 3 else
                        (SKIN_ALPHA_POLICY,) if version == 4 else
-                       (original_assets.POLICY,) if version == 5 else (POLICY,)), 'unsupported approval_policy')
+                       (ORIGINAL_ASSETS_POLICY,) if version == 5 else (POLICY,)), 'unsupported approval_policy')
     require(isinstance(record['approval_lanes'], list) and
             all(isinstance(lane, str) for lane in record['approval_lanes']) and
             len(record['approval_lanes']) == len(set(record['approval_lanes'])) and
@@ -634,6 +634,7 @@ def assess(record, lanes, package_identity=None, release_history=None, package_m
     if skin_policy:
         material_active = False; material_ids = []; material_actions = []
         if material_policy:
+            import original_assets
             material_active, material_ids, material_actions = original_assets.evaluate(
                 record, package_identity, acceptance_lanes, package_manifest, release_history, utc_now())
             if material_active:

@@ -655,11 +655,12 @@ def audit(profile='fixture'):
     if profile != 'fixture' and json.loads((ROOT/f'config/{profile}.json').read_text())['external_dependencies']:
         for name in ('official_omega', 'audit_official_omega'):
             assert plan['toolchain'].get(name+'_sha256') == digest((Path(__file__).parent/(name+'.py')).read_bytes())
-    for key,filename in [('original_assets_module_sha256','scripts/original_assets.py'),
-                         ('original_assets_policy_sha256','policies/aura-original-assets-2.1.0.json'),
-                         ('original_assets_owner_approval_sha256','policies/aura-original-assets-owner-approval.json')]:
-        assert plan['toolchain'][key] == digest((Path(__file__).resolve().parents[1]/filename).read_bytes())
     expected = reviewed_inputs(config, profile)
+    if any(item.get('provenance', {}).get('schema_version') == 5 for item in expected.values()):
+        for key,filename in [('original_assets_module_sha256','scripts/original_assets.py'),
+                             ('original_assets_policy_sha256','policies/aura-original-assets-2.1.0.json'),
+                             ('original_assets_owner_approval_sha256','policies/aura-original-assets-owner-approval.json')]:
+            assert plan['toolchain'][key] == digest((Path(__file__).resolve().parents[1]/filename).read_bytes())
     installer_version = config['fixture_version'] if profile == 'fixture' else config['version']
     installer_source = ROOT/'packages'/config['addon_id']
     installer_files = {p.relative_to(installer_source).as_posix():p.read_bytes() for p in installer_source.rglob('*') if p.is_file()}

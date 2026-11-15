@@ -3,7 +3,6 @@
 from __future__ import annotations
 import argparse
 import approval_contract
-import original_assets
 import copy
 import hashlib
 from html import escape
@@ -376,7 +375,7 @@ def production_packages(config, profile='production'):
                 all(c['static_accepted'] is False and c['runtime_accepted'] is False for c in record['compatibility'].values()))
             skin_pending = (((record.get('schema_version') == 4 and
                 record.get('approval_policy') == approval_contract.SKIN_ALPHA_POLICY) or
-                (record.get('schema_version') == 5 and record.get('approval_policy') == original_assets.POLICY)) and
+                (record.get('schema_version') == 5 and record.get('approval_policy') == approval_contract.ORIGINAL_ASSETS_POLICY)) and
                 record.get('release_approved') is False and record.get('release_decision') == {'status':'pending'} and
                 record.get('owner_acknowledgment') == {'status':'not_recorded'} and
                 record.get('skin_alpha_evidence', {}).get('owner_coverage_decision') == {'status':'pending'})
@@ -397,6 +396,7 @@ def production_packages(config, profile='production'):
         manifest, files = inspect_zip(blob, record['runtime_files'])
         verify_skin_evidence_files(record)
         if record.get('schema_version') == 5:
+            import original_assets
             original_assets.destination(json.loads((ROOT/'config/repository.json').read_text())
                                         if 'candidate_context' in config else config)
         approval = approval_contract.assess(record, item['lanes'],
@@ -442,6 +442,22 @@ def external_dependency_report(profile, manifests, builtins, lane, bindings):
         return {}
     import official_omega
     return official_omega.resolve(manifests, builtins, spec, ROOT/'incoming', lane, bindings)
+
+
+def original_assets_toolchain(profile):
+    """Only opt-in inputs require the new module and its frozen policy sources.
+
+    Legacy lifecycle candidates intentionally stage the existing fixed toolset.
+    Do not require unrelated policy files or broaden that staging allowlist.
+    """
+    if profile == 'fixture':
+        return {}
+    inputs = json.loads((ROOT/f'config/{profile}.json').read_text())
+    if not any(json.loads(safe_path(ROOT/'incoming', item['review_record']).read_text()).get('schema_version') == 5
+               for item in inputs['packages']):
+        return {}
+    import original_assets
+    return original_assets.toolchain()
 
 
 def dependency_toolchain(profile):
@@ -617,7 +633,7 @@ def build(profile):
                                                    ('preflight', 'check_publication.py')]},
                           'review_schema_sha256':sha((Path(__file__).parents[1]/'docs/REVIEW-RECORD-SCHEMA.json').read_bytes()),
                           'approval_contract_sha256':sha(Path(approval_contract.__file__).read_bytes()),
-                          **dependency_toolchain(profile), **original_assets.toolchain()},
+                          **dependency_toolchain(profile), **original_assets_toolchain(profile)},
             'release_assets':release_assets, 'site_files':site_files,
             'site_manifest_sha256':sha(json_bytes(site_files)),
             'proposed_actions':['create approved GitHub repository (not authorized)',
@@ -656,7 +672,7 @@ def verify(profile):
     require(plan['toolchain']['review_schema_sha256'] ==
             sha((Path(__file__).parents[1]/'docs/REVIEW-RECORD-SCHEMA.json').read_bytes()), 'Stale review schema')
     require(plan['toolchain']['approval_contract_sha256'] == sha(Path(approval_contract.__file__).read_bytes()), 'Stale approval contract')
-    for key,value in original_assets.toolchain().items():
+    for key,value in original_assets_toolchain(profile).items():
         require(plan['toolchain'].get(key) == value, 'Stale original-assets admission policy')
     for key,value in dependency_toolchain(profile).items():
         require(plan['toolchain'].get(key) == value, 'Stale official dependency adapter')

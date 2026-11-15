@@ -8,6 +8,8 @@ import copy
 from datetime import datetime, timezone
 import hashlib
 import json
+import shutil
+import subprocess
 from pathlib import Path
 import sys
 import tempfile
@@ -134,6 +136,33 @@ class OriginalAssetsTests(unittest.TestCase):
                 self.assertTrue(result['release_blockers'])
                 if field!='release_decision':self.assertFalse(result['package_distribution_eligible'])
                 self.assertFalse(record['release_approved'])
+
+    def test_legacy_fixed_tools_need_no_opt_in_module_or_policy_files(self):
+        import lifecycle_feed
+        with tempfile.TemporaryDirectory() as folder:
+            root=Path(folder)
+            for name in lifecycle_feed.SCRIPTS:
+                shutil.copy2(original.ROOT/'scripts'/name,root/name)
+            self.assertFalse((root/'original_assets.py').exists())
+            bootstrap=("import sys;sys.path.insert(0,sys.argv[1]);"
+                       "import repository,audit_candidate;"
+                       "assert repository.original_assets_toolchain('fixture')=={}")
+            result=subprocess.run([sys.executable,'-I','-B','-c',bootstrap,str(root)],
+                                  capture_output=True,text=True,timeout=10)
+            self.assertEqual(result.returncode,0,result.stderr)
+
+    def test_policy_toolchain_pins_follow_actual_selected_input_records(self):
+        import repository as repo
+        with tempfile.TemporaryDirectory() as folder:
+            root=Path(folder);(root/'config').mkdir();(root/'incoming').mkdir()
+            (root/'config/candidate.json').write_text(json.dumps({'packages':[{'review_record':'record.json'}]}))
+            path=root/'incoming/record.json';path.write_text(json.dumps({'schema_version':2}))
+            with patch.object(repo,'ROOT',root):
+                self.assertEqual(repo.original_assets_toolchain('candidate'),{})
+                path.write_text(json.dumps({'schema_version':5}))
+                self.assertEqual(repo.original_assets_toolchain('candidate'),original.toolchain())
+                self.assertEqual(set(repo.original_assets_toolchain('candidate')),
+                    {'original_assets_module_sha256','original_assets_policy_sha256','original_assets_owner_approval_sha256'})
 
     def test_wrong_identity_source_zip_inventory_and_destination_reject_both_gates(self):
         for field,value in [('source_commit','0'*40),('package_sha256','0'*64),

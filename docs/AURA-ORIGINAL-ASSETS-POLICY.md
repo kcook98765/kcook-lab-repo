@@ -71,3 +71,9 @@ or OpenCode permission is added.
 
 No policy implementation grants third-party redistribution permission. No new
 release or Pages write is authorized by a passing test or by the policy receipt.
+
+The new module and policy toolchain pins are loaded only when an actual selected
+review record opts into schema 5, including a retained record with empty lanes.
+The independent auditor derives that requirement from actual inputs, not plan
+flags. Legacy fixture/candidate workflows keep their fixed tool copier and need
+no policy files, extra modules or wider permissions.
