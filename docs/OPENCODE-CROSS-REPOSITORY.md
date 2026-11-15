@@ -36,11 +36,11 @@ permission wildcards. Replace the illustrative paths below with the chosen roots
 
 ```sh
 python3 -B scripts/opencode/stage_operator.py \
-  --home-root /home/OWNER \
-  --development-root /home/OWNER/development \
-  --source-root /home/OWNER/development/addons/script.channelsdvr.hub \
-  --distribution-root /home/OWNER/development/repository/kcook-lab-repo \
-  --toolkit-root /home/OWNER/development/toolkit \
+  --home-root /path/to/owner \
+  --development-root /path/to/owner/development \
+  --source-root /path/to/owner/development/addons/script.channelsdvr.hub \
+  --distribution-root /path/to/owner/development/repository/kcook-lab-repo \
+  --toolkit-root /path/to/owner/development/toolkit \
   --global-base /private/existing-service-overlay.json \
   --source-base /private/existing-source-opencode.json \
   --distribution-base /private/existing-distribution-opencode.json \

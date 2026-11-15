@@ -16,6 +16,17 @@ ROOT = repo.ROOT
 SOURCE_ROOTS = {'.gitignore', 'AGENTS.md', 'README.md', 'LICENSE', 'CONTRIBUTING.md',
                 'config', 'docs', 'fixtures', 'incoming', 'packages', 'plans',
                 'releases', 'scripts', 'tests'}
+# These seven reviewed templates are the only admitted integration sources.
+# Do not allow the entire integrations tree or newly created untracked files.
+INTEGRATION_SOURCES = {
+    'integrations/opencode/global.template.json',
+    'integrations/opencode/source.template.json',
+    'integrations/opencode/distribution.template.json',
+    'integrations/opencode/source-instructions.template.md',
+    'integrations/opencode/local-templates/GITHUB-OPERATOR.md',
+    'integrations/opencode/local-templates/skills/kodi-repository-maintenance/SKILL.md',
+    'integrations/opencode/local-templates/skills/kodi-repository-maintenance/references/intake-and-release.md',
+}
 SECRET_PATTERNS = [
     rb'-----BEGIN (?:RSA |EC |OPENSSH )?PRIVATE KEY-----',
     rb'gh[pousr]_[A-Za-z0-9]{30,}',
@@ -35,10 +46,13 @@ def source_audit():
                             cwd=ROOT,capture_output=True,check=True)
     names = sorted(set(result.stdout.decode().split('\0'))-{''})
     repo.require(bool(names), 'No source files selected')
+    tracked = set(subprocess.run(['git', 'ls-files', '--cached', '-z'], cwd=ROOT,
+                                capture_output=True, check=True).stdout.decode().split('\0'))
     hashes = {}
     for name in names:
         parts = Path(name).parts
-        repo.require(parts[0] in SOURCE_ROOTS, 'Unreviewed source root: '+name)
+        repo.require(parts[0] in SOURCE_ROOTS or (name in INTEGRATION_SOURCES and name in tracked),
+                     'Unreviewed source root: '+name)
         repo.require(not any(p.startswith('.') for p in parts if p != '.gitignore'),
                      'Private source path: '+name)
         repo.require(Path(name).suffix.lower() not in {'.zip','.log','.key','.pem','.db','.sqlite','.pyc'},
