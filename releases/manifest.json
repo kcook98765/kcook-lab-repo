@@ -14,6 +14,11 @@
       "id": "repository.ai.kodi",
       "sha256": "e1dda80a7f734681553583592fb993295b60a5457b066aab059dadcc96b39aee",
       "version": "0.1.1"
+    },
+    {
+      "id": "script.channelsdvr.hub",
+      "version": "0.1.2",
+      "sha256": "7c04857b3094415c1028ed85b0434712d924191f2cc890e90a89610607e91e69"
     }
   ],
   "schema": 1

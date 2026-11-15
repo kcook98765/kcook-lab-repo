@@ -9,6 +9,15 @@
       "review_record_sha256": "442db92cb401bf981de89eeebac9be54492a81d97fa57abcf2bb69f4a33df05f",
       "sha256": "d21af0f89c118c2a4c789b656b27d6211a086cce961dc3501fa4ad00564fce87",
       "zip": "plugin.video.tastemade-0.1.0.zip"
+    },
+    {
+      "lanes": [
+        "omega"
+      ],
+      "review_record": "channelsdvr-hub-0.1.2-review-v3-approved-r3.json",
+      "review_record_sha256": "1d99f8d856c081dd4540622cd26432d04e200caca537021e2d3304c65d6074ee",
+      "sha256": "7c04857b3094415c1028ed85b0434712d924191f2cc890e90a89610607e91e69",
+      "zip": "script.channelsdvr.hub-0.1.2.zip"
     }
   ],
   "retained_installers": [

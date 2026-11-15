@@ -80,6 +80,14 @@ No service unit or credential file is supplied here.
 
 ## Verify and preserve boundaries
 
+The existing read-only production review helper has a versioned restoration copy
+at `scripts/opencode/release-inspect.template.py`. After retaining a private
+backup, restore that exact file to `.opencode/control/release-inspect.py`; do not
+replace agent definitions, tool adapters or credentials. Its source inspection
+admits the same seven tracked integration templates as publication preflight,
+with fixed read-only Git selection and unchanged path/hash/ZIP/retention checks.
+This supplies no build, runtime, owner approval or publication capability.
+
 Use a fresh session in the enrolled source project and invoke
 `/kodi-release-prepare`. Confirm the command selects `github-operator` as primary,
 loads the maintenance skill, discovers the canonical destination, and inspects
