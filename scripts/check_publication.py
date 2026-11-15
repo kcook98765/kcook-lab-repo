@@ -44,7 +44,12 @@ SECRET_PATTERNS = [
 def scan_bytes(name, data):
     for pattern in SECRET_PATTERNS:
         repo.require(re.search(pattern, data) is None, 'Credential pattern in '+name)
-    repo.require((b'/' + b'home/') not in data and (b'/' + b'Users/') not in data,
+    # Kodi's virtual home URI is not an absolute workstation path. Recognize
+    # only this exact URI token, retaining its suffix and every other byte for
+    # path checks. Credentials are always scanned in the untouched input above.
+    # Kodi 21.3 SpecialProtocol.cpp, pinned core a3a448d: root "home".
+    host_paths = re.sub(rb'(?<![A-Za-z0-9_+./:-])special://home/', b'kodi-virtual-home:', data)
+    repo.require((b'/' + b'home/') not in host_paths and (b'/' + b'Users/') not in host_paths,
                  'Private workstation path in '+name)
 
 def source_audit():
