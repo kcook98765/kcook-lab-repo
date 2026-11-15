@@ -1,0 +1,17 @@
+{
+  "actor": "kcook98765",
+  "evidence": [
+    "POLICY-DECISION.json sha256:fa0a5e73758fff3cc3d092683a34a82f103a2f66465b6f59afa58da8a27ac40f"
+  ],
+  "owner_message": "Approve Aura policy decision fa0a5e73758fff3cc3d092683a34a82f103a2f66465b6f59afa58da8a27ac40f",
+  "package_admission_authorized": false,
+  "policy_request_sha256": "fa0a5e73758fff3cc3d092683a34a82f103a2f66465b6f59afa58da8a27ac40f",
+  "publication_authorized": false,
+  "recorded_at": "2026-11-15T03:13:04Z",
+  "role": "owner",
+  "schema": 1,
+  "scope": "implementation_and_independent_qualification_only",
+  "status": "approved",
+  "third_party_permissions_granted": false,
+  "timestamp_scope": "Time this exact owner approval was recorded by the preparation operator, not an authenticated signature or inferred earlier action"
+}

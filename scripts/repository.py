@@ -3,6 +3,7 @@
 from __future__ import annotations
 import argparse
 import approval_contract
+import original_assets
 import copy
 import hashlib
 from html import escape
@@ -274,6 +275,18 @@ def skin_alpha_notice(approval):
             'reviewed_package_delta':{k:value['reviewed_package_delta'].get(k) for k in ('status','scope')},
         'outstanding_scenarios':[{k:s[k] for k in ('id','lane','kind','observation','description')} for s in value['scenarios']],
         'owner_coverage_decision':value['owner_coverage_decision']['status'], 'expires_at':value['expires_at']}
+    if approval.get('schema_version') == 5:
+        material = approval['original_assets_admission']
+        public.pop('cleaned_package_native_accepted')
+        public['distribution_package_native_accepted'] = False
+        public['material_rights'] = {
+            'rights_approved':False, 'rights_review':'pending',
+            'admission':'owner_directed_exact_package_exception',
+            'third_party_permission_established':False, 'legal_clearance_claimed':False,
+            'notice':'This owner policy changes repository admission only; it grants no third-party rights and overrides no license restrictions.',
+            'findings':[{k:r[k] for k in ('id','category','description')} for r in approval['unresolved_risks'] if r['category']=='rights'],
+            'expires_at':material['expires_at']}
+        public['accepted_technical_findings'] = {k:v for k,v in material['technical_findings'].items() if k != 'evidence'}
     return escape('Omega skin ALPHA; incomplete formal coverage.\n' + json.dumps(public, sort_keys=True, ensure_ascii=True))
 
 
@@ -322,8 +335,8 @@ def retained_installers(config, inputs, ledger):
 
 
 def verify_skin_evidence_files(record):
-    """V4 attestations bind retained evidence bytes, not just plausible references."""
-    if record.get('schema_version') != 4:
+    """Skin attestations bind retained evidence bytes, not plausible references."""
+    if record.get('schema_version') not in (4, 5):
         return
     def inspect(value):
         if isinstance(value, dict):
@@ -361,8 +374,9 @@ def production_packages(config, profile='production'):
                 record.get('rights_approved') is False and record.get('release_approved') is False and
                 all(record.get(k) == {'status':'pending'} for k in ('rights_review','technical_release','release_decision')) and
                 all(c['static_accepted'] is False and c['runtime_accepted'] is False for c in record['compatibility'].values()))
-            skin_pending = (record.get('schema_version') == 4 and
-                record.get('approval_policy') == approval_contract.SKIN_ALPHA_POLICY and
+            skin_pending = (((record.get('schema_version') == 4 and
+                record.get('approval_policy') == approval_contract.SKIN_ALPHA_POLICY) or
+                (record.get('schema_version') == 5 and record.get('approval_policy') == original_assets.POLICY)) and
                 record.get('release_approved') is False and record.get('release_decision') == {'status':'pending'} and
                 record.get('owner_acknowledgment') == {'status':'not_recorded'} and
                 record.get('skin_alpha_evidence', {}).get('owner_coverage_decision') == {'status':'pending'})
@@ -382,6 +396,9 @@ def production_packages(config, profile='production'):
                     all(isinstance(e, str) and e.strip() for e in acceptance['evidence']), 'Malformed lane evidence')
         manifest, files = inspect_zip(blob, record['runtime_files'])
         verify_skin_evidence_files(record)
+        if record.get('schema_version') == 5:
+            original_assets.destination(json.loads((ROOT/'config/repository.json').read_text())
+                                        if 'candidate_context' in config else config)
         approval = approval_contract.assess(record, item['lanes'],
             package_identity=(manifest.get('id'), manifest.get('version')), release_history=ledger['packages'],
             package_manifest=manifest)
@@ -397,7 +414,7 @@ def production_packages(config, profile='production'):
                 require(any((old['id'], old['version'], old['sha256']) ==
                             (manifest.get('id'), manifest.get('version'), sha(blob))
                             for old in ledger['packages']), 'Empty v3 lanes require retained release')
-        if record.get('schema_version') == 4 and not item['lanes']:
+        if record.get('schema_version') in (4, 5) and not item['lanes']:
             require(any((old['id'],old['version'],old['sha256']) ==
                         (manifest.get('id'),manifest.get('version'),sha(blob)) for old in ledger['packages']),
                     'Empty skin-alpha lanes require exact retained release')
@@ -565,7 +582,7 @@ def build(profile):
                       +'</pre></section>' for r in records
                       if r.get('approval', {}).get('schema_version') == 3)
     notices += ''.join('<section data-skin-alpha-package="'+r['id']+'-'+r['version']+'"><h2>'+r['id']+' '+r['version']+' ALPHA</h2><pre>'+skin_alpha_notice(r['approval'])+'</pre></section>'
-                       for r in records if r.get('approval', {}).get('schema_version') == 4)
+                       for r in records if r.get('approval', {}).get('schema_version') in (4, 5))
     if profile == 'fixture':
         page = ('<!doctype html><title>kcook-lab-repo: local draft</title>'
                 '<p>Not published. Fixture artifacts must never be deployed.</p><ul>'+links+'</ul>\n')
@@ -600,7 +617,7 @@ def build(profile):
                                                    ('preflight', 'check_publication.py')]},
                           'review_schema_sha256':sha((Path(__file__).parents[1]/'docs/REVIEW-RECORD-SCHEMA.json').read_bytes()),
                           'approval_contract_sha256':sha(Path(approval_contract.__file__).read_bytes()),
-                          **dependency_toolchain(profile)},
+                          **dependency_toolchain(profile), **original_assets.toolchain()},
             'release_assets':release_assets, 'site_files':site_files,
             'site_manifest_sha256':sha(json_bytes(site_files)),
             'proposed_actions':['create approved GitHub repository (not authorized)',
@@ -639,6 +656,8 @@ def verify(profile):
     require(plan['toolchain']['review_schema_sha256'] ==
             sha((Path(__file__).parents[1]/'docs/REVIEW-RECORD-SCHEMA.json').read_bytes()), 'Stale review schema')
     require(plan['toolchain']['approval_contract_sha256'] == sha(Path(approval_contract.__file__).read_bytes()), 'Stale approval contract')
+    for key,value in original_assets.toolchain().items():
+        require(plan['toolchain'].get(key) == value, 'Stale original-assets admission policy')
     for key,value in dependency_toolchain(profile).items():
         require(plan['toolchain'].get(key) == value, 'Stale official dependency adapter')
     reviewed = production_packages(config, profile) if profile != 'fixture' else []

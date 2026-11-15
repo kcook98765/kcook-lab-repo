@@ -231,7 +231,7 @@ def audit_pinned_evidence(value):
 
 
 def verify_skin_evidence_files(record):
-    if record.get('schema_version') != 4:
+    if record.get('schema_version') not in (4, 5):
         return
     pending = [record]
     while pending:
@@ -249,7 +249,84 @@ def verify_skin_evidence_files(record):
             pending.extend(value)
 
 
-def skin_alpha_gate(record, manifest, history, approval):
+def original_assets_gate(record, config):
+    """Independent exact-package rule; never delegates material rights to assess()."""
+    base = Path(__file__).resolve().parents[1]
+    policy_name = 'policies/aura-original-assets-2.1.0.json'
+    approval_name = 'policies/aura-original-assets-owner-approval.json'
+    policy_hash = 'fa0a5e73758fff3cc3d092683a34a82f103a2f66465b6f59afa58da8a27ac40f'
+    approval_hash = '326791dc0bf7884f3561d028cc9e394569c47b9d9df99e297358aca2981f613e'
+    assert digest((base/policy_name).read_bytes()) == policy_hash
+    assert digest((base/approval_name).read_bytes()) == approval_hash
+    policy = json.loads((base/policy_name).read_text()); receipt = json.loads((base/approval_name).read_text())
+    assert record['schema_version'] == 5 and record['approval_policy'] == 'aura-original-assets-alpha-v1'
+    assert record['source_commit'] == '88564fd2883d2d286bdf0e887dc0bee634fd8c4e'
+    assert record['package_sha256'] == '7309fc3f60429e4ba638d36046565ae48fa2b75f56f653df5200a960aa3ce9c0'
+    assert record['source_repository'] == 'https://github.com/kcook98765/skin.aura'
+    assert record['fixture_only'] is False and len(record['runtime_files']) == 1806
+    assert record['rights_approved'] is False and record['rights_review'] == {'status':'pending'}
+    assert [r for r in record['unresolved_risks'] if r['category']=='rights'] == policy['proposed_policy_change']['rights_risks_must_remain_unresolved']
+    actual = json.loads((ROOT/'config/repository.json').read_text()) if 'candidate_context' in config else config
+    assert (actual['github_repository'],actual.get('github_repository_id'),actual['base_url'],actual['addon_id']) == (
+        'kcook98765/kcook-lab-repo',1428864210,'https://kcook98765.github.io/kcook-lab-repo/','repository.ai.kodi')
+    value = record['original_assets_admission']
+    assert set(value) == {'scope','addon_id','addon_version','source_commit','package_sha256','lanes',
+                         'destination','expires_at','policy_request_sha256','owner_policy_decision','independent_review','technical_findings'}
+    assert value['scope'] == 'exact_original_assets_aura_alpha_admission_only'
+    assert (value['addon_id'],value['addon_version']) == ('skin.aura','2.1.0')
+    assert (value['source_commit'],value['package_sha256']) == (record['source_commit'],record['package_sha256'])
+    assert value['destination'] == policy['proposed_policy_change']['destination']
+    assert value['expires_at'] == '2026-12-15T02:11:01Z' and value['policy_request_sha256'] == policy_hash
+    assert value['lanes'] == ['omega'] and record['approval_lanes'] in (['omega'], [])
+    assert record['skin_alpha_evidence']['expires_at'] <= value['expires_at']
+    owner = value['owner_policy_decision']; review = value['independent_review']
+    assert owner['status'] == 'approved' and owner['actor'] == 'kcook98765' and owner['role'] == 'owner'
+    assert owner['recorded_at'] == receipt['recorded_at'] and owner['policy_request_sha256'] == policy_hash
+    assert {policy_name+' sha256:'+policy_hash,approval_name+' sha256:'+approval_hash} <= set(owner['evidence'])
+    assert receipt['owner_message'] == 'Approve Aura policy decision '+policy_hash
+    assert receipt['policy_request_sha256'] == policy_hash and receipt['status'] == 'approved'
+    assert receipt['actor'] == owner['actor'] and receipt['role'] == 'owner'
+    assert receipt['scope'] == 'implementation_and_independent_qualification_only'
+    assert all(receipt[k] is False for k in ('package_admission_authorized','publication_authorized','third_party_permissions_granted'))
+    assert record['skin_alpha_evidence']['owner_native_use']['actor'] == owner['actor']
+    assert review['status'] in ('pending','verified','rejected','revoked')
+    if review['status'] != 'pending':
+        assert review['actor'].strip().casefold() != owner['actor'].casefold() and review['role'] == 'independent_reviewer'
+        assert review['scope'] == 'retained_material_findings_and_policy_implementation_only' and review['recorded_at'] >= owner['recorded_at']
+        assert len(review['risk_ids']) == 5 and set(review['risk_ids']) == {r['id'] for r in record['unresolved_risks'] if r['category']=='rights'}
+        assert review['rights_verified'] is False and review['permissions_granted'] is False
+        assert review['implementation_verified'] is True and review['findings_retained'] is True
+        assert audit_pinned_evidence(review['evidence'])
+    if record['release_approved']:
+        assert review['status'] == 'verified'
+    technical = value['technical_findings']
+    assert set(technical) == {'id','status','official_checker_status','official_checker_errors','official_checker_warnings',
+                             'toolkit_overall_passed','original_dimensions','paths','evidence'}
+    assert technical['id'] == 'STATIC-SCREENSHOTS' and technical['status'] == 'accepted_unofficial_distribution_limitation'
+    assert technical['official_checker_status'] == 'failed' and technical['toolkit_overall_passed'] is False
+    assert type(technical['official_checker_errors']) is int and technical['official_checker_errors'] == 5
+    assert type(technical['official_checker_warnings']) is int and technical['official_checker_warnings'] == 3
+    assert technical['original_dimensions'] == '1366x768'
+    assert technical['paths'] == ['resources/screenshot-%02d.jpg' % i for i in range(1,6)]
+    assert {'evidence/aura-restored/omega-validation.json sha256:2b13b6d7821e0bb17260b319e38540895722d8f5491ced4f8cd9414ae37b5f88',
+            'evidence/aura-restored/INDEPENDENT-DISPOSITION.md sha256:46f0dd424e020790eeb9fe9b20dcf729541b411d37c80cd4e43c1850028e4d3a'} <= set(technical['evidence'])
+    now = datetime.now(timezone.utc)
+    expiry = datetime.strptime(value['expires_at'],'%Y-%m-%dT%H:%M:%SZ').replace(tzinfo=timezone.utc)
+    assert now < expiry
+    for action in (owner,review):
+        if action['status'] == 'pending':
+            continue
+        assert audit_pinned_evidence(action['evidence'])
+        stamp = datetime.strptime(action['recorded_at'],'%Y-%m-%dT%H:%M:%SZ').replace(tzinfo=timezone.utc)
+        assert stamp <= now and stamp < expiry
+    if record['release_approved']:
+        final = record['release_decision']
+        assert final['original_assets_admission_sha256'] == digest(json.dumps(value,sort_keys=True,separators=(',',':'),ensure_ascii=True).encode())
+        assert all(action['recorded_at'] <= final['recorded_at'] for action in (owner,review))
+    return [owner,review]
+
+
+def skin_alpha_gate(record, manifest, history, approval, material_actions=None):
     """Independent production conjunction; no native test is synthesized."""
     assert record['approval_lanes'] in (['omega'], [])
     if not record['approval_lanes']:
@@ -258,7 +335,9 @@ def skin_alpha_gate(record, manifest, history, approval):
     assert manifest.get('id').startswith('skin.') and len(manifest.findall("extension[@point='xbmc.gui.skin']")) == 1
     assert all(e.get('point') in ('xbmc.gui.skin','xbmc.addon.metadata') for e in manifest.findall('extension'))
     assert manifest.find("requires/import[@addon='xbmc.gui']").get('version') == '5.17.0'
-    assert record['rights_approved'] and record['rights_review']['status'] == 'verified'
+    if material_actions is None:
+        assert record['rights_approved'] and record['rights_review']['status'] == 'verified'
+    rights_actions = [record['rights_review']] if material_actions is None else material_actions
     assert record['technical_release']['status'] == 'approved'
     value = record['skin_alpha_evidence']; native = value['owner_native_use']
     assert value['lanes'] == ['omega'] and value['scope'] == 'initial_release_skin_alpha_coverage_only'
@@ -281,13 +360,14 @@ def skin_alpha_gate(record, manifest, history, approval):
         assert action['no_known_security_defects'] is True and action['no_known_functionality_failures'] is True
         assert action['actor'].strip().casefold() != owner['actor'].strip().casefold()
     assert all(action['actor'].strip().casefold() != native['actor'].strip().casefold()
-               for action in (record['rights_review'],record['technical_release']))
+               for action in ([record['rights_review'],record['technical_release']] if material_actions is None else [record['technical_release']]))
     assert independent['owner_report_scope_verified'] is True and owner['acknowledges_package_delta'] is True
     assert native['actor'].strip().casefold() == owner['actor'].strip().casefold()
     assert owner['role'] == 'owner'
     assert owner['accepts_unverified_installed_identity'] is (native['identity_disposition']=='unverified')
-    scenarios = value['scenarios']; ids = {v['id'] for v in scenarios}; risk_ids = {r['id'] for r in record['unresolved_risks']}
-    assert scenarios and all(r['category'] == 'runtime' for r in record['unresolved_risks'])
+    scenarios = value['scenarios']; ids = {v['id'] for v in scenarios}
+    risk_ids = {r['id'] for r in record['unresolved_risks'] if r['category']=='runtime'}
+    assert scenarios and all(r['category'] == 'runtime' or (material_actions is not None and r['category']=='rights') for r in record['unresolved_risks'])
     assert all((v['kind'],v['observation']) in (
         ('unobserved_functionality','not_observed'), ('environment_limitation','unavailable'),
         ('cosmetic_layout_limitation','owner_reported_minor_layout')) for v in scenarios)
@@ -311,7 +391,7 @@ def skin_alpha_gate(record, manifest, history, approval):
     for action in (owner, independent):
         assert set(action['scenario_ids']) == ids and set(action['risk_ids']) == risk_ids
     ack = record['owner_acknowledgment']
-    assert ack['status'] == 'acknowledged' and set(ack['risk_ids']) == risk_ids
+    assert ack['status'] == 'acknowledged' and set(ack['risk_ids']) == {r['id'] for r in record['unresolved_risks']}
     assert ack['actor'].strip().casefold() == owner['actor'].strip().casefold()
     accepted = record['compatibility']['omega']
     assert accepted['static_accepted'] is True and accepted['runtime_accepted'] is False
@@ -323,12 +403,12 @@ def skin_alpha_gate(record, manifest, history, approval):
     assert now < expiry
     use_time = datetime.strptime(native['recorded_at'],'%Y-%m-%dT%H:%M:%SZ').replace(tzinfo=timezone.utc)
     assert 0 < (expiry-use_time).total_seconds() <= 90*86400
-    for action in (native, delta, owner, independent, ack, accepted['runtime_test'], record['rights_review'],record['technical_release'],record['release_decision']):
+    for action in [native, delta, owner, independent, ack, accepted['runtime_test'], record['technical_release'],record['release_decision'],*rights_actions]:
         assert datetime.strptime(action['recorded_at'],'%Y-%m-%dT%H:%M:%SZ').replace(tzinfo=timezone.utc) <= now
     final = record['release_decision']
     assert final['role'] == 'owner' and final['actor'].strip().casefold() == owner['actor'].strip().casefold()
     assert all(action['recorded_at'] <= final['recorded_at'] and action['recorded_at'] < value['expires_at']
-               for action in (native,delta,owner,independent,ack,accepted['runtime_test'],record['rights_review'],record['technical_release']))
+               for action in [native,delta,owner,independent,ack,accepted['runtime_test'],record['technical_release'],*rights_actions])
     assert owner['recorded_at'] >= native['recorded_at'] and independent['recorded_at'] >= native['recorded_at']
     assert final['skin_alpha_evidence_sha256'] == digest(json.dumps(value,sort_keys=True,separators=(',',':'),ensure_ascii=True).encode())
     assert approval['skin_alpha_policy_active'] is True and approval['package_distribution_eligible'] is True
@@ -357,7 +437,8 @@ def reviewed_inputs(config, profile):
                 record['rights_approved'] is False and record['release_approved'] is False and
                 all(record.get(k) == {'status':'pending'} for k in ('rights_review','technical_release','release_decision')) and
                 all(v['static_accepted'] is False and v['runtime_accepted'] is False for v in record['compatibility'].values()))
-            skin_pending = (record.get('schema_version') == 4 and record.get('approval_policy') == 'initial-release-skin-alpha-v1' and
+            skin_pending = (((record.get('schema_version') == 4 and record.get('approval_policy') == 'initial-release-skin-alpha-v1') or
+                (record.get('schema_version') == 5 and record.get('approval_policy') == 'aura-original-assets-alpha-v1')) and
                 record['release_approved'] is False and record['release_decision'] == {'status':'pending'} and
                 record['owner_acknowledgment'] == {'status':'not_recorded'} and
                 record.get('skin_alpha_evidence', {}).get('owner_coverage_decision') == {'status':'pending'})
@@ -377,23 +458,36 @@ def reviewed_inputs(config, profile):
         assert {n:digest(b) for n,b in files.items()} == record['runtime_files']
         history = json.loads(configuration(profile)[2].read_text())['packages']
         verify_skin_evidence_files(record)
+        assert record.get('schema_version') == 5 or 'original_assets_admission' not in record
+        if record.get('schema_version') == 5:
+            assert (manifest.get('id'),manifest.get('version')) == ('skin.aura','2.1.0')
+        material_actions = original_assets_gate(record, config) if record.get('schema_version') == 5 else None
         approval = approval_contract.assess(record, item['lanes'],
             package_identity=(manifest.get('id'), manifest.get('version')), release_history=history, package_manifest=manifest)
         approval['review_record_sha256'] = digest(raw)
         approval['package_sha256'] = digest(blob)
+        if record.get('schema_version') == 5:
+            material = record['original_assets_admission']
+            assert approval['rights_approved'] is False and approval['rights_status'] == 'pending'
+            assert approval['third_party_permission_established'] is False
+            assert approval['original_assets_admission'] == material
+            assert approval['original_assets_admission_sha256'] == digest(json.dumps(
+                material,sort_keys=True,separators=(',',':'),ensure_ascii=True).encode())
+            assert approval['original_assets_policy_active'] is (material['independent_review']['status'] == 'verified')
         # Independently enforce every strict production gate, even if a plan lies.
         if profile == 'production':
             initial_policy = record.get('schema_version') == 3 and record.get('approval_policy') == 'unofficial-integration-initial-release-v1'
-            skin_policy = record.get('schema_version') == 4 and record.get('approval_policy') == 'initial-release-skin-alpha-v1'
+            skin_policy = ((record.get('schema_version') == 4 and record.get('approval_policy') == 'initial-release-skin-alpha-v1') or
+                (record.get('schema_version') == 5 and record.get('approval_policy') == 'aura-original-assets-alpha-v1'))
             assert initial_policy or 'runtime_acceptance_exception' not in record
             assert record['release_approved']
             assert not approval['release_blockers'], 'Outstanding approval gates'
             for lane in item['lanes']:
                 accepted = record['compatibility'][lane]
                 assert accepted['static_accepted'] and (accepted['runtime_accepted'] or initial_policy or skin_policy) and accepted['evidence']
-            if record.get('schema_version', 1) != 3:
+            if record.get('schema_version', 1) not in (3, 5):
                 assert record['rights_approved']
-            if record.get('schema_version', 1) in (2, 3, 4):
+            if record.get('schema_version', 1) in (2, 3, 4, 5):
                 assert record['technical_release']['status'] == 'approved'
                 assert record['release_decision']['status'] == 'approved'
             if record.get('schema_version', 1) == 2:
@@ -401,7 +495,7 @@ def reviewed_inputs(config, profile):
                 assert not record['unresolved_risks']
                 assert all(record['compatibility'][lane]['runtime_test']['status'] == 'passed' for lane in item['lanes'])
             if skin_policy:
-                skin_alpha_gate(record, manifest, history, approval)
+                skin_alpha_gate(record, manifest, history, approval, material_actions=material_actions)
             if record.get('schema_version') == 3:
                 assert record['approval_policy'] in ('unofficial-integration-v1', 'unofficial-integration-initial-release-v1')
                 assert set(record['approval_lanes']) == set(item['lanes'])
@@ -561,6 +655,10 @@ def audit(profile='fixture'):
     if profile != 'fixture' and json.loads((ROOT/f'config/{profile}.json').read_text())['external_dependencies']:
         for name in ('official_omega', 'audit_official_omega'):
             assert plan['toolchain'].get(name+'_sha256') == digest((Path(__file__).parent/(name+'.py')).read_bytes())
+    for key,filename in [('original_assets_module_sha256','scripts/original_assets.py'),
+                         ('original_assets_policy_sha256','policies/aura-original-assets-2.1.0.json'),
+                         ('original_assets_owner_approval_sha256','policies/aura-original-assets-owner-approval.json')]:
+        assert plan['toolchain'][key] == digest((Path(__file__).resolve().parents[1]/filename).read_bytes())
     expected = reviewed_inputs(config, profile)
     installer_version = config['fixture_version'] if profile == 'fixture' else config['version']
     installer_source = ROOT/'packages'/config['addon_id']
@@ -679,7 +777,7 @@ def audit(profile='fixture'):
                            +'</pre></section>')
     for key,item in expected.items():
         record = item.get('provenance', {})
-        if record.get('schema_version') != 4:
+        if record.get('schema_version') not in (4, 5):
             continue
         value = record['skin_alpha_evidence']; native = value['owner_native_use']
         public = {'alpha':True, 'native_evidence':'owner_reported_general_use',
@@ -690,6 +788,18 @@ def audit(profile='fixture'):
             'reviewed_package_delta':{k:value['reviewed_package_delta'].get(k) for k in ('status','scope')},
             'outstanding_scenarios':[{k:s[k] for k in ('id','lane','kind','observation','description')} for s in value['scenarios']],
             'owner_coverage_decision':value['owner_coverage_decision']['status'], 'expires_at':value['expires_at']}
+        if record['schema_version'] == 5:
+            material = record['original_assets_admission']
+            public.pop('cleaned_package_native_accepted')
+            public['distribution_package_native_accepted'] = False
+            public['material_rights'] = {
+                'rights_approved':False, 'rights_review':'pending',
+                'admission':'owner_directed_exact_package_exception',
+                'third_party_permission_established':False, 'legal_clearance_claimed':False,
+                'notice':'This owner policy changes repository admission only; it grants no third-party rights and overrides no license restrictions.',
+                'findings':[{k:r[k] for k in ('id','category','description')} for r in record['unresolved_risks'] if r['category']=='rights'],
+                'expires_at':material['expires_at']}
+            public['accepted_technical_findings'] = {k:v for k,v in material['technical_findings'].items() if k != 'evidence'}
         text = escape('Omega skin ALPHA; incomplete formal coverage.\n' + json.dumps(public,sort_keys=True,ensure_ascii=True))
         notices.append('<section data-skin-alpha-package="'+key[0]+'-'+key[1]+'"><h2>'+key[0]+' '+key[1]+' ALPHA</h2><pre>'+text+'</pre></section>')
     if profile == 'fixture':

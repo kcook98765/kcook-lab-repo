@@ -21,7 +21,8 @@
         1,
         2,
         3,
-        4
+        4,
+        5
       ]
     },
     "package_sha256": {
@@ -84,7 +85,8 @@
         "strict-v1",
         "unofficial-integration-v1",
         "unofficial-integration-initial-release-v1",
-        "initial-release-skin-alpha-v1"
+        "initial-release-skin-alpha-v1",
+        "aura-original-assets-alpha-v1"
       ]
     },
     "approval_lanes": {
@@ -276,6 +278,10 @@
             "skin_alpha_evidence_sha256": {
               "type": "string",
               "pattern": "^[0-9a-f]{64}$"
+            },
+            "original_assets_admission_sha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
             }
           },
           "required": [
@@ -447,6 +453,209 @@
     },
     "skin_alpha_evidence": {
       "$ref": "#/$defs/skinAlphaEvidence"
+    },
+    "original_assets_admission": {
+      "type": "object",
+      "properties": {
+        "scope": {
+          "const": "exact_original_assets_aura_alpha_admission_only"
+        },
+        "addon_id": {
+          "const": "skin.aura"
+        },
+        "addon_version": {
+          "const": "2.1.0"
+        },
+        "source_commit": {
+          "const": "88564fd2883d2d286bdf0e887dc0bee634fd8c4e"
+        },
+        "package_sha256": {
+          "const": "7309fc3f60429e4ba638d36046565ae48fa2b75f56f653df5200a960aa3ce9c0"
+        },
+        "lanes": {
+          "const": [
+            "omega"
+          ]
+        },
+        "destination": {
+          "const": {
+            "github_repository": "kcook98765/kcook-lab-repo",
+            "github_repository_id": 1428864210,
+            "pages_url": "https://kcook98765.github.io/kcook-lab-repo/",
+            "repository_addon_id": "repository.ai.kodi"
+          }
+        },
+        "expires_at": {
+          "const": "2026-12-15T02:11:01Z"
+        },
+        "policy_request_sha256": {
+          "const": "fa0a5e73758fff3cc3d092683a34a82f103a2f66465b6f59afa58da8a27ac40f"
+        },
+        "owner_policy_decision": {
+          "type": "object",
+          "properties": {
+            "status": {
+              "const": "approved"
+            },
+            "actor": {
+              "const": "kcook98765"
+            },
+            "role": {
+              "const": "owner"
+            },
+            "recorded_at": {
+              "type": "string",
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z$"
+            },
+            "rationale": {
+              "type": "string",
+              "pattern": "\\S"
+            },
+            "evidence": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "string",
+                "pattern": "\\S"
+              }
+            },
+            "policy_request_sha256": {
+              "const": "fa0a5e73758fff3cc3d092683a34a82f103a2f66465b6f59afa58da8a27ac40f"
+            }
+          },
+          "required": [
+            "status",
+            "actor",
+            "role",
+            "recorded_at",
+            "rationale",
+            "evidence",
+            "policy_request_sha256"
+          ],
+          "additionalProperties": false
+        },
+        "independent_review": {
+          "oneOf": [
+            {
+              "type": "object",
+              "properties": {
+                "status": {
+                  "const": "pending"
+                }
+              },
+              "required": [
+                "status"
+              ],
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "status": {
+                  "enum": [
+                    "verified",
+                    "rejected",
+                    "revoked"
+                  ]
+                },
+                "actor": {
+                  "type": "string",
+                  "pattern": "\\S"
+                },
+                "role": {
+                  "const": "independent_reviewer"
+                },
+                "recorded_at": {
+                  "type": "string",
+                  "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z$"
+                },
+                "rationale": {
+                  "type": "string",
+                  "pattern": "\\S"
+                },
+                "evidence": {
+                  "type": "array",
+                  "minItems": 1,
+                  "items": {
+                    "type": "string",
+                    "pattern": "\\S"
+                  }
+                },
+                "scope": {
+                  "const": "retained_material_findings_and_policy_implementation_only"
+                },
+                "risk_ids": {
+                  "$ref": "#/$defs/riskIds"
+                },
+                "rights_verified": {
+                  "const": false
+                },
+                "permissions_granted": {
+                  "const": false
+                },
+                "implementation_verified": {
+                  "const": true
+                },
+                "findings_retained": {
+                  "const": true
+                }
+              },
+              "required": [
+                "status",
+                "actor",
+                "role",
+                "recorded_at",
+                "rationale",
+                "evidence",
+                "scope",
+                "risk_ids",
+                "rights_verified",
+                "permissions_granted",
+                "implementation_verified",
+                "findings_retained"
+              ],
+              "additionalProperties": false
+            }
+          ]
+        },
+        "technical_findings": {
+          "const": {
+            "id": "STATIC-SCREENSHOTS",
+            "status": "accepted_unofficial_distribution_limitation",
+            "official_checker_status": "failed",
+            "official_checker_errors": 5,
+            "official_checker_warnings": 3,
+            "toolkit_overall_passed": false,
+            "original_dimensions": "1366x768",
+            "paths": [
+              "resources/screenshot-01.jpg",
+              "resources/screenshot-02.jpg",
+              "resources/screenshot-03.jpg",
+              "resources/screenshot-04.jpg",
+              "resources/screenshot-05.jpg"
+            ],
+            "evidence": [
+              "evidence/aura-restored/omega-validation.json sha256:2b13b6d7821e0bb17260b319e38540895722d8f5491ced4f8cd9414ae37b5f88",
+              "evidence/aura-restored/INDEPENDENT-DISPOSITION.md sha256:46f0dd424e020790eeb9fe9b20dcf729541b411d37c80cd4e43c1850028e4d3a"
+            ]
+          }
+        }
+      },
+      "required": [
+        "scope",
+        "addon_id",
+        "addon_version",
+        "source_commit",
+        "package_sha256",
+        "lanes",
+        "destination",
+        "expires_at",
+        "policy_request_sha256",
+        "owner_policy_decision",
+        "independent_review",
+        "technical_findings"
+      ],
+      "additionalProperties": false
     }
   },
   "allOf": [
@@ -460,7 +669,8 @@
             "enum": [
               2,
               3,
-              4
+              4,
+              5
             ]
           }
         }
@@ -758,7 +968,8 @@
           "approval_policy": {
             "enum": [
               "strict-v1",
-              "initial-release-skin-alpha-v1"
+              "initial-release-skin-alpha-v1",
+              "aura-original-assets-alpha-v1"
             ]
           },
           "unresolved_risks": {
@@ -843,7 +1054,10 @@
         ],
         "properties": {
           "schema_version": {
-            "const": 4
+            "enum": [
+              4,
+              5
+            ]
           }
         }
       },
@@ -853,7 +1067,10 @@
         ],
         "properties": {
           "approval_policy": {
-            "const": "initial-release-skin-alpha-v1"
+            "enum": [
+              "initial-release-skin-alpha-v1",
+              "aura-original-assets-alpha-v1"
+            ]
           },
           "approval_lanes": {
             "oneOf": [
@@ -947,6 +1164,186 @@
         "properties": {
           "approval_policy": {
             "const": "strict-v1"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "required": [
+          "schema_version"
+        ],
+        "properties": {
+          "schema_version": {
+            "const": 5
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "original_assets_admission",
+          "skin_alpha_evidence"
+        ],
+        "properties": {
+          "approval_policy": {
+            "const": "aura-original-assets-alpha-v1"
+          },
+          "rights_approved": {
+            "const": false
+          },
+          "rights_review": {
+            "type": "object",
+            "properties": {
+              "status": {
+                "const": "pending"
+              }
+            },
+            "required": [
+              "status"
+            ],
+            "additionalProperties": false
+          },
+          "source_repository": {
+            "const": "https://github.com/kcook98765/skin.aura"
+          },
+          "source_commit": {
+            "const": "88564fd2883d2d286bdf0e887dc0bee634fd8c4e"
+          },
+          "package_sha256": {
+            "const": "7309fc3f60429e4ba638d36046565ae48fa2b75f56f653df5200a960aa3ce9c0"
+          },
+          "runtime_files": {
+            "minProperties": 1806,
+            "maxProperties": 1806
+          },
+          "unresolved_risks": {
+            "allOf": [
+              {
+                "contains": {
+                  "const": {
+                    "category": "rights",
+                    "description": "Original SF Distant Galaxy supplied terms prohibit product inclusion; no applicable skin-bundling permission established.",
+                    "evidence": [
+                      "evidence/aura-restored/INDEPENDENT-REVIEW.md sha256:4d97e238bce7fed46f0b245201623b0355d245cb835a5bcb995b0f7b0ca93674",
+                      "evidence/aura-restored/omega-validation.json sha256:2b13b6d7821e0bb17260b319e38540895722d8f5491ced4f8cd9414ae37b5f88"
+                    ],
+                    "id": "RIGHTS-SF"
+                  }
+                },
+                "minContains": 1,
+                "maxContains": 1
+              },
+              {
+                "contains": {
+                  "const": {
+                    "category": "rights",
+                    "description": "Original Nasalization EULA does not establish public skin redistribution; sharing scope/permanent-transfer restrictions retained.",
+                    "evidence": [
+                      "evidence/aura-restored/INDEPENDENT-REVIEW.md sha256:4d97e238bce7fed46f0b245201623b0355d245cb835a5bcb995b0f7b0ca93674",
+                      "evidence/aura-restored/omega-validation.json sha256:2b13b6d7821e0bb17260b319e38540895722d8f5491ced4f8cd9414ae37b5f88"
+                    ],
+                    "id": "RIGHTS-NASAL"
+                  }
+                },
+                "minContains": 1,
+                "maxContains": 1
+              },
+              {
+                "contains": {
+                  "const": {
+                    "category": "rights",
+                    "description": "Original Geomancy/BOXING/Theboldfont distribution conditions and exact scope/provenance remain unresolved, without asserting categorical bans for all.",
+                    "evidence": [
+                      "evidence/aura-restored/INDEPENDENT-REVIEW.md sha256:4d97e238bce7fed46f0b245201623b0355d245cb835a5bcb995b0f7b0ca93674",
+                      "evidence/aura-restored/omega-validation.json sha256:2b13b6d7821e0bb17260b319e38540895722d8f5491ced4f8cd9414ae37b5f88"
+                    ],
+                    "id": "RIGHTS-OTHER-FONTS"
+                  }
+                },
+                "minContains": 1,
+                "maxContains": 1
+              },
+              {
+                "contains": {
+                  "const": {
+                    "category": "rights",
+                    "description": "All original Knavs flags retain opensource/non-profitable condition; applicable public skin-bundling scope is unverified.",
+                    "evidence": [
+                      "evidence/aura-restored/INDEPENDENT-REVIEW.md sha256:4d97e238bce7fed46f0b245201623b0355d245cb835a5bcb995b0f7b0ca93674",
+                      "evidence/aura-restored/omega-validation.json sha256:2b13b6d7821e0bb17260b319e38540895722d8f5491ced4f8cd9414ae37b5f88"
+                    ],
+                    "id": "RIGHTS-FLAGS"
+                  }
+                },
+                "minContains": 1,
+                "maxContains": 1
+              },
+              {
+                "contains": {
+                  "const": {
+                    "category": "rights",
+                    "description": "Original photographic defaults, commercial-art screenshots and previews retain previously unresolved public redistribution permission gaps.",
+                    "evidence": [
+                      "evidence/aura-restored/INDEPENDENT-REVIEW.md sha256:4d97e238bce7fed46f0b245201623b0355d245cb835a5bcb995b0f7b0ca93674",
+                      "evidence/aura-restored/omega-validation.json sha256:2b13b6d7821e0bb17260b319e38540895722d8f5491ced4f8cd9414ae37b5f88"
+                    ],
+                    "id": "RIGHTS-ART"
+                  }
+                },
+                "minContains": 1,
+                "maxContains": 1
+              }
+            ]
+          },
+          "release_decision": {
+            "if": {
+              "properties": {
+                "status": {
+                  "const": "approved"
+                }
+              }
+            },
+            "then": {
+              "required": [
+                "original_assets_admission_sha256",
+                "skin_alpha_evidence_sha256"
+              ]
+            }
+          }
+        }
+      },
+      "else": {
+        "not": {
+          "required": [
+            "original_assets_admission"
+          ]
+        },
+        "properties": {
+          "release_decision": {
+            "not": {
+              "required": [
+                "original_assets_admission_sha256"
+              ]
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "schema_version": {
+            "const": 4
+          }
+        },
+        "required": [
+          "schema_version"
+        ]
+      },
+      "then": {
+        "properties": {
+          "approval_policy": {
+            "const": "initial-release-skin-alpha-v1"
           }
         }
       }

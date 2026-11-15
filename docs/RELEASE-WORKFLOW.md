@@ -214,3 +214,11 @@ is not authorized. After exact package decisions, prepare the complete productio
 site, preserve all old artifacts, obtain independent frozen-site review and
 request a separate publication decision binding its complete digest. See
 APPROVAL-CONTRACT.md and the interchange schema; no owner action is inferred.
+
+
+For the owner-approved original-assets Aura candidate only, schema 5 supplies the
+[exact-package admission policy](AURA-ORIGINAL-ASSETS-POLICY.md). It retains
+false/pending rights and all original adverse findings. Its implementation
+approval is not package admission or publication. Keep the real checker failures
+and scoped owner-reported native use. No native action is required or authorized.
+All other policies and immutable release/installer retention remain unchanged.

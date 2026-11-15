@@ -8,6 +8,7 @@ from pathlib import PurePosixPath
 import hashlib
 import json
 import re
+import original_assets
 
 POLICY = 'strict-v1'
 UNOFFICIAL_POLICY = 'unofficial-integration-v1'
@@ -314,7 +315,8 @@ def unofficial(record, risks, ack, blockers, package_identity, accepted_runtime_
             'publication_authorized': False}
 
 
-def skin_alpha(record, lanes, risks, ack, identity, history, manifest, blockers):
+def skin_alpha(record, lanes, risks, ack, identity, history, manifest, blockers,
+               material_policy=None):
     """Owner-reported use plus independently reviewed distribution delta.
 
     This never converts general use to native acceptance of the cleaned ZIP or
@@ -440,7 +442,10 @@ def skin_alpha(record, lanes, risks, ack, identity, history, manifest, blockers)
     except ValueError:
         raise ValueError('Approval contract: invalid skin-alpha expiry') from None
     now = utc_now(); current = True
-    for action in (use, delta, owner, review, ack, test, record['rights_review'], record['technical_release']):
+    material_active, material_actions = (False, []) if material_policy is None else material_policy
+    rights_actions = [record['rights_review']] if material_policy is None else material_actions
+    all_actions = [use, delta, owner, review, ack, test, record['technical_release'], *rights_actions]
+    for action in all_actions:
         if action['status'] in ('pending', 'not_recorded'):
             current = False
             continue
@@ -459,11 +464,13 @@ def skin_alpha(record, lanes, risks, ack, identity, history, manifest, blockers)
     for action in (owner, review):
         if action['status'] != 'pending':
             require(action['recorded_at'] >= use['recorded_at'], 'skin-alpha decision precedes owner-use report')
-    active = (record['rights_approved'] is True and record['technical_release']['status'] == 'approved' and
+    active = ((record['rights_approved'] is True or material_active) and record['technical_release']['status'] == 'approved' and
               delta['status'] == 'verified' and owner['status'] == 'accepted' and review['status'] == 'verified' and
               acknowledged and initial and current and now < expiry)
     if not active:
-        blockers.append('Skin-alpha coverage missing rights, delta, owner acceptance, independent review, acknowledgment, initial history or current expiry')
+        blockers.append('Skin-alpha coverage missing rights, delta, owner acceptance, independent review, acknowledgment, initial history or current expiry'
+                        if material_policy is None else
+                        'Skin-alpha coverage missing reviewed material policy, delta, owner acceptance, independent review, acknowledgment, initial history or current expiry')
     if record['release_approved']:
         final = record['release_decision']
         require(final['role'] == 'owner' and final['actor'].strip().casefold() == use['actor'].strip().casefold() and
@@ -471,7 +478,7 @@ def skin_alpha(record, lanes, risks, ack, identity, history, manifest, blockers)
                 'final owner package approval must bind exact skin-alpha evidence')
         final_time = datetime.strptime(final['recorded_at'], '%Y-%m-%dT%H:%M:%SZ').replace(tzinfo=timezone.utc)
         require(all(x['status'] not in ('pending', 'not_recorded') and x['recorded_at'] <= final['recorded_at']
-                    for x in (use, delta, owner, review, ack, test, record['rights_review'], record['technical_release'])) and
+                    for x in all_actions) and
                 final_time <= now, 'final skin-alpha owner approval precedes evidence/decisions or is future-dated')
     return active, risk_ids
 
@@ -484,16 +491,19 @@ def assess(record, lanes, package_identity=None, release_history=None, package_m
     This does not authenticate actors or establish the substance of evidence.
     """
     version = record.get('schema_version', 1)
-    require(type(version) is int and version in (1, 2, 3, 4), 'unsupported schema_version')
+    require(type(version) is int and version in (1, 2, 3, 4, 5), 'unsupported schema_version')
     require(version == 3 or 'unofficial_integration' not in record, 'v3 fields require schema_version=3')
     initial_policy = version == 3 and record.get('approval_policy') == INITIAL_POLICY
-    skin_policy = version == 4 and record.get('approval_policy') == SKIN_ALPHA_POLICY
+    material_policy = version == 5 and record.get('approval_policy') == original_assets.POLICY
+    skin_policy = (version == 4 and record.get('approval_policy') == SKIN_ALPHA_POLICY) or material_policy
+    require(material_policy or 'original_assets_admission' not in record,
+            'original-assets evidence requires explicit schema-5 policy')
     if skin_policy and not lanes:
         require(isinstance(release_history, list) and package_identity is not None and
                 any((old.get('id'),old.get('version'),old.get('sha256')) ==
                     (package_identity[0],package_identity[1],record['package_sha256']) for old in release_history),
                 'Empty skin-alpha lanes require exact retained history')
-    require(skin_policy or 'skin_alpha_evidence' not in record, 'skin-alpha evidence requires explicit schema-4 policy')
+    require(skin_policy or 'skin_alpha_evidence' not in record, 'skin-alpha evidence requires explicit skin policy')
     require(initial_policy or 'runtime_acceptance_exception' not in record,
             'runtime exception requires explicit initial-release policy')
     scope = {key: record[key] for key in ('package_sha256', 'source_repository', 'source_commit',
@@ -504,8 +514,8 @@ def assess(record, lanes, package_identity=None, release_history=None, package_m
     runtime = {}
     # No active lanes is retained history only. Preserve acceptance over the
     # recorded compatibility scope; both consumers separately require the ledger.
-    acceptance_lanes = lanes or (list(record['compatibility']) if version in (3, 4) else [])
-    if version in (3, 4) and not acceptance_lanes:
+    acceptance_lanes = lanes or (list(record['compatibility']) if version in (3, 4, 5) else [])
+    if version in (3, 4, 5) and not acceptance_lanes:
         blockers.append('Original runtime acceptance scope missing')
     for lane in acceptance_lanes:
         item = record['compatibility'][lane]
@@ -528,7 +538,8 @@ def assess(record, lanes, package_identity=None, release_history=None, package_m
     require(V2_FIELDS <= set(record), 'v2 fields missing')
     policy = record['approval_policy']
     require(policy in ((UNOFFICIAL_POLICY, INITIAL_POLICY) if version == 3 else
-                       (SKIN_ALPHA_POLICY,) if version == 4 else (POLICY,)), 'unsupported approval_policy')
+                       (SKIN_ALPHA_POLICY,) if version == 4 else
+                       (original_assets.POLICY,) if version == 5 else (POLICY,)), 'unsupported approval_policy')
     require(isinstance(record['approval_lanes'], list) and
             all(isinstance(lane, str) for lane in record['approval_lanes']) and
             len(record['approval_lanes']) == len(set(record['approval_lanes'])) and
@@ -536,7 +547,8 @@ def assess(record, lanes, package_identity=None, release_history=None, package_m
     for key, statuses in [('rights_review', ('verified', 'pending', 'rejected', 'revoked')),
                           ('technical_release', ('approved', 'pending', 'rejected', 'revoked')),
                           ('release_decision', ('approved', 'pending', 'rejected', 'revoked'))]:
-        extras = (('runtime_exception_sha256',) if initial_policy else
+        extras = (('original_assets_admission_sha256', 'skin_alpha_evidence_sha256') if material_policy else
+                  ('runtime_exception_sha256',) if initial_policy else
                   ('skin_alpha_evidence_sha256',) if skin_policy else ()) if key == 'release_decision' else ()
         decision(record[key], statuses, extra=extras)
     require(record['rights_approved'] is (record['rights_review']['status'] == 'verified'),
@@ -556,8 +568,8 @@ def assess(record, lanes, package_identity=None, release_history=None, package_m
                 and risk['category'] in (('rights', 'runtime', 'technical', 'other', 'provider_terms')
                                          if version == 3 else ('rights', 'runtime', 'technical', 'other'))
                 and references(risk['evidence']), 'risk evidence missing')
-        if version in (3, 4):
-            require(pinned_references(risk['evidence']), 'v3/v4 risk evidence must be hash-pinned')
+        if version in (3, 4, 5):
+            require(pinned_references(risk['evidence']), 'v3/v4/v5 risk evidence must be hash-pinned')
         ids.append(risk['id'])
         if version != 3 or risk['category'] != 'provider_terms':
             blockers.append('Unresolved risk: ' + risk['id'])
@@ -620,8 +632,18 @@ def assess(record, lanes, package_identity=None, release_history=None, package_m
                            runtime_exception_active=runtime_active,
                            runtime_admission='owner_accepted_runtime_limitations' if runtime_active else 'blocked')
     if skin_policy:
+        material_active = False; material_ids = []; material_actions = []
+        if material_policy:
+            material_active, material_ids, material_actions = original_assets.evaluate(
+                record, package_identity, acceptance_lanes, package_manifest, release_history, utc_now())
+            if material_active:
+                removable = {'rights_approved', *('Unresolved risk: '+rid for rid in material_ids)}
+                blockers = [b for b in blockers if b not in removable]
+            else:
+                blockers.append('Exact original-assets policy missing independent review or current expiry')
         skin_active, skin_ids = skin_alpha(record, acceptance_lanes, risks, ack,
-            package_identity, release_history, package_manifest, blockers)
+            package_identity, release_history, package_manifest, blockers,
+            material_policy=(material_active, material_actions) if material_policy else None)
         if skin_active:
             removable = {'Unresolved risk: ' + rid for rid in skin_ids}
             removable.update(('Per-lane acceptance missing: omega', 'Runtime testing deferred: omega'))
@@ -633,7 +655,14 @@ def assess(record, lanes, package_identity=None, release_history=None, package_m
                            runtime_admission='owner_reported_skin_alpha_limitations' if skin_active else 'blocked',
                            native_evidence_grade='owner_reported_general_use',
                            cleaned_package_native_accepted=False, publication_authorized=False)
-    if version in (3, 4):
+        if material_policy:
+            alternative.update(original_assets_admission=record['original_assets_admission'],
+                original_assets_admission_sha256=exception_digest(record['original_assets_admission']),
+                original_assets_policy_active=material_active,
+                material_rights_admission='owner_directed_exact_package_exception' if material_active else 'blocked',
+                third_party_permission_established=False, distribution_package_native_accepted=False,
+                accepted_technical_findings=record['original_assets_admission']['technical_findings'])
+    if version in (3, 4, 5):
         alternative['package_distribution_eligible'] = not any(b != 'release_approved' for b in blockers)
     require(not record['release_approved'] or not blockers,
             'final release approval contradicts outstanding gates')

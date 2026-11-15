@@ -1,0 +1,150 @@
+{
+  "decision": {
+    "status": "not_recorded"
+  },
+  "evidence": {
+    "CANDIDATE-INDEPENDENT-AUDIT.json": "3254e3e5f84096ef8f6cd08379946de72edd99dec29d453618205704c16f30f8",
+    "CANDIDATE-VERIFY.json": "1b94ba4626edb22159d0423036cad24d74f4116305a38811e91de7651b5dd931",
+    "CURRENT-CONTRACT-ASSESSMENT.json": "4b18b0f75bf8c405e0b2f0d00784ce10a30ea68ad93341766d084d4ab972d1a1",
+    "EXISTING-PRODUCTION-INTAKE-RECHECK.json": "e0feb78480d2513a6d56382d5b6063b2bc91e0003fb3007787335ddfc2b02ed3",
+    "INDEPENDENT-DISPOSITION.md": "46f0dd424e020790eeb9fe9b20dcf729541b411d37c80cd4e43c1850028e4d3a",
+    "TECHNICAL-SUCCESSOR-ASSESSMENT.json": "231e71aafa5be0688225d2a2aea476fa5eb57150ed219d1c3dd13360c35addcc",
+    "VERIFICATION.json": "afed108eb78079cb0d5a510d49378af652bae3d6458dd9a7788f1fb94437da38",
+    "frozen_restoration_packet_manifest": "00304f6e3bfbddb95cd254b28bf67efdf9cd7c7d10ae2c8e3492d8652ff02ee2",
+    "frozen_review_record": "dfa14461dc1deceb1e96ea4eff8a0e6768bcc9f70cef6b7a12916f8b35e4da7b",
+    "technical_successor_record": "fa2b6549ddd666b0d7b4aaf3f5a221586dee3d12a5c09f5eb037d9d10321602f"
+  },
+  "existing_rule": {
+    "documentation": [
+      "docs/APPROVAL-CONTRACT.md:21",
+      "docs/APPROVAL-CONTRACT.md:61",
+      "docs/APPROVAL-CONTRACT.md:232",
+      "docs/APPROVAL-CONTRACT.md:245",
+      "docs/APPROVAL-CONTRACT.md:376",
+      "docs/APPROVAL-CONTRACT.md:431"
+    ],
+    "implementation": [
+      "scripts/approval_contract.py:462",
+      "scripts/approval_contract.py:502",
+      "scripts/approval_contract.py:542",
+      "scripts/approval_contract.py:573",
+      "scripts/audit_candidate.py:329"
+    ],
+    "meaning": "Production requires supported rights verification. Unresolved material rights block; current skin-alpha coverage does not waive this. These are owner-maintained admission policies, not official Kodi screenshot requirements."
+  },
+  "legal_effect": "Changes only this unofficial repository admission requirement. It does not grant third-party redistribution rights, override font EULAs or other licenses, or establish that the proposed public distribution is authorized by the relevant rights holders. The documented SF Distant Galaxy and Nasalization restrictions and other unresolved findings remain adverse findings.",
+  "owner_direction_already_recorded": {
+    "basis": "Latest owner message: CONTINUE \u2014 Publish original-assets Aura Omega 2.1.0 Alpha. This is not interpreted as an explicit change to the existing nonwaivable material-rights gate.",
+    "incomplete_functional_coverage_accepted_for_alpha": true,
+    "new_native_testing_prohibited": true,
+    "official_screenshot_size_failures_accepted_as_unofficial_limitations": true,
+    "original_assets_required": true,
+    "public_distribution_intent": true
+  },
+  "package": {
+    "addon_id": "skin.aura",
+    "bytes": 17662910,
+    "file_count": 1806,
+    "filename": "skin.aura-2.1.0.zip",
+    "label": "ALPHA",
+    "lanes": [
+      "omega"
+    ],
+    "sha256": "7309fc3f60429e4ba638d36046565ae48fa2b75f56f653df5200a960aa3ce9c0",
+    "source_commit": "88564fd2883d2d286bdf0e887dc0bee634fd8c4e",
+    "source_repository": "https://github.com/kcook98765/skin.aura",
+    "version": "2.1.0"
+  },
+  "policy_implemented": false,
+  "proposed_policy_change": {
+    "artifact_or_source_change_invalidates_exception": true,
+    "destination": {
+      "github_repository": "kcook98765/kcook-lab-repo",
+      "github_repository_id": 1428864210,
+      "pages_url": "https://kcook98765.github.io/kcook-lab-repo/",
+      "repository_addon_id": "repository.ai.kodi"
+    },
+    "exact_allowlist_required": true,
+    "expires_at": "2026-12-15T02:11:01Z",
+    "expiry_does_not_override_dependency_or_coverage_evidence_expiry": true,
+    "initial_omega_release_only": true,
+    "not_authorized_by_this_policy": [
+      "Changing any Aura runtime, visual or functional bytes",
+      "Setting rights_approved true or rights_review verified without actual supporting evidence",
+      "Clearing, hiding or relabeling adverse rights findings as provider terms/runtime limitations",
+      "Native Kodi actions, production-profile inspection or testing",
+      "Bypassing security, provenance, dependency, integrity, retention or independent review",
+      "Any wildcard/version successor policy, other add-on exception or automatic publication"
+    ],
+    "public_disclosure_required": "Disclose unverified permissions and previously identified restrictions; do not imply rights verification, relicensing, third-party consent or legal clearance. Keep original attributions/licenses and notices.",
+    "remaining_required_controls": [
+      "Independent review of the new narrowly scoped policy and all production consumers before use",
+      "Actual static/package/source/determinism/dependency/security/inventory/retention checks",
+      "Attributable independent technical approval; raw official checker results remain failed with five screenshot errors and three warnings",
+      "Genuine package/source provenance and independently retained examination of existing redistribution findings; policy acceptance supplies no affirmative rights basis",
+      "Existing owner-reported production-use evidence with unknown installed-byte identity; runtime acceptance remains false and every unobserved scenario remains disclosed under the approved skin-alpha coverage safeguards",
+      "Separate hash-bound package-admission decision against the reviewed successor evidence record",
+      "Separate final publication decision against the complete production site digest, destination, source snapshot and GitHub release assets"
+    ],
+    "rights_approved_must_remain": false,
+    "rights_review_must_remain": {
+      "status": "pending"
+    },
+    "rights_risks_must_remain_unresolved": [
+      {
+        "category": "rights",
+        "description": "Original SF Distant Galaxy supplied terms prohibit product inclusion; no applicable skin-bundling permission established.",
+        "evidence": [
+          "evidence/aura-restored/INDEPENDENT-REVIEW.md sha256:4d97e238bce7fed46f0b245201623b0355d245cb835a5bcb995b0f7b0ca93674",
+          "evidence/aura-restored/omega-validation.json sha256:2b13b6d7821e0bb17260b319e38540895722d8f5491ced4f8cd9414ae37b5f88"
+        ],
+        "id": "RIGHTS-SF"
+      },
+      {
+        "category": "rights",
+        "description": "Original Nasalization EULA does not establish public skin redistribution; sharing scope/permanent-transfer restrictions retained.",
+        "evidence": [
+          "evidence/aura-restored/INDEPENDENT-REVIEW.md sha256:4d97e238bce7fed46f0b245201623b0355d245cb835a5bcb995b0f7b0ca93674",
+          "evidence/aura-restored/omega-validation.json sha256:2b13b6d7821e0bb17260b319e38540895722d8f5491ced4f8cd9414ae37b5f88"
+        ],
+        "id": "RIGHTS-NASAL"
+      },
+      {
+        "category": "rights",
+        "description": "Original Geomancy/BOXING/Theboldfont distribution conditions and exact scope/provenance remain unresolved, without asserting categorical bans for all.",
+        "evidence": [
+          "evidence/aura-restored/INDEPENDENT-REVIEW.md sha256:4d97e238bce7fed46f0b245201623b0355d245cb835a5bcb995b0f7b0ca93674",
+          "evidence/aura-restored/omega-validation.json sha256:2b13b6d7821e0bb17260b319e38540895722d8f5491ced4f8cd9414ae37b5f88"
+        ],
+        "id": "RIGHTS-OTHER-FONTS"
+      },
+      {
+        "category": "rights",
+        "description": "All original Knavs flags retain opensource/non-profitable condition; applicable public skin-bundling scope is unverified.",
+        "evidence": [
+          "evidence/aura-restored/INDEPENDENT-REVIEW.md sha256:4d97e238bce7fed46f0b245201623b0355d245cb835a5bcb995b0f7b0ca93674",
+          "evidence/aura-restored/omega-validation.json sha256:2b13b6d7821e0bb17260b319e38540895722d8f5491ced4f8cd9414ae37b5f88"
+        ],
+        "id": "RIGHTS-FLAGS"
+      },
+      {
+        "category": "rights",
+        "description": "Original photographic defaults, commercial-art screenshots and previews retain previously unresolved public redistribution permission gaps.",
+        "evidence": [
+          "evidence/aura-restored/INDEPENDENT-REVIEW.md sha256:4d97e238bce7fed46f0b245201623b0355d245cb835a5bcb995b0f7b0ca93674",
+          "evidence/aura-restored/omega-validation.json sha256:2b13b6d7821e0bb17260b319e38540895722d8f5491ced4f8cd9414ae37b5f88"
+        ],
+        "id": "RIGHTS-ART"
+      }
+    ],
+    "scope": "One exact original-assets skin package only; opt-in owner-directed admission with unresolved material-rights findings. The existing general rights verification and skin-alpha policies retain their meanings and remain unchanged for every other artifact.",
+    "wildcard_or_automatic_successor_approval": false
+  },
+  "publication_authorized": false,
+  "remote_actions_executed": [],
+  "request_id": "AURA-ORIGINAL-ASSETS-EXACT-PACKAGE-POLICY-20261114",
+  "request_kind": "explicit_owner_admission_policy_change",
+  "schema": 1,
+  "scope_of_approval_requested_now": "Authorize implementation and independent qualification of this explicitly bounded policy change. No current approval record is changed by preparing this request; exact package-admission and final complete-site decisions follow after qualified evidence exists.",
+  "status": "awaiting_owner_decision"
+}

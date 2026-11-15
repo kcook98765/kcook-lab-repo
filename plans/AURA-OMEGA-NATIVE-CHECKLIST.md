@@ -1,3 +1,20 @@
+# Current owner-approved original-assets policy preparation
+
+Owner policy request fa0a5e73758fff3cc3d092683a34a82f103a2f66465b6f59afa58da8a27ac40f is explicitly approved for implementation and independent qualification. Schema 5 / aura-original-assets-alpha-v1 applies only to source 88564fd2883d2d286bdf0e887dc0bee634fd8c4e and ZIP 7309fc3f60429e4ba638d36046565ae48fa2b75f56f653df5200a960aa3ce9c0 (1,806 files), Omega only. It retains false/pending rights and all original adverse findings; it supplies no third-party permission. The unchanged screenshots have independent technical disposition while actual checker FAIL (five errors/three warnings) remains disclosed.
+
+Package admission and final complete-site publication are separate pending owner decisions. No new native test or production-profile action is authorized. Preserve the original assets, OpenCode enrollment, existing dependency/coverage infrastructure and every published package/installer/history record. See docs/AURA-ORIGINAL-ASSETS-POLICY.md. Earlier text below is preserved preparation history; any categorical statement that only rights-holder evidence can change this self-imposed admission rule is superseded solely by the exact owner-approved schema 5 policy. No original license or restriction is superseded.
+
+---
+
+# Current restored-assets revision: no native testing
+
+The original-assets restoration changes no native authority. Owner daily-use
+report remains bounded evidence; no install/switch/reset/new instance/test or
+production modification is authorized. Request81b45e5e0dfa is superseded.
+Read current AURA-OMEGA-INTAKE.md and restored-assets packet for blocked admission.
+
+--- Retained earlier retirement record ---
+
 # Aura release campaign: native plan retired
 
 The owner explicitly prohibited any new native smoke/acceptance campaign in the

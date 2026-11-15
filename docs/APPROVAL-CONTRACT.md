@@ -3,7 +3,7 @@
 The repository retains **strict admission for legacy/v1 and v2**. Rights authorization, owner risk
 acknowledgment, technical release approval, observed runtime acceptance, final
 release approval and operator publication authority are separate assertions.
-Schemas 3 and 4 add only their separately bounded routes described below. An acknowledgment cannot provide missing
+Schemas 3, 4 and 5 add only their separately bounded routes described below. An acknowledgment cannot provide missing
 rights, resolve an adverse finding or complete a test. Deferred testing remains
 ineligible under strict/v3 ordinary policies. Only the separate initial-release
 coverage and skin-alpha policies below may admit explicitly accepted scope while preserving
@@ -33,6 +33,8 @@ license alone cannot establish every relevant authorization. Provider permission
 must have its own actual evidence if claimed; it is not inferred from a rights
 status or an acknowledgment. This policy does not invent a universal provider
 permission requirement or declare a particular legal basis sufficient.
+
+Schema 5 is the separately owner-approved exact-package change described at the end of this contract. It changes only this repository admission rule for the pinned original-assets Aura candidate; rights remain unverified and all original restrictions remain findings. It grants no third-party permission. Schemas 1–4 retain their existing meanings.
 
 ## Version 2 records
 
@@ -225,7 +227,7 @@ remain false/pending, provider permission remains false, and content authorizati
 remains `not_established`. The derived `provider_authorization_exception_active`
 flag and full attributed decision appear in each plan and independent audit.
 
-### Nonwaivable review requirements
+### Nonwaivable review requirements for schemas 1–4
 
 Before recording `package_distribution_review=verified`, independently inspect
 **every** source file, third-party code, artwork, media, font, binary, notice and
@@ -490,3 +492,61 @@ reviewed cleanup delta and every outstanding scenario without exporting private
 evidence paths. The independent auditor reconstructs these notices and admission
 from original pinned inputs. Final publication approval remains a later decision
 binding the complete production-site digest and destination.
+
+
+## Schema 5: exact original-assets Aura owner policy
+
+The owner explicitly approved policy decision
+`fa0a5e73758fff3cc3d092683a34a82f103a2f66465b6f59afa58da8a27ac40f`.
+Its [frozen request](../policies/aura-original-assets-2.1.0.json) and
+[recorded owner approval](../policies/aura-original-assets-owner-approval.json)
+are pinned by the producer and independent auditor. That approval covers
+implementation and independent qualification only, not package admission or
+publication. See [the complete bounded procedure](AURA-ORIGINAL-ASSETS-POLICY.md).
+
+Opt in with `schema_version=5`, `approval_policy=aura-original-assets-alpha-v1`
+and the closed `original_assets_admission` object. The only allowed artifact is
+`skin.aura` 2.1.0, source `88564fd2883d2d286bdf0e887dc0bee634fd8c4e`,
+ZIP `7309fc3f60429e4ba638d36046565ae48fa2b75f56f653df5200a960aa3ce9c0`,
+1,806 runtime files, Omega only. Actual distribution configuration must match
+`kcook98765/kcook-lab-repo`, immutable ID `1428864210`, its existing Pages URL
+and `repository.ai.kodi`. The policy expires at `2026-12-15T02:11:01Z`; it
+cannot extend official dependency metadata or coverage evidence expiry.
+Initial-release and exact retained-artifact history checks remain mandatory.
+
+This is an explicit exception to this repository's affirmative material-rights
+admission requirement for that artifact. `rights_approved=false` and
+`rights_review={"status":"pending"}` are mandatory. All five complete original
+rights-risk objects remain unresolved and unchanged, including known adverse
+font terms. No rights are verified by this route. The independent material
+review verifies the retained findings and policy implementation only;
+`rights_verified=false`, `permissions_granted=false`, independent attribution,
+pinned evidence and current dates are required. Other unresolved risks remain
+blockers. The provider exception is not involved.
+
+The existing skin-alpha coverage structure and safeguards are reused, preserving
+owner-reported general use, unknown installed identity, false native acceptance,
+deferred formal tests and every scenario. Only schema 5 substitutes validated
+policy/findings actions for the rights prerequisite and rights-action chronology.
+Schema 4 still requires verified rights. Security, provenance, integrity,
+archive safety, dependencies, attribution/notices, retention, actual static
+evidence, independent review and final authorization are unchanged.
+
+Five original 1366x768 screenshots remain a disclosed, independently accepted
+unofficial technical limitation. Official checker FAIL (five errors and three
+warnings) and Toolkit overall FAIL remain explicit. Their fixed evidence hashes
+and separate independent technical disposition are retained. No test becomes
+PASS and no asset is changed.
+
+Public notices expose the unresolved rights findings, actual technical failures
+and alpha coverage limits without private evidence paths. They state that this
+policy changes admission only, grants no third-party rights and overrides no
+license. The auditor independently reconstructs those notices.
+
+Separate owner package admission must bind both complete objects using
+`skin_alpha_evidence_sha256` and `original_assets_admission_sha256`, with all
+owner coverage/risk acknowledgments and independent decisions actually recorded.
+Policy approval cannot supply those actions. The request/receipt and all
+consumer/schema/policy files are included in toolchain pins. Final publication
+remains a later authorization against the complete qualified production-site
+digest and exact source/Release/Pages actions.

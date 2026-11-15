@@ -27,6 +27,12 @@ INTEGRATION_SOURCES = {
     'integrations/opencode/local-templates/skills/kodi-repository-maintenance/SKILL.md',
     'integrations/opencode/local-templates/skills/kodi-repository-maintenance/references/intake-and-release.md',
 }
+# Only these frozen owner-approved policy sources join the selected Git source.
+# This is not permission for arbitrary files in policies/ or runtime evidence.
+POLICY_SOURCES = {
+    'policies/aura-original-assets-2.1.0.json',
+    'policies/aura-original-assets-owner-approval.json',
+}
 SECRET_PATTERNS = [
     rb'-----BEGIN (?:RSA |EC |OPENSSH )?PRIVATE KEY-----',
     rb'gh[pousr]_[A-Za-z0-9]{30,}',
@@ -51,7 +57,7 @@ def source_audit():
     hashes = {}
     for name in names:
         parts = Path(name).parts
-        repo.require(parts[0] in SOURCE_ROOTS or (name in INTEGRATION_SOURCES and name in tracked),
+        repo.require(parts[0] in SOURCE_ROOTS or (name in INTEGRATION_SOURCES | POLICY_SOURCES and name in tracked),
                      'Unreviewed source root: '+name)
         repo.require(not any(p.startswith('.') for p in parts if p != '.gitignore'),
                      'Private source path: '+name)
