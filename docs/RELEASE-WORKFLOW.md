@@ -178,3 +178,39 @@ machine. It reuses these release gates and cannot publish, change an existing
 approval, or promote a candidate into production. Its successful synthetic cases
 are not native acceptance, GitHub enforcement tests or production authorization.
 Current real proposals retain missing-input, compatibility and decision blockers.
+
+## Opt-in initial-release Omega skin alpha
+
+Schema 4 / `initial-release-skin-alpha-v1` is separate from provider-specific
+schema-3 policies. It admits only a reviewed skin-only Omega manifest and exact
+initial-release source/ZIP/ledger scope. Genuine material rights, independent
+source/package-delta and static review remain mandatory. An attributable owner
+report of stable general production use can be retained even when installed-byte
+identity is unknown. It is never a formal test PASS or exact cleaned-package
+native acceptance. No new native test is required solely for this policy.
+
+Keep `runtime_accepted=false`, an explicit deferred runtime action, all named
+outstanding scenarios and reported cosmetic limits. Require hash-pinned evidence,
+finite expiry within90 days of the owner report, independent verification,
+explicit owner all-risk acknowledgment and coverage acceptance including the
+unverified installed identity/package delta, then a separate owner package
+admission decision binding the complete skin-alpha evidence digest. Failed
+functionality, missing rights, security, dependency or provenance safeguards are
+not waived. The current owner instruction approves implementing this mechanism;
+it does not supply any exact-package admission or publication decision.
+
+Official dependencies for the enrolled Aura Omega alpha use only the closed,
+source/ZIP-bound official-Omega adapter described in
+[the dependency contract](OFFICIAL-OMEGA-DEPENDENCIES.md). Builds fetch nothing;
+both consumers independently read the pinned snapshot, exact allowlist, official
+core source and current expiry. External add-ons never become built-ins or
+mirrored releases. Toolchain hashes pin both resolver implementations. The
+qualifier and publication preflight rederive the same gates on current inputs.
+
+An isolated candidate may use a truthful pending schema-4 record with reviewed
+rights/static evidence, but owner acknowledgment, coverage acceptance and final
+package approval stay pending. Candidate feed installation/hosting/publication
+is not authorized. After exact package decisions, prepare the complete production
+site, preserve all old artifacts, obtain independent frozen-site review and
+request a separate publication decision binding its complete digest. See
+APPROVAL-CONTRACT.md and the interchange schema; no owner action is inferred.

@@ -261,6 +261,22 @@ def fixture_packages():
                 'validation_sha256': sha(validation_path.read_bytes())}})
     return result
 
+def skin_alpha_notice(approval):
+    value = approval.get('skin_alpha_evidence')
+    if value is None:
+        return ''
+    native = value['owner_native_use']
+    public = {'alpha':True, 'native_evidence':'owner_reported_general_use',
+        'reported_version':native['reported_version'], 'platform':native['platform'],
+        'duration':native['duration'], 'result':native['result'], 'known_limitations':native['known_limitations'],
+        'formal_scripted_acceptance':False, 'cleaned_package_native_accepted':False,
+        'installed_identity':native['identity_disposition'], 'identity_limitation':native['identity_limitation'],
+            'reviewed_package_delta':{k:value['reviewed_package_delta'].get(k) for k in ('status','scope')},
+        'outstanding_scenarios':[{k:s[k] for k in ('id','lane','kind','observation','description')} for s in value['scenarios']],
+        'owner_coverage_decision':value['owner_coverage_decision']['status'], 'expires_at':value['expires_at']}
+    return escape('Omega skin ALPHA; incomplete formal coverage.\n' + json.dumps(public, sort_keys=True, ensure_ascii=True))
+
+
 def runtime_notice(approval):
     value = approval.get('runtime_acceptance_exception')
     if value is None:
@@ -305,10 +321,33 @@ def retained_installers(config, inputs, ledger):
     return packages
 
 
+def verify_skin_evidence_files(record):
+    """V4 attestations bind retained evidence bytes, not just plausible references."""
+    if record.get('schema_version') != 4:
+        return
+    def inspect(value):
+        if isinstance(value, dict):
+            for key, child in value.items():
+                if key in ('evidence', 'static_package_evidence'):
+                    require(approval_contract.pinned_references(child), 'Skin-alpha evidence must be hash-pinned')
+                    for ref in child:
+                        name, digest = ref.rsplit(' sha256:', 1)
+                        require(sha(safe_path(ROOT/'incoming', name).read_bytes()) == digest,
+                                'Skin-alpha retained evidence hash mismatch: ' + name)
+                else:
+                    inspect(child)
+        elif isinstance(value, list):
+            for child in value:
+                inspect(child)
+    inspect(record)
+
+
 def production_packages(config, profile='production'):
     require(profile in ('production', 'candidate'), 'Invalid intake profile')
     inputs = json.loads((ROOT/f'config/{profile}.json').read_text())
-    require(inputs['external_dependencies'] == {}, 'External dependency snapshots need a separately reviewed adapter')
+    require(isinstance(inputs['external_dependencies'], dict), 'Malformed external dependency configuration')
+    require(not inputs['external_dependencies'] or set(inputs['external_dependencies']) == {'official_omega'},
+            'External dependencies require the separately reviewed adapter official_omega')
     ledger = json.loads(ledger_path(profile).read_text())
     packages = []
     for item in inputs['packages']:
@@ -318,11 +357,17 @@ def production_packages(config, profile='production'):
         require(sha(record_path.read_bytes()) == item['review_record_sha256'], 'Review record hash mismatch')
         record = json.loads(record_path.read_text())
         if 'candidate_context' in config:
-            require(record.get('schema_version') == 2 and record.get('approval_policy') == 'strict-v1' and
-                    record.get('rights_approved') is False and record.get('release_approved') is False and
-                    all(record.get(k) == {'status':'pending'} for k in ('rights_review','technical_release','release_decision')) and
-                    all(c['static_accepted'] is False and c['runtime_accepted'] is False for c in record['compatibility'].values()),
-                    'Isolated candidate context accepts only truthful pending strict-v2 records')
+            strict_pending = (record.get('schema_version') == 2 and record.get('approval_policy') == 'strict-v1' and
+                record.get('rights_approved') is False and record.get('release_approved') is False and
+                all(record.get(k) == {'status':'pending'} for k in ('rights_review','technical_release','release_decision')) and
+                all(c['static_accepted'] is False and c['runtime_accepted'] is False for c in record['compatibility'].values()))
+            skin_pending = (record.get('schema_version') == 4 and
+                record.get('approval_policy') == approval_contract.SKIN_ALPHA_POLICY and
+                record.get('release_approved') is False and record.get('release_decision') == {'status':'pending'} and
+                record.get('owner_acknowledgment') == {'status':'not_recorded'} and
+                record.get('skin_alpha_evidence', {}).get('owner_coverage_decision') == {'status':'pending'})
+            require(strict_pending or skin_pending,
+                    'Isolated candidate context requires pending strict-v2 or unapproved skin-alpha decisions')
         require(record['package_sha256'] == sha(blob) and record['fixture_only'] is False,
                 'Independent package approval/hash evidence missing')
         require(all(type(record[k]) is bool for k in ('release_approved','rights_approved')),
@@ -336,8 +381,10 @@ def production_packages(config, profile='production'):
                     isinstance(acceptance['evidence'], list) and
                     all(isinstance(e, str) and e.strip() for e in acceptance['evidence']), 'Malformed lane evidence')
         manifest, files = inspect_zip(blob, record['runtime_files'])
+        verify_skin_evidence_files(record)
         approval = approval_contract.assess(record, item['lanes'],
-            package_identity=(manifest.get('id'), manifest.get('version')), release_history=ledger['packages'])
+            package_identity=(manifest.get('id'), manifest.get('version')), release_history=ledger['packages'],
+            package_manifest=manifest)
         approval['review_record_sha256'] = item['review_record_sha256']
         approval['package_sha256'] = sha(blob)
         blockers = approval['release_blockers']
@@ -350,6 +397,10 @@ def production_packages(config, profile='production'):
                 require(any((old['id'], old['version'], old['sha256']) ==
                             (manifest.get('id'), manifest.get('version'), sha(blob))
                             for old in ledger['packages']), 'Empty v3 lanes require retained release')
+        if record.get('schema_version') == 4 and not item['lanes']:
+            require(any((old['id'],old['version'],old['sha256']) ==
+                        (manifest.get('id'),manifest.get('version'),sha(blob)) for old in ledger['packages']),
+                    'Empty skin-alpha lanes require exact retained release')
         packages.append({'blob': blob, 'lanes': item['lanes'], 'fixture_only': False,
                          'provenance': record, 'approval': approval, 'release_blockers': blockers})
     packages.extend(retained_installers(config, inputs, ledger))
@@ -364,15 +415,39 @@ def production_packages(config, profile='production'):
         require(current.get((old['id'], old['version'])) == old['sha256'], 'Historical release removed or changed')
     return packages
 
-def dependencies(selected, builtins):
-    available = {**builtins, **{m.get('id'): m.get('version') for m in selected}}
+def external_dependency_report(profile, manifests, builtins, lane, bindings):
+    if profile == 'fixture':
+        return {}
+    inputs = json.loads((ROOT/f'config/{profile}.json').read_text())
+    spec = inputs['external_dependencies']
+    require(isinstance(spec, dict), 'Malformed external dependency configuration')
+    if not spec:
+        return {}
+    import official_omega
+    return official_omega.resolve(manifests, builtins, spec, ROOT/'incoming', lane, bindings)
+
+
+def dependency_toolchain(profile):
+    if profile == 'fixture' or not json.loads((ROOT/f'config/{profile}.json').read_text())['external_dependencies']:
+        return {}
+    return {name+'_sha256':sha((Path(__file__).parent/filename).read_bytes()) for name,filename in
+            [('official_omega','official_omega.py'), ('audit_official_omega','audit_official_omega.py')]}
+
+
+def dependencies(selected, builtins, external_versions=None):
+    external_versions = external_versions or {}
+    available = {**external_versions, **builtins, **{m.get('id'): m.get('version') for m in selected}}
     edges = {}
     warnings = []
     for manifest in selected:
         edges[manifest.get('id')] = []
         for dep in manifest.findall('requires/import'):
             name = dep.get('addon')
-            satisfied = name in available and version(available[name]) >= version(dep.get('version'))
+            if name in external_versions:
+                from official_omega import version_key
+                satisfied = version_key(available[name]) >= version_key(dep.get('version'))
+            else:
+                satisfied = name in available and version(available[name]) >= version(dep.get('version'))
             if dep.get('optional') == 'true':
                 if not satisfied:
                     warnings.append('Optional dependency unresolved: ' + name)
@@ -459,7 +534,10 @@ def build(profile):
     for lane, settings in config['lanes'].items():
         selected = [(item,m,f) for item,m,f in parsed if lane in item['lanes']]
         require(len({m.get('id') for _,m,_ in selected}) == len(selected), 'Multiple current versions in one lane')
-        warnings = dependencies([m for _,m,_ in selected], settings['builtins'])
+        bindings = {m.get('id'):{'package_sha256':sha(item['blob']), 'source_commit':item['provenance']['source_commit'], 'source_repository':item['provenance']['source_repository']}
+                    for item,m,_ in selected if 'source_commit' in item['provenance']}
+        external = external_dependency_report(profile, [m for _,m,_ in selected], settings['builtins'], lane, bindings)
+        warnings = dependencies([m for _,m,_ in selected], settings['builtins'], external.get('external_versions'))
         catalog = ET.Element('addons')
         for item,m,files in sorted(selected,key=lambda v:v[1].get('id')):
             catalog.append(copy.deepcopy(m))
@@ -472,6 +550,8 @@ def build(profile):
         write_output(Path(str(path)+'.sha256'), (sha(data)+'\n').encode())
         catalogs[lane] = {'path': path.relative_to(site).as_posix(), 'sha256': sha(data),
                           'ids': {m.get('id'):m.get('version') for _,m,_ in selected}, 'warnings': warnings}
+        if external:
+            catalogs[lane]['official_dependencies'] = external
     write_output(site/'.nojekyll', b'')
     current_version = config['fixture_version'] if profile == 'fixture' else config['version']
     filename = f'{config["addon_id"]}-{current_version}.zip'
@@ -484,6 +564,8 @@ def build(profile):
                       +runtime_notice(r.get('approval', {}))
                       +'</pre></section>' for r in records
                       if r.get('approval', {}).get('schema_version') == 3)
+    notices += ''.join('<section data-skin-alpha-package="'+r['id']+'-'+r['version']+'"><h2>'+r['id']+' '+r['version']+' ALPHA</h2><pre>'+skin_alpha_notice(r['approval'])+'</pre></section>'
+                       for r in records if r.get('approval', {}).get('schema_version') == 4)
     if profile == 'fixture':
         page = ('<!doctype html><title>kcook-lab-repo: local draft</title>'
                 '<p>Not published. Fixture artifacts must never be deployed.</p><ul>'+links+'</ul>\n')
@@ -517,7 +599,8 @@ def build(profile):
                              for name,filename in [('auditor', 'audit_candidate.py'), ('qualifier', 'qualify.py'),
                                                    ('preflight', 'check_publication.py')]},
                           'review_schema_sha256':sha((Path(__file__).parents[1]/'docs/REVIEW-RECORD-SCHEMA.json').read_bytes()),
-                          'approval_contract_sha256':sha(Path(approval_contract.__file__).read_bytes())},
+                          'approval_contract_sha256':sha(Path(approval_contract.__file__).read_bytes()),
+                          **dependency_toolchain(profile)},
             'release_assets':release_assets, 'site_files':site_files,
             'site_manifest_sha256':sha(json_bytes(site_files)),
             'proposed_actions':['create approved GitHub repository (not authorized)',
@@ -556,6 +639,18 @@ def verify(profile):
     require(plan['toolchain']['review_schema_sha256'] ==
             sha((Path(__file__).parents[1]/'docs/REVIEW-RECORD-SCHEMA.json').read_bytes()), 'Stale review schema')
     require(plan['toolchain']['approval_contract_sha256'] == sha(Path(approval_contract.__file__).read_bytes()), 'Stale approval contract')
+    for key,value in dependency_toolchain(profile).items():
+        require(plan['toolchain'].get(key) == value, 'Stale official dependency adapter')
+    reviewed = production_packages(config, profile) if profile != 'fixture' else []
+    bindings = {}
+    for item in reviewed:
+        manifest, _ = inspect_zip(item['blob'])
+        provenance = item['provenance']
+        if 'source_commit' in provenance:
+            bindings[manifest.get('id')] = {'package_sha256':sha(item['blob']), 'source_commit':provenance['source_commit'], 'source_repository':provenance['source_repository']}
+        if 'approval' in item:
+            pinned = next(r for r in plan['packages'] if r['sha256'] == sha(item['blob']))
+            require(pinned.get('approval') == item['approval'], 'Stale package approval evidence')
     actual_site = {p.relative_to(site).as_posix():sha(p.read_bytes()) for p in sorted(site.rglob('*')) if p.is_file()}
     require(actual_site == plan['site_files'] and sha(json_bytes(actual_site)) == plan['site_manifest_sha256'], 'Site contains missing/changed/unreviewed files')
     require({p.name:sha(p.read_bytes()) for p in sorted((output/'release-assets').iterdir()) if p.is_file()} == plan['release_assets'], 'Release asset set differs')
@@ -581,7 +676,9 @@ def verify(profile):
         require(root.tag == 'addons', 'Invalid catalog root')
         actual = {m.get('id'):m.get('version') for m in root}
         require(actual == record['ids'], 'Catalog identity mismatch')
-        dependencies(list(root), config['lanes'][lane]['builtins'])
+        external = external_dependency_report(profile, list(root), config['lanes'][lane]['builtins'], lane, bindings)
+        require(record.get('official_dependencies', {}) == external, 'Official dependency report differs from pinned inputs')
+        dependencies(list(root), config['lanes'][lane]['builtins'], external.get('external_versions'))
         for entry in root:
             package = next(r for r in plan['packages'] if r['id']==entry.get('id') and r['version']==entry.get('version'))
             manifest, files = inspect_zip((site/package['path']).read_bytes())

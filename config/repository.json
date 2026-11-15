@@ -30,7 +30,8 @@
       "maxversion": "21.9.999",
       "builtins": {
         "xbmc.addon": "21.0.0",
-        "xbmc.python": "3.0.1"
+        "xbmc.python": "3.0.1",
+        "xbmc.gui": "5.17.0"
       }
     },
     "piers": {

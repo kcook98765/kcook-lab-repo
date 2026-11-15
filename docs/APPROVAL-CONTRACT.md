@@ -3,10 +3,10 @@
 The repository retains **strict admission for legacy/v1 and v2**. Rights authorization, owner risk
 acknowledgment, technical release approval, observed runtime acceptance, final
 release approval and operator publication authority are separate assertions.
-Schema 3 adds only the bounded distribution route described below. An acknowledgment cannot provide missing
+Schemas 3 and 4 add only their separately bounded routes described below. An acknowledgment cannot provide missing
 rights, resolve an adverse finding or complete a test. Deferred testing remains
-ineligible under existing policies. Only the separate initial-release coverage
-policy below may admit explicitly accepted unobserved scenarios while preserving
+ineligible under strict/v3 ordinary policies. Only the separate initial-release
+coverage and skin-alpha policies below may admit explicitly accepted scope while preserving
 their test status. These boundaries apply to every independently developed add-on.
 
 The [JSON Schema](REVIEW-RECORD-SCHEMA.json) describes structural interchange;
@@ -381,3 +381,112 @@ This route grants no general waiver or Tastemade approval. Existing audio
 acceptance supplies no other-scenario acceptance or final authorization. Use a
 reviewed hash-bound successor, never an automatic/live approval migration. Upgrade
 all consumers together and regenerate complete toolchain/schema pins.
+
+## Schema 4: opt-in initial-release skin alpha
+
+`schema_version=4`, `approval_policy="initial-release-skin-alpha-v1"` is a separate
+skin-only route. It does not use or relax the provider-specific v3 policies,
+and requires no invented provider-service finding. Legacy, strict-v2 and v3
+semantics remain unchanged. New skin fields and final-decision digests reject
+in earlier versions. Builders and auditors must pass the actual inspected
+manifest as `package_manifest` when calling `assess`; an ID prefix alone is not
+skin compatibility evidence.
+
+This route is deliberately limited to an inspected `xbmc.gui.skin` add-on with
+no other runtime extension, `xbmc.gui` 5.17.0 and **Omega only**. First-release
+eligibility is checked against retained history: either no prior skin artifact,
+or the exact immutable version/hash of its first release. An empty intake lane
+list is retained history only, using the recorded Omega compatibility scope;
+it cannot admit a new artifact. Source, archive, material rights, dependency,
+retention and publication controls remain in force.
+
+The closed `skin_alpha_evidence` object has exactly:
+
+- `scope="initial_release_skin_alpha_coverage_only"`, `addon_id`, `addon_version`,
+  `package_sha256`, `source_commit`, `lanes=["omega"]`, `expires_at`;
+- `owner_native_use`, `reviewed_package_delta`, `scenarios`,
+  `owner_coverage_decision`, `independent_verification`.
+
+`owner_native_use` is an attributed `status="owner_reported"`, `role="owner"`
+action. In addition to the existing action fields it records `addon_id`,
+`reported_version`, `kodi_major=21`, `platform`, `duration`,
+`result="stable_regular_use"`, a `known_limitations` array,
+`formal_scripted_acceptance=false`, `cleaned_package_native_accepted=false`,
+`identity_disposition` (`verified` or `unverified`), `installed_package_sha256`
+and `identity_limitation`. Unverified installed bytes require a null installed
+package digest and an explicit limitation; a verified claim requires the exact
+candidate digest and corresponding pinned inspection evidence. Nonempty scope
+and source references remain required. General owner use is genuine scoped
+native-use evidence; it never supplies a PASS for formal scenarios or establishes
+that cleaned distribution assets were installed. Production OS/patch/identity
+may remain unknown and must be described accurately. No fresh native campaign
+is a prerequisite of this policy, and this policy authorizes no Kodi action.
+
+`reviewed_package_delta` is pending or an attributed independent `verified`,
+`rejected`, `revoked` action with `scope`, `source_provenance_verified=true`,
+`no_known_security_defects=true`, `no_known_functionality_failures=true`, and
+nonempty pinned `static_package_evidence`. Its scope must cover the frozen source,
+cleaned archive, removed/replaced file references and provenance limitations.
+A successful static comparison supplies no missing native rendering observation.
+The material `rights_review` remains a genuine independent v2-style decision;
+rights stay pending until reviewed and cannot be replaced by acknowledgment.
+Technical source/release review remains separately attributable and independent.
+
+Each named scenario uses the existing `id`, `lane`, `risk_id`, `kind`,
+`observation`, `description`, `supporting_evidence` structure. Permitted pairs:
+`unobserved_functionality/not_observed`, `environment_limitation/unavailable`,
+`cosmetic_layout_limitation/owner_reported_minor_layout`. The cosmetic class
+retains the owner's actual minor-layout report rather than mislabeling it as
+unobserved. It cannot excuse a known broken function. Supporting evidence has
+`method`, `status`, `scope`, `evidence`; only offline `passed/not_observed`,
+environment `unavailable`, and owner-reported `not_observed/reported_minor_layout`
+are accepted. No native scenario PASS is manufactured. Unavailable environment
+and cosmetic scenarios need matching scoped support. Every runtime risk and
+outstanding scenario remains listed; reported minor-layout limitations require
+a cosmetic scenario. Known failed functionality/security and rights defects are
+not admissible through this route.
+
+Both the attributed `owner_coverage_decision` (`accepted`, `declined`, `revoked`,
+or pending) and `independent_verification` (`verified`, `rejected`, `revoked`, or
+pending) name exact `scenario_ids` and runtime `risk_ids`. The coverage owner
+matches the native-use reporter and all-risk acknowledgment owner, explicitly
+sets `acknowledges_package_delta=true`, and records
+`accepts_unverified_installed_identity` exactly when identity is unverified.
+Independent verification records `no_known_security_defects=true`,
+`no_known_functionality_failures=true`, `owner_report_scope_verified=true`.
+Reviewers must substantively inspect those statements and evidence; JSON
+validation cannot authenticate an actor or establish legal rights. Reviewers of
+rights, technical evidence, package delta and coverage differ from the owner.
+All nested evidence lists are hash-pinned; consumers additionally read and hash
+retained evidence bytes. No role can self-issue an owner acceptance.
+
+The expiry must be a real UTC-second timestamp, later than evidence/decisions,
+and within **90 days** of the owner-use report. Decisions cannot be future-dated;
+coverage acceptance and independent verification cannot predate the use report.
+Current expiry, initial history, genuine rights/technical approval, verified
+delta, independent verification, accepted owner coverage and exact all-risk
+acknowledgment are all necessary for policy activation. Otherwise the candidate
+remains blocked. Pending means exactly `{"status":"pending"}` and invents no
+action. Explicit rejection/revocation never becomes approval.
+
+Omega retains `static_accepted=true`, `runtime_accepted=false`, an attributable
+`runtime_test.status="deferred"` and the exact scenario IDs in
+`outstanding_tests`. The assessment reports `skin_alpha_policy_active`,
+`skin_alpha_admission="owner_reported_use_with_reviewed_distribution_delta"`
+when active, `native_evidence_grade="owner_reported_general_use"`, false cleaned
+package native acceptance, complete evidence, its SHA-256 and all findings.
+Only the specified runtime coverage blockers are conditionally admitted. The
+report's `package_distribution_eligible` can become true while the separate
+package `release_approved` remains false; this never grants publication authority.
+
+Final package admission requires a separate attributable owner
+`release_decision.status="approved"` with `skin_alpha_evidence_sha256` equal to
+SHA-256 of the complete evidence object (UTF-8 sorted-key compact JSON,
+`ensure_ascii=true`). It cannot predate any evidence/decision or be future-dated.
+An evidence, source, ZIP, scenario, identity or owner-decision change invalidates
+that binding. Policy implementation approval is not package acceptance.
+Public notices disclose the owner-reported scope, unknown installed identity,
+reviewed cleanup delta and every outstanding scenario without exporting private
+evidence paths. The independent auditor reconstructs these notices and admission
+from original pinned inputs. Final publication approval remains a later decision
+binding the complete production-site digest and destination.

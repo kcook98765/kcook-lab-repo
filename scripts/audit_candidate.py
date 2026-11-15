@@ -230,6 +230,111 @@ def audit_pinned_evidence(value):
     return True
 
 
+def verify_skin_evidence_files(record):
+    if record.get('schema_version') != 4:
+        return
+    pending = [record]
+    while pending:
+        value = pending.pop()
+        if isinstance(value, dict):
+            for key, child in value.items():
+                if key in ('evidence', 'static_package_evidence'):
+                    assert audit_pinned_evidence(child), 'Skin-alpha evidence must be pinned'
+                    for ref in child:
+                        name, expected = ref.rsplit(' sha256:', 1)
+                        assert digest(path(ROOT/'incoming', name).read_bytes()) == expected, 'Skin-alpha evidence bytes changed'
+                else:
+                    pending.append(child)
+        elif isinstance(value, list):
+            pending.extend(value)
+
+
+def skin_alpha_gate(record, manifest, history, approval):
+    """Independent production conjunction; no native test is synthesized."""
+    assert record['approval_lanes'] in (['omega'], [])
+    if not record['approval_lanes']:
+        assert any((old['id'],old['version'],old['sha256']) ==
+                   (manifest.get('id'),manifest.get('version'),record['package_sha256']) for old in history)
+    assert manifest.get('id').startswith('skin.') and len(manifest.findall("extension[@point='xbmc.gui.skin']")) == 1
+    assert all(e.get('point') in ('xbmc.gui.skin','xbmc.addon.metadata') for e in manifest.findall('extension'))
+    assert manifest.find("requires/import[@addon='xbmc.gui']").get('version') == '5.17.0'
+    assert record['rights_approved'] and record['rights_review']['status'] == 'verified'
+    assert record['technical_release']['status'] == 'approved'
+    value = record['skin_alpha_evidence']; native = value['owner_native_use']
+    assert value['lanes'] == ['omega'] and value['scope'] == 'initial_release_skin_alpha_coverage_only'
+    assert (value['addon_id'],value['addon_version'],value['package_sha256'],value['source_commit']) == (
+        manifest.get('id'),manifest.get('version'),record['package_sha256'],record['source_commit'])
+    assert native['status'] == 'owner_reported' and native['role'] == 'owner'
+    assert native['addon_id'] == manifest.get('id') and native['formal_scripted_acceptance'] is False
+    assert all(isinstance(native[k],str) and native[k].strip() for k in ('reported_version','platform','duration','identity_limitation'))
+    assert native['cleaned_package_native_accepted'] is False and native['kodi_major'] == 21
+    assert native['result'] == 'stable_regular_use'
+    assert native['identity_disposition'] in ('verified','unverified')
+    if native['identity_disposition'] == 'unverified':
+        assert native['installed_package_sha256'] is None and native['identity_limitation'].strip()
+    else:
+        assert native['installed_package_sha256'] == record['package_sha256']
+    delta = value['reviewed_package_delta']; independent = value['independent_verification']; owner = value['owner_coverage_decision']
+    assert delta['status'] == independent['status'] == 'verified' and owner['status'] == 'accepted'
+    assert delta['source_provenance_verified'] is True and delta['static_package_evidence']
+    for action in (delta, independent):
+        assert action['no_known_security_defects'] is True and action['no_known_functionality_failures'] is True
+        assert action['actor'].strip().casefold() != owner['actor'].strip().casefold()
+    assert all(action['actor'].strip().casefold() != native['actor'].strip().casefold()
+               for action in (record['rights_review'],record['technical_release']))
+    assert independent['owner_report_scope_verified'] is True and owner['acknowledges_package_delta'] is True
+    assert native['actor'].strip().casefold() == owner['actor'].strip().casefold()
+    assert owner['role'] == 'owner'
+    assert owner['accepts_unverified_installed_identity'] is (native['identity_disposition']=='unverified')
+    scenarios = value['scenarios']; ids = {v['id'] for v in scenarios}; risk_ids = {r['id'] for r in record['unresolved_risks']}
+    assert scenarios and all(r['category'] == 'runtime' for r in record['unresolved_risks'])
+    assert all((v['kind'],v['observation']) in (
+        ('unobserved_functionality','not_observed'), ('environment_limitation','unavailable'),
+        ('cosmetic_layout_limitation','owner_reported_minor_layout')) for v in scenarios)
+    for scenario in scenarios:
+        assert scenario['supporting_evidence'] and scenario['lane'] == 'omega'
+        for evidence in scenario['supporting_evidence']:
+            assert set(evidence) == {'method','status','scope','evidence'}
+            assert (evidence['method'],evidence['status']) in (
+                ('offline','passed'),('offline','not_observed'),('environment','unavailable'),
+                ('owner_reported','not_observed'),('owner_reported','reported_minor_layout'))
+            assert isinstance(evidence['scope'],str) and evidence['scope'].strip()
+            assert audit_pinned_evidence(evidence['evidence'])
+        if scenario['kind'] == 'environment_limitation':
+            assert any(e['method']=='environment' and e['status']=='unavailable' for e in scenario['supporting_evidence'])
+        if scenario['kind'] == 'cosmetic_layout_limitation':
+            assert any(e['method']=='owner_reported' and e['status']=='reported_minor_layout' for e in scenario['supporting_evidence'])
+    assert len(ids) == len(scenarios)
+    if native['known_limitations']:
+        assert any(s['kind']=='cosmetic_layout_limitation' for s in scenarios)
+    assert {v['risk_id'] for v in scenarios} == risk_ids
+    for action in (owner, independent):
+        assert set(action['scenario_ids']) == ids and set(action['risk_ids']) == risk_ids
+    ack = record['owner_acknowledgment']
+    assert ack['status'] == 'acknowledged' and set(ack['risk_ids']) == risk_ids
+    assert ack['actor'].strip().casefold() == owner['actor'].strip().casefold()
+    accepted = record['compatibility']['omega']
+    assert accepted['static_accepted'] is True and accepted['runtime_accepted'] is False
+    assert accepted['runtime_test']['status'] == 'deferred' and set(accepted['runtime_test']['outstanding_tests']) == ids
+    prior = [r for r in history if r['id'] == manifest.get('id')]
+    assert not prior or (prior[0]['version'],prior[0]['sha256']) == (manifest.get('version'),record['package_sha256'])
+    now = datetime.now(timezone.utc)
+    expiry = datetime.strptime(value['expires_at'],'%Y-%m-%dT%H:%M:%SZ').replace(tzinfo=timezone.utc)
+    assert now < expiry
+    use_time = datetime.strptime(native['recorded_at'],'%Y-%m-%dT%H:%M:%SZ').replace(tzinfo=timezone.utc)
+    assert 0 < (expiry-use_time).total_seconds() <= 90*86400
+    for action in (native, delta, owner, independent, ack, accepted['runtime_test'], record['rights_review'],record['technical_release'],record['release_decision']):
+        assert datetime.strptime(action['recorded_at'],'%Y-%m-%dT%H:%M:%SZ').replace(tzinfo=timezone.utc) <= now
+    final = record['release_decision']
+    assert final['role'] == 'owner' and final['actor'].strip().casefold() == owner['actor'].strip().casefold()
+    assert all(action['recorded_at'] <= final['recorded_at'] and action['recorded_at'] < value['expires_at']
+               for action in (native,delta,owner,independent,ack,accepted['runtime_test'],record['rights_review'],record['technical_release']))
+    assert owner['recorded_at'] >= native['recorded_at'] and independent['recorded_at'] >= native['recorded_at']
+    assert final['skin_alpha_evidence_sha256'] == digest(json.dumps(value,sort_keys=True,separators=(',',':'),ensure_ascii=True).encode())
+    assert approval['skin_alpha_policy_active'] is True and approval['package_distribution_eligible'] is True
+    assert approval['skin_alpha_evidence'] == value and approval['cleaned_package_native_accepted'] is False
+
+
 def reviewed_inputs(config, profile):
     expected = {}
     if profile == 'fixture':
@@ -239,7 +344,8 @@ def reviewed_inputs(config, profile):
             expected[('script.toolkit.sample', ver)] = {'files': files, 'lanes': lanes, 'fixture_only': True}
         return expected
     inputs = json.loads((ROOT/f'config/{profile}.json').read_text())
-    assert inputs['external_dependencies'] == {}
+    assert isinstance(inputs['external_dependencies'], dict)
+    assert not inputs['external_dependencies'] or set(inputs['external_dependencies']) == {'official_omega'}
     for item in inputs['packages']:
         blob = path(ROOT/'incoming', item['zip']).read_bytes()
         assert digest(blob) == item['sha256']
@@ -247,10 +353,15 @@ def reviewed_inputs(config, profile):
         assert digest(raw) == item['review_record_sha256']
         record = json.loads(raw)
         if 'candidate_context' in config:
-            assert record.get('schema_version') == 2 and record.get('approval_policy') == 'strict-v1'
-            assert record['rights_approved'] is False and record['release_approved'] is False
-            assert all(record.get(k) == {'status':'pending'} for k in ('rights_review','technical_release','release_decision'))
-            assert all(v['static_accepted'] is False and v['runtime_accepted'] is False for v in record['compatibility'].values())
+            old_pending = (record.get('schema_version') == 2 and record.get('approval_policy') == 'strict-v1' and
+                record['rights_approved'] is False and record['release_approved'] is False and
+                all(record.get(k) == {'status':'pending'} for k in ('rights_review','technical_release','release_decision')) and
+                all(v['static_accepted'] is False and v['runtime_accepted'] is False for v in record['compatibility'].values()))
+            skin_pending = (record.get('schema_version') == 4 and record.get('approval_policy') == 'initial-release-skin-alpha-v1' and
+                record['release_approved'] is False and record['release_decision'] == {'status':'pending'} and
+                record['owner_acknowledgment'] == {'status':'not_recorded'} and
+                record.get('skin_alpha_evidence', {}).get('owner_coverage_decision') == {'status':'pending'})
+            assert old_pending or skin_pending, 'Candidate must retain pending owner decisions'
         assert record['package_sha256'] == digest(blob) and record['fixture_only'] is False
         assert re.fullmatch('[0-9a-f]{40}', record['source_commit'])
         assert record['source_repository'].startswith('https://github.com/')
@@ -265,28 +376,32 @@ def reviewed_inputs(config, profile):
         manifest, files = archive_files(blob)
         assert {n:digest(b) for n,b in files.items()} == record['runtime_files']
         history = json.loads(configuration(profile)[2].read_text())['packages']
+        verify_skin_evidence_files(record)
         approval = approval_contract.assess(record, item['lanes'],
-            package_identity=(manifest.get('id'), manifest.get('version')), release_history=history)
+            package_identity=(manifest.get('id'), manifest.get('version')), release_history=history, package_manifest=manifest)
         approval['review_record_sha256'] = digest(raw)
         approval['package_sha256'] = digest(blob)
         # Independently enforce every strict production gate, even if a plan lies.
         if profile == 'production':
             initial_policy = record.get('schema_version') == 3 and record.get('approval_policy') == 'unofficial-integration-initial-release-v1'
+            skin_policy = record.get('schema_version') == 4 and record.get('approval_policy') == 'initial-release-skin-alpha-v1'
             assert initial_policy or 'runtime_acceptance_exception' not in record
             assert record['release_approved']
             assert not approval['release_blockers'], 'Outstanding approval gates'
             for lane in item['lanes']:
                 accepted = record['compatibility'][lane]
-                assert accepted['static_accepted'] and (accepted['runtime_accepted'] or initial_policy) and accepted['evidence']
+                assert accepted['static_accepted'] and (accepted['runtime_accepted'] or initial_policy or skin_policy) and accepted['evidence']
             if record.get('schema_version', 1) != 3:
                 assert record['rights_approved']
-            if record.get('schema_version', 1) in (2, 3):
+            if record.get('schema_version', 1) in (2, 3, 4):
                 assert record['technical_release']['status'] == 'approved'
                 assert record['release_decision']['status'] == 'approved'
             if record.get('schema_version', 1) == 2:
                 assert record['rights_review']['status'] == 'verified'
                 assert not record['unresolved_risks']
                 assert all(record['compatibility'][lane]['runtime_test']['status'] == 'passed' for lane in item['lanes'])
+            if skin_policy:
+                skin_alpha_gate(record, manifest, history, approval)
             if record.get('schema_version') == 3:
                 assert record['approval_policy'] in ('unofficial-integration-v1', 'unofficial-integration-initial-release-v1')
                 assert set(record['approval_lanes']) == set(item['lanes'])
@@ -384,14 +499,31 @@ def reviewed_inputs(config, profile):
     return expected
 
 
-def check_dependencies(manifests, builtins):
-    available = {**builtins, **{m.get('id'):m.get('version') for m in manifests}}
+def external_dependency_report(profile, manifests, builtins, lane, bindings):
+    if profile == 'fixture':
+        return {}
+    inputs = json.loads((ROOT/f'config/{profile}.json').read_text())
+    spec = inputs['external_dependencies']
+    assert isinstance(spec, dict)
+    if not spec:
+        return {}
+    import audit_official_omega
+    return audit_official_omega.resolve(manifests, builtins, spec, ROOT/'incoming', lane, bindings)
+
+
+def check_dependencies(manifests, builtins, external_versions=None):
+    external_versions = external_versions or {}
+    available = {**external_versions, **builtins, **{m.get('id'):m.get('version') for m in manifests}}
     edges = {}
     for manifest in manifests:
         aid = manifest.get('id'); edges[aid] = []
         for dep in manifest.findall('requires/import'):
             name = dep.get('addon')
-            satisfied = name in available and numeric(available[name]) >= numeric(dep.get('version'))
+            if name in external_versions:
+                from audit_official_omega import version_ge
+                satisfied = version_ge(available[name], dep.get('version'))
+            else:
+                satisfied = name in available and numeric(available[name]) >= numeric(dep.get('version'))
             if dep.get('optional') == 'true': continue
             assert satisfied, 'Required dependency unavailable/too old: '+name
             if name not in builtins: edges[aid].append(name)
@@ -426,6 +558,9 @@ def audit(profile='fixture'):
                           ('qualifier', 'qualify.py'), ('preflight', 'check_publication.py')]:
         assert plan['toolchain'][name+'_sha256'] == digest((Path(__file__).parent/filename).read_bytes())
     assert plan['toolchain']['review_schema_sha256'] == digest((Path(__file__).parents[1]/'docs/REVIEW-RECORD-SCHEMA.json').read_bytes())
+    if profile != 'fixture' and json.loads((ROOT/f'config/{profile}.json').read_text())['external_dependencies']:
+        for name in ('official_omega', 'audit_official_omega'):
+            assert plan['toolchain'].get(name+'_sha256') == digest((Path(__file__).parent/(name+'.py')).read_bytes())
     expected = reviewed_inputs(config, profile)
     installer_version = config['fixture_version'] if profile == 'fixture' else config['version']
     installer_source = ROOT/'packages'/config['addon_id']
@@ -501,7 +636,12 @@ def audit(profile='fixture'):
         root = xml(data); assert root.tag == 'addons'
         assert len(root) == len(identities) and {m.get('id'):m.get('version') for m in root} == identities == record['ids']
         assert [m.get('id') for m in root] == sorted(identities)
-        check_dependencies(list(root), settings['builtins'])
+        bindings = {key[0]:{'package_sha256':digest(item['blob']), 'source_commit':item['provenance']['source_commit'],
+                    'source_repository':item['provenance']['source_repository']}
+                    for key,item in expected.items() if lane in item['lanes'] and 'source_commit' in item.get('provenance',{})}
+        external = external_dependency_report(profile, list(root), settings['builtins'], lane, bindings)
+        assert record.get('official_dependencies', {}) == external, 'Official dependency report differs from actual inputs'
+        check_dependencies(list(root), settings['builtins'], external.get('external_versions'))
         for m in root:
             manifest, files = selected[(m.get('id'), m.get('version'))]
             assert structure(m) == structure(manifest)
@@ -537,6 +677,21 @@ def audit(profile='fixture'):
                            +escape(record['unofficial_integration']['disclosure']['release_text'])
                            +runtime_text
                            +'</pre></section>')
+    for key,item in expected.items():
+        record = item.get('provenance', {})
+        if record.get('schema_version') != 4:
+            continue
+        value = record['skin_alpha_evidence']; native = value['owner_native_use']
+        public = {'alpha':True, 'native_evidence':'owner_reported_general_use',
+            'reported_version':native['reported_version'], 'platform':native['platform'],
+            'duration':native['duration'], 'result':native['result'], 'known_limitations':native['known_limitations'],
+            'formal_scripted_acceptance':False, 'cleaned_package_native_accepted':False,
+            'installed_identity':native['identity_disposition'], 'identity_limitation':native['identity_limitation'],
+            'reviewed_package_delta':{k:value['reviewed_package_delta'].get(k) for k in ('status','scope')},
+            'outstanding_scenarios':[{k:s[k] for k in ('id','lane','kind','observation','description')} for s in value['scenarios']],
+            'owner_coverage_decision':value['owner_coverage_decision']['status'], 'expires_at':value['expires_at']}
+        text = escape('Omega skin ALPHA; incomplete formal coverage.\n' + json.dumps(public,sort_keys=True,ensure_ascii=True))
+        notices.append('<section data-skin-alpha-package="'+key[0]+'-'+key[1]+'"><h2>'+key[0]+' '+key[1]+' ALPHA</h2><pre>'+text+'</pre></section>')
     if profile == 'fixture':
         expected_page = ('<!doctype html><title>kcook-lab-repo: local draft</title>'
                          '<p>Not published. Fixture artifacts must never be deployed.</p><ul>'+links+'</ul>\n')

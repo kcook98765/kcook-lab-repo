@@ -24,7 +24,8 @@ class IntakeTests(unittest.TestCase):
         self.addCleanup(self.temp.cleanup)
         self.root = Path(self.temp.name)
         for name in ['config', 'packages', 'releases']:
-            shutil.copytree(r.ROOT / name, self.root / name)
+            shutil.copytree(r.ROOT / name, self.root / name,
+                ignore=shutil.ignore_patterns('candidate.json','candidate-repository.json','candidate-manifest.json'))
         shutil.copy(r.ROOT / 'LICENSE', self.root / 'LICENSE')
         (self.root / 'incoming').mkdir()
         # Synthetic admission tests must not inherit the live release ledger or
