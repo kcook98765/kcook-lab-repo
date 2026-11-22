@@ -1,0 +1,6 @@
+{
+  "encoding": "deterministic gzip, NOT historical HTTP compressed bytes",
+  "previous_spec": "omega-previous-spec.json",
+  "retained_gzip_sha256": "80de8d6db55761c020b82506fd7d6c906eefe26b41dc8094de1339c1c73cab6a",
+  "xml_sha256": "6296b93298117faccab8d97b84c3ad6656f1298660cdf5d031a7a715c503ad0b"
+}

@@ -6,8 +6,12 @@ supplies dependency metadata, never dependency ZIPs, installations, built-ins,
 package approval or publication authority. Other package/lane admission is
 unchanged; a different selected package cannot borrow Aura's allowlist.
 
-`external_dependencies` remains `{}` for existing inputs. Its only nonempty form
-is `{"official_omega": SPEC}`. SPEC is a closed object with:
+`external_dependencies` remains `{}` for ordinary inputs. Aura uses
+`{"official_omega": SPEC}`. The separately enrolled exact TV Guide/Nexus adapter
+may coexist under `official_nexus`; see [its bounded contract](OFFICIAL-NEXUS-DEPENDENCIES.md).
+Unknown keys reject; each configured resolver sees only its own spec and all its
+checks run. At most one report can be active per lane; its shape is unchanged.
+Omega SPEC is a closed object with:
 
 - `schema`: integer 1;
 - `source_url`: exactly `https://mirrors.kodi.tv/addons/omega/addons.xml.gz`;
@@ -54,3 +58,26 @@ edges and unavailable optionals. Consumers pin both source files and compare
 freshly reconstructed reports. A structural PASS establishes metadata closure,
 not successful installation, runtime behavior, dependency redistribution rights
 or permission to mirror official packages.
+
+## 2026-11-22 snapshot maintenance
+
+The [retained acquisition](official-dependencies/acquisition-2026-11-22.json)
+records a new authoritative download, exact compressed/XML hashes and matching
+official SHA-256/MD5 sidecars. New XML SHA-256 is
+`800fc70454c9e942d83a4e30c12871e0ac603db85a9ad909941dd8ebba70cb2b`,
+retrieved `2026-11-22T07:21:54Z`, expires `2026-11-29T07:21:54Z`. The
+[previous spec and bytes](official-dependencies/README.md) remain retained;
+`6296b93298117faccab8d97b84c3ad6656f1298660cdf5d031a7a715c503ad0b`
+is the previous XML hash. Both independent resolvers reconstructed the previous
+closure at its actual original retrieval time (historical only) and the current
+closure at actual current time. All **32 external versions, 81 edges, core facts,
+root bindings and unavailable-optionals** match; see
+[the comparison](official-dependencies/omega-closure-comparison.json).
+
+Only snapshot path/hash and actual acquisition/expiry timestamps changed in
+`config/production.json`; its packages, review hashes, allowlist, roots and retained
+installers remain unchanged. No production build/publication or unrelated package
+change was performed. Restore the selected decompressed XML into ignored intake
+using the documented hash-checking procedure; public compressed bytes are tracked
+under docs so private-intake source audit stays strict. A new acquisition/review is
+needed after expiry, not a timestamp extension.
