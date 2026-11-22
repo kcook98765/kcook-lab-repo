@@ -50,6 +50,7 @@
         "script.module.infotagger": "0.0.8",
         "script.module.jurialmunkey": "0.2.28",
         "script.module.pyqrcode": "1.2.1+matrix.4",
+        "script.module.pytz": "2023.3.0+matrix.1",
         "script.module.requests": "2.31.0",
         "script.module.routing": "0.2.3+matrix.1",
         "script.module.simplecache": "2.0.2",
@@ -67,6 +68,11 @@
       "expires_at": "2026-11-29T07:21:54Z",
       "retrieved_at": "2026-11-22T07:21:54Z",
       "roots": {
+        "script.tvguide.fullscreen": {
+          "package_sha256": "76533fcb570cd813e2deb885c919b59eea21171c6ce344d5a40ef5d8fba287b9",
+          "source_commit": "f936c0a514e0de126e62e24fd3d24b66b0c74097",
+          "version": "0.1.1"
+        },
         "skin.aura": {
           "package_sha256": "7309fc3f60429e4ba638d36046565ae48fa2b75f56f653df5200a960aa3ce9c0",
           "source_commit": "88564fd2883d2d286bdf0e887dc0bee634fd8c4e",
@@ -109,10 +115,11 @@
     },
     {
       "lanes": [
-        "nexus"
+        "nexus",
+        "omega"
       ],
-      "review_record": "tvguide-0.1.1-review-v2-independent-final-r2.json",
-      "review_record_sha256": "8a78e12b85edfe2824e326078667debd31526c0c7d86d54a3ef019b3045008ad",
+      "review_record": "tvguide-0.1.1-review-v2-nexus-omega-final-r1.json",
+      "review_record_sha256": "b1f223586f0402b13365683522ff7bdfce27a188d0eebd4d74c7a3a1926a3850",
       "sha256": "76533fcb570cd813e2deb885c919b59eea21171c6ce344d5a40ef5d8fba287b9",
       "zip": "script.tvguide.fullscreen-0.1.1.zip"
     }

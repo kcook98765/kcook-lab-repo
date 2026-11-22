@@ -27,6 +27,9 @@ PROVIDED = {
 FIELDS = {'schema', 'source_url', 'snapshot', 'snapshot_sha256', 'retrieved_at',
           'expires_at', 'core_commit', 'allowlist', 'roots'}
 IDENTIFIER = r'[a-z0-9]+(?:[._-][a-z0-9]+)+'
+TVGUIDE = 'script.tvguide.fullscreen'
+TV_ENROLLED = {'version': '0.1.1', 'package_sha256': '76533fcb570cd813e2deb885c919b59eea21171c6ce344d5a40ef5d8fba287b9',
+               'source_commit': 'f936c0a514e0de126e62e24fd3d24b66b0c74097'}
 
 
 def check(value, message):
@@ -123,11 +126,15 @@ def resolve(manifests, builtins, external_dependencies, incoming_root, lane, bin
     for aid, ver in listed.items():
         check(isinstance(aid, str) and re.fullmatch(IDENTIFIER, aid) and aid not in PROVIDED, 'invalid official allowlist')
         parse_version(ver)
-    check(isinstance(data['roots'], dict) and set(data['roots']) == {'skin.aura'}, 'only Aura is enrolled')
-    bind = data['roots']['skin.aura']
-    check(isinstance(bind, dict) and set(bind) == {'version', 'package_sha256', 'source_commit'} and bind['version'] == '2.1.0' and
-          isinstance(bind['package_sha256'], str) and re.fullmatch('[0-9a-f]{64}', bind['package_sha256']) and
-          isinstance(bind['source_commit'], str) and re.fullmatch('[0-9a-f]{40}', bind['source_commit']), 'invalid Aura artifact binding')
+    check(isinstance(data['roots'], dict) and data['roots'] and
+          set(data['roots']) <= {'skin.aura', TVGUIDE}, 'only Aura and exact TV Guide are enrolled')
+    if 'skin.aura' in data['roots']:
+        bind = data['roots']['skin.aura']
+        check(isinstance(bind, dict) and set(bind) == {'version', 'package_sha256', 'source_commit'} and bind['version'] == '2.1.0' and
+              isinstance(bind['package_sha256'], str) and re.fullmatch('[0-9a-f]{64}', bind['package_sha256']) and
+              isinstance(bind['source_commit'], str) and re.fullmatch('[0-9a-f]{40}', bind['source_commit']), 'invalid Aura artifact binding')
+    if TVGUIDE in data['roots']:
+        check(data['roots'][TVGUIDE] == TV_ENROLLED, 'only exact frozen TV Guide beta is enrolled')
     raw = file_bytes(incoming_root, data['snapshot'])
     check(hashlib.sha256(raw).hexdigest() == data['snapshot_sha256'], 'snapshot checksum mismatch')
     check(b'\0' not in raw, 'only UTF-8 snapshot XML is accepted')
@@ -146,15 +153,32 @@ def resolve(manifests, builtins, external_dependencies, incoming_root, lane, bin
     check(len(manifests) == len(selected) and not set(selected).intersection(listed), 'ambiguous or substituted selected package')
     if lane != 'omega':
         check('skin.aura' not in selected, 'Aura official adapter is Omega-only')
+        check(TVGUIDE not in selected, 'TV Guide adapter is Omega 21.3-only')
         return inactive
-    if 'skin.aura' not in selected: return inactive
-    aura = selected['skin.aura']
-    check(aura.get('version') == '2.1.0' and aura.find("extension[@point='xbmc.gui.skin']") is not None, 'enrolled root is not Aura 2.1.0 skin')
-    actual = bindings.get('skin.aura', {})
-    check(actual.get('package_sha256') == bind['package_sha256'] and actual.get('source_commit') == bind['source_commit'] and actual.get('source_repository') == 'https://github.com/kcook98765/skin.aura', 'Aura artifact/source binding mismatch')
+    check(TVGUIDE not in selected or TVGUIDE in data['roots'], 'TV Guide requires its own exact Omega enrollment')
+    roots = sorted(set(selected).intersection(data['roots']))
+    if not roots: return inactive
+    for root_id in roots:
+        node, actual = selected[root_id], bindings.get(root_id, {})
+        if root_id == 'skin.aura':
+            bind = data['roots'][root_id]
+            check(node.get('version') == '2.1.0' and node.find("extension[@point='xbmc.gui.skin']") is not None, 'enrolled root is not Aura 2.1.0 skin')
+            check(actual.get('package_sha256') == bind['package_sha256'] and actual.get('source_commit') == bind['source_commit'] and actual.get('source_repository') == 'https://github.com/kcook98765/skin.aura', 'Aura artifact/source binding mismatch')
+        else:
+            expected = (('script.module.beautifulsoup4', '4.12.2', False), ('script.module.dateutil', '2.8.2', False),
+                        ('script.module.pil', '5.1.0', False), ('script.module.pytz', '2023.3.0+matrix.1', False),
+                        ('script.module.requests', '2.31.0', False), ('xbmc.python', '3.0.0', False))
+            extensions = sorted((e.get('point'), e.get('library')) for e in node.findall('extension') if e.get('point') != 'xbmc.addon.metadata')
+            check(node.get('version') == '0.1.1' and imports(node) == expected and
+                  extensions == [('xbmc.python.script', 'addon.py'), ('xbmc.service', 'service.py')], 'enrolled root manifest mismatch')
+            check(set(actual) == {'source_commit', 'package_sha256', 'source_repository'} and
+                  actual['source_commit'] == TV_ENROLLED['source_commit'] and actual['package_sha256'] == TV_ENROLLED['package_sha256'] and
+                  actual['source_repository'] == 'https://github.com/kcook98765/script.tvguide.fullscreen', 'TV Guide artifact/source binding mismatch')
     for aid in set(builtins).intersection(PROVIDED): check(builtins[aid] == PROVIDED[aid][0], 'configured built-in differs from pinned Omega core')
     for aid, node in selected.items():
-        if aid != 'skin.aura': check(not any(a in listed for a, _, optional in imports(node) if not optional), 'unrelated package attempts Aura-only external admission')
+        if aid not in roots:
+            check(not any(a in listed or a in PROVIDED and a not in builtins for a, _, optional in imports(node) if not optional),
+                  'unrelated package attempts Aura-only or TV Guide external admission')
     ext, core, edges, missing, finished = {}, {}, [], [], set()
 
     def walk(parent, aid, floor, optional, branch, ancestry):
@@ -190,15 +214,26 @@ def resolve(manifests, builtins, external_dependencies, incoming_root, lane, bin
             for child, ver, opt in descendants: walk(aid, child, ver, opt, branch, ancestry + (aid,))
             finished.add((aid, branch))
 
-    for aid, floor, optional in imports(aura): walk('skin.aura', aid, floor, optional, False, ())
+    closures, combined_ext, combined_core, combined_edges, combined_missing = {}, {}, {}, [], []
+    for root_id in roots:
+        ext, core, edges, missing, finished = {}, {}, [], [], set()
+        for aid, floor, optional in imports(selected[root_id]): walk(root_id, aid, floor, optional, False, ())
+        closures[root_id] = {'external_versions': dict(sorted(ext.items())), 'core_versions': dict(sorted(core.items())),
+                             'edges': sorted(edges, key=lambda e: (e['parent'], e['addon'], e['optional_branch'], e['minimum'])),
+                             'unavailable_optional': sorted(missing, key=lambda e: (e['parent'], e['addon']))}
+        combined_ext.update(ext); combined_core.update(core)
+        combined_edges += edges; combined_missing += missing
+    ext, core, edges, missing = combined_ext, combined_core, combined_edges, combined_missing
     check(set(ext) == set(listed), 'unused or incomplete exact official allowlist')
-    return {'active': True, 'source_url': ORIGIN, 'snapshot_sha256': data['snapshot_sha256'],
+    report = {'active': True, 'source_url': ORIGIN, 'snapshot_sha256': data['snapshot_sha256'],
             'retrieved_at': data['retrieved_at'], 'expires_at': data['expires_at'], 'core_commit': REVISION,
             'version_comparison_source': 'https://github.com/xbmc/xbmc/blob/' + REVISION + '/xbmc/addons/AddonVersion.cpp',
             'roots': data['roots'], 'external_versions': dict(sorted(ext.items())), 'core_versions': dict(sorted(core.items())),
             'edges': sorted(edges, key=lambda x: (x['parent'], x['addon'], x['optional_branch'], x['minimum'])),
             'unavailable_optional': sorted(missing, key=lambda x: (x['parent'], x['addon'])),
             'warnings': ['Official snapshot dependency evidence only; no dependency installation or native acceptance is asserted.']}
+    if TVGUIDE in data['roots']: report['root_closures'] = closures
+    return report
 
 version_key = cmp_to_key(compare_versions)
 

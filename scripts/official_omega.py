@@ -1,4 +1,4 @@
-"""Pinned official Omega dependency evidence for the explicitly enrolled Aura alpha.
+"""Pinned official Omega evidence for Aura and the exact enrolled TV Guide beta.
 
 No download, add-on execution, package mirroring, built-in reclassification or
 release authority. Consumers retain their own ordinary dependency/approval gates.
@@ -34,6 +34,9 @@ KEYS = {'schema', 'source_url', 'snapshot', 'snapshot_sha256', 'retrieved_at',
         'expires_at', 'core_commit', 'allowlist', 'roots'}
 ID = re.compile(r'[a-z0-9]+(?:[._-][a-z0-9]+)+\Z')
 HEX = re.compile(r'[0-9a-f]{64}\Z')
+TVGUIDE = 'script.tvguide.fullscreen'
+TV_BINDING = {'version': '0.1.1', 'source_commit': 'f936c0a514e0de126e62e24fd3d24b66b0c74097',
+              'package_sha256': '76533fcb570cd813e2deb885c919b59eea21171c6ce344d5a40ef5d8fba287b9'}
 
 
 def require(ok, reason):
@@ -145,11 +148,15 @@ def resolve(manifests, builtins, external_dependencies, incoming_root, lane, bin
     allow = spec['allowlist']
     require(isinstance(allow, dict) and 0 < len(allow) <= 128 and all(isinstance(k, str) and ID.fullmatch(k) and k not in CORE for k in allow), 'invalid official allowlist')
     for version in allow.values(): _parts(version)
-    require(isinstance(spec['roots'], dict) and set(spec['roots']) == {'skin.aura'}, 'only Aura is enrolled')
-    binding = spec['roots']['skin.aura']
-    require(isinstance(binding, dict) and set(binding) == {'version', 'package_sha256', 'source_commit'} and
-            binding['version'] == '2.1.0' and isinstance(binding['package_sha256'], str) and HEX.fullmatch(binding['package_sha256']) and
-            isinstance(binding['source_commit'], str) and re.fullmatch(r'[0-9a-f]{40}', binding['source_commit']), 'invalid Aura artifact binding')
+    require(isinstance(spec['roots'], dict) and spec['roots'] and
+            set(spec['roots']) <= {'skin.aura', TVGUIDE}, 'only Aura and exact TV Guide are enrolled')
+    if 'skin.aura' in spec['roots']:
+        binding = spec['roots']['skin.aura']
+        require(isinstance(binding, dict) and set(binding) == {'version', 'package_sha256', 'source_commit'} and
+                binding['version'] == '2.1.0' and isinstance(binding['package_sha256'], str) and HEX.fullmatch(binding['package_sha256']) and
+                isinstance(binding['source_commit'], str) and re.fullmatch(r'[0-9a-f]{40}', binding['source_commit']), 'invalid Aura artifact binding')
+    if TVGUIDE in spec['roots']:
+        require(spec['roots'][TVGUIDE] == TV_BINDING, 'only exact frozen TV Guide beta is enrolled')
     raw = _read_snapshot(incoming_root, spec['snapshot'])
     require(hashlib.sha256(raw).hexdigest() == spec['snapshot_sha256'], 'snapshot checksum mismatch')
     require(b'\0' not in raw, 'only UTF-8 snapshot XML is accepted')
@@ -169,19 +176,33 @@ def resolve(manifests, builtins, external_dependencies, incoming_root, lane, bin
     require(not set(selected) & set(allow), 'official provider may not be replaced by admitted package')
     if lane != 'omega':
         require('skin.aura' not in selected, 'Aura official adapter is Omega-only')
+        require(TVGUIDE not in selected, 'TV Guide adapter is Omega 21.3-only')
         return empty
-    if 'skin.aura' not in selected:
-        return empty
-    aura = selected['skin.aura']
-    require(aura.get('version') == '2.1.0' and aura.find("extension[@point='xbmc.gui.skin']") is not None, 'enrolled root is not Aura 2.1.0 skin')
-    actual = bindings.get('skin.aura', {})
-    require(actual.get('package_sha256') == binding['package_sha256'] and actual.get('source_commit') == binding['source_commit'] and actual.get('source_repository') == 'https://github.com/kcook98765/skin.aura', 'Aura artifact/source binding mismatch')
+    require(TVGUIDE not in selected or TVGUIDE in spec['roots'], 'TV Guide requires its own exact Omega enrollment')
+    enrolled = set(selected) & set(spec['roots'])
+    if not enrolled: return empty
+    if 'skin.aura' in enrolled:
+        aura = selected['skin.aura']
+        require(aura.get('version') == '2.1.0' and aura.find("extension[@point='xbmc.gui.skin']") is not None, 'enrolled root is not Aura 2.1.0 skin')
+        binding, actual = spec['roots']['skin.aura'], bindings.get('skin.aura', {})
+        require(actual.get('package_sha256') == binding['package_sha256'] and actual.get('source_commit') == binding['source_commit'] and actual.get('source_repository') == 'https://github.com/kcook98765/skin.aura', 'Aura artifact/source binding mismatch')
+    if TVGUIDE in enrolled:
+        tv = selected[TVGUIDE]
+        require(tv.get('version') == '0.1.1' and _requirements(tv) == [
+            ('script.module.beautifulsoup4', '4.12.2', False), ('script.module.dateutil', '2.8.2', False),
+            ('script.module.pil', '5.1.0', False), ('script.module.pytz', '2023.3.0+matrix.1', False),
+            ('script.module.requests', '2.31.0', False), ('xbmc.python', '3.0.0', False)] and
+            sorted((n.get('point'), n.get('library')) for n in tv.findall('extension') if n.get('point') != 'xbmc.addon.metadata') ==
+            [('xbmc.python.script', 'addon.py'), ('xbmc.service', 'service.py')], 'enrolled root manifest mismatch')
+        require(bindings.get(TVGUIDE) == {k: TV_BINDING[k] for k in ('source_commit', 'package_sha256')} |
+                {'source_repository': 'https://github.com/kcook98765/script.tvguide.fullscreen'}, 'TV Guide artifact/source binding mismatch')
     for aid, version in builtins.items():
         if aid in CORE: require(version == CORE[aid][0], 'configured built-in differs from pinned Omega core')
-    # A separate selected add-on cannot borrow the Aura-specific admission.
+    # A separate selected add-on cannot borrow either root's external/core admission.
     for aid, node in selected.items():
-        if aid != 'skin.aura':
-            require(not any(dep in allow for dep, _, optional in _requirements(node) if not optional), 'unrelated package attempts Aura-only external admission')
+        if aid not in enrolled:
+            require(not any(dep in allow or dep in CORE and dep not in builtins
+                            for dep, _, optional in _requirements(node) if not optional), 'unrelated package attempts Aura-only or TV Guide external admission')
     external = {}; core = {}; edges = []; unavailable = []; done = set(); active = set()
 
     def visit(parent, aid, minimum, optional=False, via_optional=False):
@@ -218,15 +239,28 @@ def resolve(manifests, builtins, external_dependencies, incoming_root, lane, bin
         active.remove(aid)
         done.add((aid, branch))
 
-    for aid, minimum, optional in _requirements(aura): visit('skin.aura', aid, minimum, optional)
+    closures = {}
+    all_external, all_core, all_edges, all_unavailable = {}, {}, [], []
+    for root_id in sorted(enrolled):
+        # Do not share traversal caches between roots, including optional branches.
+        external, core, edges, unavailable, done, active = {}, {}, [], [], set(), set()
+        for aid, minimum, optional in _requirements(selected[root_id]): visit(root_id, aid, minimum, optional)
+        closures[root_id] = dict(external_versions=dict(sorted(external.items())), core_versions=dict(sorted(core.items())),
+                                edges=sorted(edges, key=lambda e: (e['parent'], e['addon'], e['optional_branch'], e['minimum'])),
+                                unavailable_optional=sorted(unavailable, key=lambda e: (e['parent'], e['addon'])))
+        all_external.update(external); all_core.update(core)
+        all_edges.extend(edges); all_unavailable.extend(unavailable)
+    external, core, edges, unavailable = all_external, all_core, all_edges, all_unavailable
     require(set(external) == set(allow), 'unused or incomplete exact official allowlist')
-    return {'active': True, 'source_url': SOURCE_URL, 'snapshot_sha256': spec['snapshot_sha256'],
+    report = {'active': True, 'source_url': SOURCE_URL, 'snapshot_sha256': spec['snapshot_sha256'],
             'retrieved_at': spec['retrieved_at'], 'expires_at': spec['expires_at'], 'core_commit': CORE_COMMIT,
             'version_comparison_source': VERSION_SOURCE, 'roots': spec['roots'],
             'external_versions': dict(sorted(external.items())), 'core_versions': dict(sorted(core.items())),
             'edges': sorted(edges, key=lambda e: (e['parent'], e['addon'], e['optional_branch'], e['minimum'])),
             'unavailable_optional': sorted(unavailable, key=lambda e: (e['parent'], e['addon'])),
             'warnings': ['Official snapshot dependency evidence only; no dependency installation or native acceptance is asserted.']}
+    if TVGUIDE in spec['roots']: report['root_closures'] = closures
+    return report
 
 
 def _requirements_signature(node):

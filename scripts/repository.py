@@ -404,7 +404,7 @@ def production_packages(config, profile='production'):
     require(profile in ('production', 'candidate'), 'Invalid intake profile')
     inputs = json.loads((ROOT/f'config/{profile}.json').read_text())
     require(isinstance(inputs['external_dependencies'], dict), 'Malformed external dependency configuration')
-    require(set(inputs['external_dependencies']) <= {'official_omega', 'official_nexus'},
+    require(set(inputs['external_dependencies']) <= {'official_omega', 'official_nexus', 'official_matrix'},
             'External dependencies require a separately reviewed adapter (exact-root official enrollment)')
     ledger = json.loads(ledger_path(profile).read_text())
     packages = []
@@ -486,14 +486,23 @@ def external_dependency_report(profile, manifests, builtins, lane, bindings):
     require(isinstance(spec, dict), 'Malformed external dependency configuration')
     if not spec:
         return {}
-    require(set(spec) <= {'official_omega', 'official_nexus'}, 'Unsupported external provider')
+    require(set(spec) <= {'official_omega', 'official_nexus', 'official_matrix'}, 'Unsupported external provider')
     reports = []
-    if 'official_omega' in spec:
-        import official_omega
-        reports.append(official_omega.resolve(manifests, builtins, {'official_omega': spec['official_omega']}, ROOT/'incoming', lane, bindings))
-    if 'official_nexus' in spec:
-        import official_nexus
-        reports.append(official_nexus.resolve(manifests, builtins, {'official_nexus': spec['official_nexus']}, ROOT/'incoming', lane, bindings))
+    import importlib
+    current = 'official_' + lane if lane in ('matrix', 'nexus', 'omega') else None
+    order = ([current] if current in spec else []) + sorted(set(spec) - {current})
+    tv_enrolled = False
+    for name in order:
+        # Only a successfully reconstructed exact current-lane TV Guide root may
+        # defer the inactive adapters' historical wrong-lane TV Guide prohibition.
+        # Never hide Aura/foreign roots, or skip inactive input integrity/expiry.
+        selected = [m for m in manifests if m.get('id') != 'script.tvguide.fullscreen'] if tv_enrolled and name != current else manifests
+        report = importlib.import_module(name).resolve(selected, builtins, {name: spec[name]}, ROOT/'incoming', lane, bindings)
+        reports.append(report)
+        if name == current and report['active']:
+            tv_enrolled = report.get('roots', {}).get('script.tvguide.fullscreen') == {
+                'version': '0.1.1', 'source_commit': 'f936c0a514e0de126e62e24fd3d24b66b0c74097',
+                'package_sha256': '76533fcb570cd813e2deb885c919b59eea21171c6ce344d5a40ef5d8fba287b9'}
     active = [report for report in reports if report['active']]
     require(len(active) <= 1, 'Conflicting active exact-root dependency adapters')
     return active[0] if active else reports[0]
@@ -519,10 +528,12 @@ def dependency_toolchain(profile):
     if profile == 'fixture' or not json.loads((ROOT/f'config/{profile}.json').read_text())['external_dependencies']:
         return {}
     spec = json.loads((ROOT/f'config/{profile}.json').read_text())['external_dependencies']
-    require(set(spec) <= {'official_omega', 'official_nexus'}, 'Unsupported external provider')
+    require(set(spec) <= {'official_omega', 'official_nexus', 'official_matrix'}, 'Unsupported external provider')
     names = ['official_omega', 'audit_official_omega']
     if 'official_nexus' in spec:
         names += ['official_nexus', 'audit_official_nexus']
+    if 'official_matrix' in spec:
+        names += ['official_matrix', 'audit_official_matrix']
     return {name+'_sha256':sha((Path(__file__).parent/(name+'.py')).read_bytes()) for name in names}
 
 

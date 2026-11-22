@@ -1,0 +1,64 @@
+{
+  "matrix": {
+    "bytes": 1315360,
+    "expires_at": "2026-11-29T09:47:47Z",
+    "file": "matrix-8473a49bffc6.xml.gz",
+    "final_url": "https://ftp.halifax.rwth-aachen.de/xbmc/addons/matrix/addons.xml.gz",
+    "http_headers": {
+      "Accept-Ranges": "bytes",
+      "Connection": "close",
+      "Content-Length": "1315360",
+      "Content-Type": "application/octet-stream",
+      "Date": "Sun, 22 Nov 2026 09:47:46 GMT",
+      "Last-Modified": "Tue, 17 Nov 2026 22:20:47 GMT",
+      "Server": "nginx/1.26.3"
+    },
+    "http_status": 200,
+    "md5_sidecar": {
+      "bytes": 47,
+      "file": "matrix-8473a49bffc6.xml.gz.md5",
+      "final_url": "https://mirrors.kodi.tv/addons/matrix/addons.xml.gz.md5",
+      "http_headers": {
+        "Cache-Control": "no-cache",
+        "Connection": "close",
+        "Content-Length": "47",
+        "Content-Type": "text/plain; charset=UTF-8",
+        "Date": "Sun, 22 Nov 2026 09:47:47 GMT",
+        "Expires": "Sun, 22 Nov 2026 09:47:46 GMT",
+        "X-Kodi-Recheck-After": "21600"
+      },
+      "http_status": 200,
+      "matched": true,
+      "retrieved_at": "2026-11-22T09:47:47Z",
+      "sha256": "a71ee0a59738b13538e6886594a046411817ca63ee3762ecbb7cf96a9ce847e8",
+      "source_url": "https://mirrors.kodi.tv/addons/matrix/addons.xml.gz.md5",
+      "started_at": "2026-11-22T09:47:47Z"
+    },
+    "retrieved_at": "2026-11-22T09:47:47Z",
+    "sha256": "a3f37b9fbc0e1d0896565311bf4c150d9af55d6e10e0185674c9e13302b28727",
+    "sha256_sidecar": {
+      "bytes": 79,
+      "file": "matrix-8473a49bffc6.xml.gz.sha256",
+      "final_url": "https://mirrors.kodi.tv/addons/matrix/addons.xml.gz.sha256",
+      "http_headers": {
+        "Cache-Control": "no-cache",
+        "Connection": "close",
+        "Content-Length": "79",
+        "Content-Type": "text/plain; charset=UTF-8",
+        "Date": "Sun, 22 Nov 2026 09:47:47 GMT",
+        "Expires": "Sun, 22 Nov 2026 09:47:46 GMT",
+        "X-Kodi-Recheck-After": "21600"
+      },
+      "http_status": 200,
+      "matched": true,
+      "retrieved_at": "2026-11-22T09:47:47Z",
+      "sha256": "ea55954a0cf6bf8deff4ef1cf3f362e37999924001c998660184e9f62a2508a7",
+      "source_url": "https://mirrors.kodi.tv/addons/matrix/addons.xml.gz.sha256",
+      "started_at": "2026-11-22T09:47:47Z"
+    },
+    "source_url": "https://mirrors.kodi.tv/addons/matrix/addons.xml.gz",
+    "started_at": "2026-11-22T09:47:44Z",
+    "xml_bytes": 7810768,
+    "xml_sha256": "8473a49bffc64d461ed0fd20b7f28500759d257edfa8634d63cc5f4709565516"
+  }
+}

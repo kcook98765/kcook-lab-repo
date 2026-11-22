@@ -1,0 +1,30 @@
+{
+  "official_matrix": {
+    "allowlist": {
+      "script.module.beautifulsoup4": "4.12.2",
+      "script.module.certifi": "2023.5.7",
+      "script.module.chardet": "5.1.0",
+      "script.module.dateutil": "2.8.2",
+      "script.module.idna": "3.10.0",
+      "script.module.pytz": "2023.3.0+matrix.1",
+      "script.module.requests": "2.31.0",
+      "script.module.six": "1.16.0+matrix.1",
+      "script.module.soupsieve": "2.4.1",
+      "script.module.urllib3": "2.2.3"
+    },
+    "core_commit": "e12e66e019af29ba9d5f5a2614315b15a138b81a",
+    "expires_at": "2026-11-29T09:47:47Z",
+    "retrieved_at": "2026-11-22T09:47:47Z",
+    "roots": {
+      "script.tvguide.fullscreen": {
+        "package_sha256": "76533fcb570cd813e2deb885c919b59eea21171c6ce344d5a40ef5d8fba287b9",
+        "source_commit": "f936c0a514e0de126e62e24fd3d24b66b0c74097",
+        "version": "0.1.1"
+      }
+    },
+    "schema": 1,
+    "snapshot": "official/matrix-8473a49bffc6.xml",
+    "snapshot_sha256": "8473a49bffc64d461ed0fd20b7f28500759d257edfa8634d63cc5f4709565516",
+    "source_url": "https://mirrors.kodi.tv/addons/matrix/addons.xml.gz"
+  }
+}

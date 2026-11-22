@@ -51,3 +51,14 @@ adapters still validate current snapshot integrity/expiry. Builds require the
 separately retained private approved packages/records as before. No TV Guide ZIP,
 review record or new ledger entry belongs in this directory or this maintenance
 change. Every candidate decision remains pending until genuinely reviewed.
+
+## TV Guide Matrix/Omega preparation
+
+See [the exact lane contract](../TVGUIDE-LANE-PREPARATION.md). Matrix's actual
+2026-11-22 acquisition, both official sidecars and separate 19.4 primary-source
+proof are retained here. No Nexus/Omega catalog snapshot is refreshed by that
+change. The full proposed Omega enrollment retains Aura and its closure; a
+TV-Guide-only private candidate instead selects only its own ten-provider closure.
+The public enrollment JSON files are proposals, not live production admission.
+Matrix remains policy-blocked for the unresolved historical native crash even
+though exact metadata closure and a separately reported bounded smoke succeeded.

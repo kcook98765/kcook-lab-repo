@@ -16,6 +16,8 @@ import official_nexus
 import audit_official_nexus
 import official_omega
 import audit_official_omega
+import official_matrix
+import audit_official_matrix
 
 
 def sha(raw): return hashlib.sha256(raw).hexdigest()
@@ -23,6 +25,47 @@ def load(name): return json.loads((PUBLIC / name).read_text())
 
 
 class OfficialMetadata(unittest.TestCase):
+    def test_matrix_acquisition_sidecars_and_actual_seven_day_window(self):
+        entry = load('matrix-acquisition-2026-11-22.json')['matrix']
+        raw = (PUBLIC / entry['file']).read_bytes()
+        self.assertEqual(sha(raw), entry['sha256'])
+        self.assertEqual(len(raw), entry['bytes'])
+        self.assertEqual(sha(gzip.decompress(raw)), entry['xml_sha256'])
+        self.assertEqual(len(gzip.decompress(raw)), entry['xml_bytes'])
+        self.assertEqual(entry['source_url'], official_matrix.SOURCE_URL)
+        for suffix in ('sha256', 'md5'):
+            proof = entry[suffix + '_sidecar']
+            sidecar = (PUBLIC / proof['file']).read_bytes()
+            self.assertEqual(sha(sidecar), proof['sha256'])
+            self.assertEqual(sidecar.decode().split()[0], hashlib.new(suffix, raw).hexdigest())
+            self.assertTrue(proof['matched'])
+        spec = load('tvguide-matrix-enrollment.json')['official_matrix']
+        self.assertEqual(spec['snapshot_sha256'], entry['xml_sha256'])
+        for key in ('retrieved_at', 'expires_at'): self.assertEqual(spec[key], entry[key])
+        self.assertEqual(official_omega._stamp(spec['expires_at']) - official_omega._stamp(spec['retrieved_at']), timedelta(days=7))
+
+    def test_separate_matrix_and_omega_tvguide_core_primary_sources(self):
+        for filename, producer, auditor, tag in (
+            ('matrix-core-provenance.json', official_matrix, audit_official_matrix, '19.4-Matrix'),
+            ('omega-tvguide-core-provenance.json', official_omega, audit_official_omega, '21.3-Omega')):
+            proof = load(filename)
+            self.assertEqual(proof['commit'], producer.CORE_COMMIT)
+            self.assertEqual(proof['commit'], auditor.REVISION)
+            self.assertEqual(proof['tag'], tag)
+            for relative, entry in proof['files'].items():
+                self.assertIn('/' + proof['commit'] + '/', entry['source_url'])
+                if 'file' not in entry:
+                    self.assertTrue(relative.endswith('.cpp')); continue
+                raw = (PUBLIC / entry['file']).read_bytes()
+                self.assertEqual(sha(raw), entry['sha256'])
+                self.assertEqual(len(raw), entry['bytes'])
+                if relative.endswith('addon.xml'):
+                    manifest = ET.fromstring(raw)
+                    abi = manifest.find('backwards-compatibility')
+                    actual = (manifest.get('version'), abi.get('abi') if abi is not None else None)
+                    self.assertEqual(actual, producer.CORE[manifest.get('id')])
+                    self.assertEqual(actual, auditor.PROVIDED[manifest.get('id')])
+
     def test_exact_downloaded_bytes_xml_and_both_sidecars(self):
         for lane, entry in load('acquisition-2026-11-22.json').items():
             with self.subTest(lane=lane):
@@ -50,8 +93,10 @@ class OfficialMetadata(unittest.TestCase):
         self.assertEqual(old['retrieved_at'], '2026-11-15T01:46:57Z')
         self.assertEqual(old['expires_at'], '2026-11-22T01:46:57Z')
         current = json.loads((ROOT / 'config/production.json').read_text())['external_dependencies']['official_omega']
-        unchanged = set(old) - {'snapshot', 'snapshot_sha256', 'retrieved_at', 'expires_at'}
+        unchanged = set(old) - {'snapshot', 'snapshot_sha256', 'retrieved_at', 'expires_at', 'roots', 'allowlist'}
         self.assertEqual({k: old[k] for k in unchanged}, {k: current[k] for k in unchanged})
+        self.assertEqual(current['roots'], old['roots'] | {official_nexus.ROOT_ID: official_nexus.ROOT_BINDING})
+        self.assertEqual(current['allowlist'], old['allowlist'] | {'script.module.pytz': '2023.3.0+matrix.1'})
         self.assertNotEqual(old['snapshot'], current['snapshot'])
 
     def test_actual_core_source_manifests_and_abi_proof(self):
@@ -76,6 +121,11 @@ class OfficialMetadata(unittest.TestCase):
     def test_retained_omega_reconstructs_all_32_approved_providers_and_81_edges(self):
         spec = json.loads((ROOT / 'config/production.json').read_text())['external_dependencies']['official_omega']
         report = load('omega-refreshed-closure.json')
+        # Preserve the historical Aura-only reconstruction after the separately
+        # reviewed exact TV Guide root is added to the current production proposal.
+        self.assertEqual({aid: spec['allowlist'][aid] for aid in report['external_versions']}, report['external_versions'])
+        spec['roots'] = {'skin.aura': spec['roots']['skin.aura']}
+        spec['allowlist'] = report['external_versions']
         root = ET.Element('addon', id='skin.aura', version='2.1.0')
         group = ET.SubElement(root, 'requires')
         for edge in report['edges']:
@@ -99,7 +149,7 @@ class OfficialMetadata(unittest.TestCase):
         self.assertEqual(len(report['edges']), 81)
         self.assertEqual(load('omega-closure-comparison.json')['differences'], {})
 
-    def test_nexus_public_spec_is_successor_only_and_not_production_admission(self):
+    def test_nexus_public_spec_and_final_nexus_omega_only_production_intake(self):
         external = load('tvguide-nexus-enrollment.json')
         spec = external['official_nexus']
         self.assertEqual(spec['roots'], {official_nexus.ROOT_ID: official_nexus.ROOT_BINDING})
@@ -108,8 +158,17 @@ class OfficialMetadata(unittest.TestCase):
         self.assertNotIn('script.module.pil', spec['allowlist'])
         self.assertNotIn('xbmc.python', spec['allowlist'])
         production = json.loads((ROOT / 'config/production.json').read_text())
-        self.assertEqual(set(production['external_dependencies']), {'official_omega'})
-        self.assertFalse(any('tvguide' in p['zip'] for p in production['packages']))
+        self.assertEqual(set(production['external_dependencies']), {'official_omega', 'official_nexus'})
+        self.assertEqual(production['external_dependencies']['official_nexus'], spec)
+        tv = [p for p in production['packages'] if 'tvguide' in p['zip']]
+        self.assertEqual(len(tv), 1)
+        self.assertEqual(tv[0]['lanes'], ['nexus', 'omega'])
+        self.assertEqual(tv[0]['sha256'], official_nexus.ROOT_BINDING['package_sha256'])
+        self.assertEqual(tv[0]['review_record'], 'tvguide-0.1.1-review-v2-nexus-omega-final-r1.json')
+        self.assertEqual(tv[0]['review_record_sha256'], 'b1f223586f0402b13365683522ff7bdfce27a188d0eebd4d74c7a3a1926a3850')
+        self.assertEqual(production['external_dependencies']['official_omega'], load('tvguide-omega-enrollment.json')['official_omega'])
+        self.assertNotIn('official_matrix', production['external_dependencies'])
+        self.assertTrue(set(tv[0]['lanes']).isdisjoint({'matrix', 'piers'}))
 
 
 if __name__ == '__main__': unittest.main()
