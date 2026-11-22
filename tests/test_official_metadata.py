@@ -149,7 +149,7 @@ class OfficialMetadata(unittest.TestCase):
         self.assertEqual(len(report['edges']), 81)
         self.assertEqual(load('omega-closure-comparison.json')['differences'], {})
 
-    def test_nexus_public_spec_and_final_nexus_omega_only_production_intake(self):
+    def test_nexus_public_spec_and_final_three_lane_production_intake(self):
         external = load('tvguide-nexus-enrollment.json')
         spec = external['official_nexus']
         self.assertEqual(spec['roots'], {official_nexus.ROOT_ID: official_nexus.ROOT_BINDING})
@@ -158,17 +158,17 @@ class OfficialMetadata(unittest.TestCase):
         self.assertNotIn('script.module.pil', spec['allowlist'])
         self.assertNotIn('xbmc.python', spec['allowlist'])
         production = json.loads((ROOT / 'config/production.json').read_text())
-        self.assertEqual(set(production['external_dependencies']), {'official_omega', 'official_nexus'})
+        self.assertEqual(set(production['external_dependencies']), {'official_matrix', 'official_omega', 'official_nexus'})
         self.assertEqual(production['external_dependencies']['official_nexus'], spec)
         tv = [p for p in production['packages'] if 'tvguide' in p['zip']]
         self.assertEqual(len(tv), 1)
-        self.assertEqual(tv[0]['lanes'], ['nexus', 'omega'])
+        self.assertEqual(tv[0]['lanes'], ['matrix', 'nexus', 'omega'])
         self.assertEqual(tv[0]['sha256'], official_nexus.ROOT_BINDING['package_sha256'])
-        self.assertEqual(tv[0]['review_record'], 'tvguide-0.1.1-review-v2-nexus-omega-final-r1.json')
-        self.assertEqual(tv[0]['review_record_sha256'], 'b1f223586f0402b13365683522ff7bdfce27a188d0eebd4d74c7a3a1926a3850')
+        self.assertEqual(tv[0]['review_record'], 'tvguide-0.1.1-review-v2-three-lane-final-r1.json')
+        self.assertEqual(tv[0]['review_record_sha256'], 'd3d235fda503f98cda087be49ac04802e7f8f0c3ebaf6d3084172227c39782e9')
         self.assertEqual(production['external_dependencies']['official_omega'], load('tvguide-omega-enrollment.json')['official_omega'])
-        self.assertNotIn('official_matrix', production['external_dependencies'])
-        self.assertTrue(set(tv[0]['lanes']).isdisjoint({'matrix', 'piers'}))
+        self.assertEqual(production['external_dependencies']['official_matrix'], load('tvguide-matrix-enrollment.json')['official_matrix'])
+        self.assertNotIn('piers', tv[0]['lanes'])
 
 
 if __name__ == '__main__': unittest.main()
