@@ -1,16 +1,20 @@
 # Narrow official Omega dependency adapter
 
-This opt-in adapter is enrolled only for `skin.aura` **2.1.0**, its exact reviewed
-source commit/ZIP, the `xbmc.gui.skin` extension and the **Omega** catalog. It
+This opt-in adapter supports `skin.aura` **2.1.0**, its reviewed source commit/ZIP,
+the `xbmc.gui.skin` extension and the **Omega** catalog, plus only the exact
+[TV Guide 0.1.1 enrollment](TVGUIDE-LANE-PREPARATION.md). It
 supplies dependency metadata, never dependency ZIPs, installations, built-ins,
 package approval or publication authority. Other package/lane admission is
 unchanged; a different selected package cannot borrow Aura's allowlist.
 
 `external_dependencies` remains `{}` for ordinary inputs. Aura uses
 `{"official_omega": SPEC}`. The separately enrolled exact TV Guide/Nexus adapter
-may coexist under `official_nexus`; see [its bounded contract](OFFICIAL-NEXUS-DEPENDENCIES.md).
+may coexist under `official_nexus`; the closed Matrix preparation adapter may
+coexist under `official_matrix`. See [the Nexus contract](OFFICIAL-NEXUS-DEPENDENCIES.md)
+and [TV Guide lane preparation](TVGUIDE-LANE-PREPARATION.md).
 Unknown keys reject; each configured resolver sees only its own spec and all its
-checks run. At most one report can be active per lane; its shape is unchanged.
+checks run. At most one report can be active per lane. Aura-only report shape is
+unchanged; TV Guide enrollment adds independently reconstructed `root_closures`.
 Omega SPEC is a closed object with:
 
 - `schema`: integer 1;
@@ -24,9 +28,12 @@ Omega SPEC is a closed object with:
 - `core_commit`: `a3a448d26b8d560a65655dab2cd122994dc4e146` (Kodi 21.3 source);
 - `allowlist`: exact map of every reached official add-on ID to its newest
   published version. Missing, unused or old-provider entries reject;
-- `roots`: exactly `{"skin.aura": {"version": "2.1.0", "package_sha256": HASH,
+- `roots`: Aura-only remains `{"skin.aura": {"version": "2.1.0", "package_sha256": HASH,
   "source_commit": COMMIT}}`, bound to independently inspected intake values and
-  source repository `https://github.com/kcook98765/skin.aura`.
+  source repository `https://github.com/kcook98765/skin.aura`. Only the exact
+  TV Guide binding documented above may additionally appear (or be selected alone
+  for a TV-Guide-only private candidate); foreign roots reject. The allowlist must
+  equal the union of selected roots' separately traversed complete closures.
 
 No command in the adapter fetches the source URL or runs add-on code. An operator
 acquires authoritative metadata separately, records provenance and reviews its

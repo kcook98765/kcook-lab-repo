@@ -256,7 +256,7 @@ class OfficialNexus(unittest.TestCase):
                 foreign = ET.fromstring('<addon id="script.unrelated" version="1.0.0"><requires><import addon="script.module.dateutil" version="1.0.0"/></requires></addon>')
                 with self.assertRaisesRegex(ValueError, 'unrelated'):
                     run(module, manifests + [foreign], builtins, lane)
-                with self.assertRaisesRegex(ValueError, 'only'):
+                with self.assertRaisesRegex(ValueError, 'only|own exact Omega enrollment'):
                     run(module, [aura, self.root], builtins, lane)
             write(combined)
             self.assertFalse(run(module, [], {}, 'matrix')['active'])

@@ -462,7 +462,7 @@ def reviewed_inputs(config, profile):
         return expected
     inputs = json.loads((ROOT/f'config/{profile}.json').read_text())
     assert isinstance(inputs['external_dependencies'], dict)
-    assert set(inputs['external_dependencies']) <= {'official_omega', 'official_nexus'}
+    assert set(inputs['external_dependencies']) <= {'official_omega', 'official_nexus', 'official_matrix'}
     for item in inputs['packages']:
         blob = path(ROOT/'incoming', item['zip']).read_bytes()
         assert digest(blob) == item['sha256']
@@ -638,14 +638,23 @@ def external_dependency_report(profile, manifests, builtins, lane, bindings):
     assert isinstance(spec, dict)
     if not spec:
         return {}
-    assert set(spec) <= {'official_omega', 'official_nexus'}
+    assert set(spec) <= {'official_omega', 'official_nexus', 'official_matrix'}
     results = []
-    if 'official_omega' in spec:
-        import audit_official_omega
-        results.append(audit_official_omega.resolve(manifests, builtins, {'official_omega': spec['official_omega']}, ROOT/'incoming', lane, bindings))
-    if 'official_nexus' in spec:
-        import audit_official_nexus
-        results.append(audit_official_nexus.resolve(manifests, builtins, {'official_nexus': spec['official_nexus']}, ROOT/'incoming', lane, bindings))
+    import importlib
+    own = {'matrix': 'official_matrix', 'nexus': 'official_nexus', 'omega': 'official_omega'}.get(lane)
+    providers = sorted(spec, key=lambda key: (key != own, key))
+    exact_current_root = False
+    for provider in providers:
+        visible = manifests
+        if provider != own and exact_current_root:
+            visible = [node for node in manifests if node.get('id') != 'script.tvguide.fullscreen']
+        result = importlib.import_module('audit_' + provider).resolve(visible, builtins, {provider: spec[provider]}, ROOT/'incoming', lane, bindings)
+        results.append(result)
+        if provider == own and result['active']:
+            root = result.get('roots', {}).get('script.tvguide.fullscreen')
+            exact_current_root = root == {'version': '0.1.1',
+                'package_sha256': '76533fcb570cd813e2deb885c919b59eea21171c6ce344d5a40ef5d8fba287b9',
+                'source_commit': 'f936c0a514e0de126e62e24fd3d24b66b0c74097'}
     enabled = [result for result in results if result['active']]
     assert len(enabled) <= 1, 'Conflicting active exact-root dependency adapters'
     return enabled[0] if enabled else results[0]
@@ -697,10 +706,12 @@ def audit(profile='fixture'):
     assert plan['toolchain']['review_schema_sha256'] == digest((Path(__file__).parents[1]/'docs/REVIEW-RECORD-SCHEMA.json').read_bytes())
     if profile != 'fixture' and json.loads((ROOT/f'config/{profile}.json').read_text())['external_dependencies']:
         adapters = json.loads((ROOT/f'config/{profile}.json').read_text())['external_dependencies']
-        assert set(adapters) <= {'official_omega', 'official_nexus'}
+        assert set(adapters) <= {'official_omega', 'official_nexus', 'official_matrix'}
         names = ['official_omega', 'audit_official_omega']
         if 'official_nexus' in adapters:
             names += ['official_nexus', 'audit_official_nexus']
+        if 'official_matrix' in adapters:
+            names += ['official_matrix', 'audit_official_matrix']
         for name in names:
             assert plan['toolchain'].get(name+'_sha256') == digest((Path(__file__).parent/(name+'.py')).read_bytes())
     expected = reviewed_inputs(config, profile)
