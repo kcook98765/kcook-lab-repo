@@ -17,13 +17,18 @@
     },
     {
       "id": "script.channelsdvr.hub",
-      "version": "0.1.2",
-      "sha256": "7c04857b3094415c1028ed85b0434712d924191f2cc890e90a89610607e91e69"
+      "sha256": "7c04857b3094415c1028ed85b0434712d924191f2cc890e90a89610607e91e69",
+      "version": "0.1.2"
     },
     {
       "id": "skin.aura",
-      "version": "2.1.0",
-      "sha256": "7309fc3f60429e4ba638d36046565ae48fa2b75f56f653df5200a960aa3ce9c0"
+      "sha256": "7309fc3f60429e4ba638d36046565ae48fa2b75f56f653df5200a960aa3ce9c0",
+      "version": "2.1.0"
+    },
+    {
+      "id": "script.tvguide.fullscreen",
+      "sha256": "76533fcb570cd813e2deb885c919b59eea21171c6ce344d5a40ef5d8fba287b9",
+      "version": "0.1.1"
     }
   ],
   "schema": 1
