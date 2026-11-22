@@ -12,8 +12,8 @@ import official_omega as parsing
 SOURCE_URL = 'https://mirrors.kodi.tv/addons/nexus/addons.xml.gz'
 CORE_COMMIT = '4b95737efaddf7c869736e539318f18433413ff1'
 ROOT_ID = 'script.tvguide.fullscreen'
-ROOT_BINDING = {'version': '0.1.0', 'source_commit': 'c19f256333efbe7af12418312f17e00f99792dc2',
-                'package_sha256': 'da5f38eed4707aa6de9ac7d9648008565ac332f51e93dc6cc5dab6f11f00f82e'}
+ROOT_BINDING = {'version': '0.1.1', 'source_commit': 'f936c0a514e0de126e62e24fd3d24b66b0c74097',
+                'package_sha256': '76533fcb570cd813e2deb885c919b59eea21171c6ce344d5a40ef5d8fba287b9'}
 # From exact 20.5-Nexus addons/ manifests, acquired with provenance.
 CORE = {'xbmc.core': ('0.1.0', '0.1'), 'xbmc.python': ('3.0.1', '3.0.0'),
         'script.module.pil': ('5.1.0', None)}
