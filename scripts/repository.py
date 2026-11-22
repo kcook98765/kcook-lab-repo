@@ -38,6 +38,52 @@ def version(value):
     require(isinstance(value, str) and bool(VERSION.fullmatch(value)), 'Only reviewed numeric x.y.z versions are supported')
     return tuple(map(int, value.split('.')))
 
+def dependency_version(value):
+    """Bounded, numeric-led Kodi dependency grammar, NOT package identity.
+
+    Kodi 21.3 AddonVersion.cpp (a3a448d26b8d560a65655dab2cd122994dc4e146)
+    defines epoch/upstream/revision and the URL-safe alphabet. We support
+    nonempty alphanumeric spans separated by .+_@~, rejecting empty spans and
+    numeric runs outside portable signed-32-bit strtol range rather than
+    emulating Kodi's invalid-input fallback or integer overflow.
+    """
+    require(isinstance(value, str) and 0 < len(value) <= 128 and re.fullmatch(
+        r'(?:[0-9]+:)?[0-9][A-Za-z0-9]*(?:[.+_@~][A-Za-z0-9]+)*'
+        r'(?:-[A-Za-z0-9]+(?:[.+_@~][A-Za-z0-9]+)*)?', value),
+        'Invalid or unsupported Kodi dependency version')
+    require(all(len(n) <= 10 and int(n) <= 2147483647 for n in re.findall(r'[0-9]+', value)),
+            'Kodi dependency numeric component out of range')
+    epoch, colon, rest = value.partition(':')
+    if not colon:
+        epoch, rest = '0', value
+    upstream, _, revision = rest.lower().partition('-')
+    return int(epoch), upstream, revision
+
+def dependency_ge(provided, minimum):
+    left, right = dependency_version(provided), dependency_version(minimum)
+    if left[0] != right[0]:
+        return left[0] > right[0]
+    # Same alternating literal/integer comparison as the pinned Kodi source.
+    for a, b in zip(left[1:], right[1:]):
+        i = j = 0
+        while i < len(a) and j < len(b):
+            x, y = a[i], b[j]
+            if x.isdigit() and y.isdigit():
+                ai, bj = i, j
+                while i < len(a) and a[i].isdigit(): i += 1
+                while j < len(b) and b[j].isdigit(): j += 1
+                n, m = int(a[ai:i]), int(b[bj:j])
+                if n != m: return n > m
+            else:
+                if x != y:
+                    if x == '~': return False
+                    if y == '~': return True
+                    return not x.isdigit() if x.isdigit() != y.isdigit() else x > y
+                i += 1; j += 1
+        if i < len(a): return a[i] != '~'
+        if j < len(b): return b[j] == '~'
+    return True
+
 def json_bytes(value):
     return (json.dumps(value, indent=2, sort_keys=True) + '\n').encode()
 
@@ -119,7 +165,7 @@ def manifest_files(files):
         require(bool(ID.fullmatch(dep.get('addon', ''))), 'Invalid dependency ID')
         require(dep.get('addon') not in dependency_ids, 'Duplicate dependency ID')
         dependency_ids.add(dep.get('addon'))
-        version(dep.get('version', ''))
+        dependency_version(dep.get('version'))
         require(dep.get('optional', 'false') in ('true', 'false'), 'Invalid optional dependency flag')
     return root
 
@@ -476,11 +522,8 @@ def dependencies(selected, builtins, external_versions=None):
         edges[manifest.get('id')] = []
         for dep in manifest.findall('requires/import'):
             name = dep.get('addon')
-            if name in external_versions:
-                from official_omega import version_key
-                satisfied = version_key(available[name]) >= version_key(dep.get('version'))
-            else:
-                satisfied = name in available and version(available[name]) >= version(dep.get('version'))
+            dependency_version(dep.get('version'))
+            satisfied = name in available and dependency_ge(available[name], dep.get('version'))
             if dep.get('optional') == 'true':
                 if not satisfied:
                     warnings.append('Optional dependency unresolved: ' + name)

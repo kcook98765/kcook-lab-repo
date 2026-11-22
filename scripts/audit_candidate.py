@@ -65,6 +65,43 @@ def numeric(value):
     return tuple(map(int, value.split('.')))
 
 
+def dependency_version(value):
+    """Independent bounded Kodi grammar; numeric x.y.z package rules stay intact.
+
+    Source: Kodi a3a448d26b8d560a65655dab2cd122994dc4e146,
+    xbmc/addons/AddonVersion.cpp. Invalid/fallback and overflowing inputs are
+    unsupported, not normalized into apparently valid dependency floors.
+    """
+    assert isinstance(value, str) and 0 < len(value) <= 128
+    assert re.fullmatch(r'(?:[0-9]+:)?[0-9][a-zA-Z0-9]*(?:[.+_@~][a-zA-Z0-9]+)*'
+                        r'(?:-[a-zA-Z0-9]+(?:[.+_@~][a-zA-Z0-9]+)*)?', value)
+    assert all(len(n) <= 10 and int(n) <= 2147483647 for n in re.findall('[0-9]+', value))
+    pieces = value.lower().split(':')
+    epoch, body = (int(pieces[0]), pieces[1]) if len(pieces) == 2 else (0, pieces[0])
+    upstream, _, revision = body.partition('-')
+    return epoch, re.findall('[0-9]+|[^0-9]', upstream), re.findall('[0-9]+|[^0-9]', revision)
+
+
+def dependency_ge(provided, minimum):
+    a, b = dependency_version(provided), dependency_version(minimum)
+    if a[0] != b[0]: return a[0] > b[0]
+    for left, right in zip(a[1:], b[1:]):
+        offset = 0
+        while offset < min(len(left), len(right)):
+            x, y = left[offset], right[offset]
+            xd, yd = x[0].isdigit(), y[0].isdigit()
+            if xd and yd:
+                if int(x) != int(y): return int(x) > int(y)
+            elif x != y:
+                if x == '~': return False
+                if y == '~': return True
+                return not xd if xd != yd else x > y
+            offset += 1
+        if len(left) != len(right):
+            return left[offset] != '~' if offset < len(left) else right[offset] == '~'
+    return True
+
+
 def configuration(profile):
     """Independent candidate identity/retention selection; never imports builder."""
     production_file = path(ROOT, 'config/repository.json')
@@ -133,7 +170,7 @@ def archive_files(blob):
     for dep in manifest.findall('requires/import'):
         name = dep.get('addon', '')
         assert ID.fullmatch(name) and name not in seen
-        seen.add(name); numeric(dep.get('version'))
+        seen.add(name); dependency_version(dep.get('version'))
         assert dep.get('optional', 'false') in ('true', 'false')
     return manifest, files
 
@@ -613,11 +650,8 @@ def check_dependencies(manifests, builtins, external_versions=None):
         aid = manifest.get('id'); edges[aid] = []
         for dep in manifest.findall('requires/import'):
             name = dep.get('addon')
-            if name in external_versions:
-                from audit_official_omega import version_ge
-                satisfied = version_ge(available[name], dep.get('version'))
-            else:
-                satisfied = name in available and numeric(available[name]) >= numeric(dep.get('version'))
+            dependency_version(dep.get('version'))
+            satisfied = name in available and dependency_ge(available[name], dep.get('version'))
             if dep.get('optional') == 'true': continue
             assert satisfied, 'Required dependency unavailable/too old: '+name
             if name not in builtins: edges[aid].append(name)
