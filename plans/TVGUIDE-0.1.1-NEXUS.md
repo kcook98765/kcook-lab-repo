@@ -55,8 +55,9 @@ or expiry relabeling. The former 0.1.0 root cannot borrow successor enrollment.
    privately, including failed attempts. These checks are not candidate qualification.
 2. Codex independently prepares/reviews the truthful strict-v2 private candidate
    packet and runs candidate build, verify, independent audit and qualification.
-   Keep final release decision pending; do not fabricate rights, runtime or owner
-   decisions. Any proposed intake stays in ignored private staging/proposal, never
+   Preserve the pending staging record and prior pending/adverse history separately
+   from genuine substantive review decisions; do not fabricate rights, runtime or
+   owner decisions. Proposed intake stays in ignored private staging/proposal, never
    active production merely to make preparation pass.
 3. Preserve byte-identical `config/production.json` and `releases/manifest.json`.
    Preserve all prior source/package/review hashes, published artifacts/releases,
@@ -70,11 +71,16 @@ or expiry relabeling. The former 0.1.0 root cannot borrow successor enrollment.
    prerelease `v0.1.1-beta` with the exact reviewed ZIP/checksum; this implementer
    neither creates releases nor uploads assets. Do not create a public tag or
    publish the prerelease before separate exact owner approval.
-6. Genuine exact-package owner admission permits the documented approval-dependent
-   continuation to finalize production intake and the complete retained production
-   site; no wholly new campaign is required. Recheck current metadata expiry, run
-   production gates and independent frozen-site review. Obtain separate exact owner
-   publication approval binding the complete qualified inventory/digest and
-   destination `kcook98765/kcook-lab-repo` before public tag creation, release
-   publication or Pages promotion. A passing test, commit, draft or future PR
-   supplies none of those approvals.
+6. Under the unchanged strict-v2 contract, final package admission requires a genuine
+   attributable independent reviewer release decision after substantive exact-package
+   review, not an owner-role decision. Codex may issue that decision as the independent
+   AI reviewer; it is neither an owner decision nor a human approval and grants no
+   publication authority. Complete local production preparation remains within this
+   campaign: finalize reviewed intake, preserve all existing packages/ledger, recheck
+   current metadata expiry, and run complete production build, verify, independent
+   audit, deterministic qualification, preflight and independent frozen-site review.
+   Owner publication approval is separate and must bind the frozen complete qualified
+   site inventory/digest, exact source artifacts and destination
+   `kcook98765/kcook-lab-repo` before public tag creation, release publication or Pages
+   promotion. A package review, passing test, commit, draft or future PR supplies none
+   of that publication authority; no contract, policy or gate is changed.
