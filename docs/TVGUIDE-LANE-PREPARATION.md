@@ -1,10 +1,13 @@
 # TV Guide 0.1.1: bounded dependency-lane preparation
 
-This is repository adapter preparation, **not** a new add-on release, package
-approval, crash fix or publication. TV Guide production intake stays **Nexus
-only**. Production configuration, release ledger, installer, all other packages,
-existing ZIPs and artwork are unchanged. Piers is excluded. No new native result
-is produced by this code change; no add-on code is executed.
+This is repository adapter and **Nexus/Omega production proposal** preparation,
+not a new add-on release, crash fix or publication. The initial adapter/private
+qualification commit `339d8f6` retained Nexus-only intake. A subsequent genuine
+Codex strict-v2 final package review now supports proposed Nexus/Omega admission.
+**Actual Pages remains Nexus-only until separate exact-site owner approval and
+promotion.** Matrix is policy-blocked; Piers is excluded. The release ledger,
+installer, other packages, existing ZIPs and artwork remain unchanged. No new
+native result is produced by these code/intake edits; no add-on code is executed.
 
 ## Exact enrollment and independent reconstruction
 
@@ -100,11 +103,24 @@ FAIL, non-clean logs, source-delta and finite Linux-only smoke limitations remai
 There is no full legacy parity, upgrade/pruning, repository install/update/UI
 discovery or general stability claim. No crash/debug/native campaign runs here.
 
-Owner-authorized partial progression can later select **Nexus and Omega only**
-with a genuine separately scoped strict-v2 successor and independent final package
-review. Matrix metadata support stays unused in production. Preserve the full
-Aura-plus-TV-Guide Omega spec in that later production intake, never substitute
-the private TV-Guide-only closure. Production intake and ledger edits are separate.
+Owner-authorized partial progression now prepares **Nexus and Omega only** with
+Codex's genuine separately scoped strict-v2 final package review, SHA-256
+`b1f223586f0402b13365683522ff7bdfce27a188d0eebd4d74c7a3a1926a3850`.
+Codex is the independent reviewer, not an owner/human signature. The old Nexus-only
+approval and all pending/Matrix-risk records remain immutable. The final two-lane
+record excludes Matrix rather than waiving its risk. Matrix metadata support is
+unused in production: `official_matrix` is absent from production configuration.
+
+The prepared production intake retains the full Aura-plus-TV-Guide Omega spec,
+adding only the exact TV Guide root and pytz provider. Nexus's entire spec is
+unchanged. Only the TV Guide item changes lanes/review reference/digest; its ZIP
+identity, the other three items, retained installers, global configuration and
+all six ledger entries remain exact. The private TV-Guide-only closure is never
+substituted for production. Complete real production build/verify/independent
+audit/deterministic qualification/source-and-site scans/preflight must pass on
+the final clean committed source. Public HTTPS validation must not be run against
+unpublished expected bytes. No release/tag/asset/Pages promotion or merge occurs
+in this preparation; exact complete-site owner approval remains pending.
 
 ## Supported private qualification
 
@@ -114,9 +130,12 @@ Matrix/Nexus/Omega. Candidate Omega uses the exact TV Guide root plus its ten
 providers from `root_closures`, with the same valid snapshot/core. Nexus spec is
 unchanged; Matrix uses the newly acquired spec.
 
-Keep Codex's genuine record immutable; separately call `approval_contract.assess`
+The completed private-stage procedure kept Codex's genuine three-lane record
+immutable and separately called `approval_contract.assess`
 using the exact inspected manifest/package/source and real production ledger.
-Retain its Matrix risk/deferred acceptance and pending final package decision.
+That dated assessment retains its Matrix risk/deferred acceptance and then-pending
+final package decision; it is not superseded or rewritten by the final two-lane
+decision. The private-stage source remains frozen at `339d8f6`.
 The structural namespace candidate uses a **separate all-pending strict-v2
 projection**: rights, technical, static, runtime and final decisions pending/false,
 with the unresolved Matrix risk retained. This neither revokes genuine evidence

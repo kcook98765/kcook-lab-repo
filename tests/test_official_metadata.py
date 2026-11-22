@@ -93,8 +93,10 @@ class OfficialMetadata(unittest.TestCase):
         self.assertEqual(old['retrieved_at'], '2026-11-15T01:46:57Z')
         self.assertEqual(old['expires_at'], '2026-11-22T01:46:57Z')
         current = json.loads((ROOT / 'config/production.json').read_text())['external_dependencies']['official_omega']
-        unchanged = set(old) - {'snapshot', 'snapshot_sha256', 'retrieved_at', 'expires_at'}
+        unchanged = set(old) - {'snapshot', 'snapshot_sha256', 'retrieved_at', 'expires_at', 'roots', 'allowlist'}
         self.assertEqual({k: old[k] for k in unchanged}, {k: current[k] for k in unchanged})
+        self.assertEqual(current['roots'], old['roots'] | {official_nexus.ROOT_ID: official_nexus.ROOT_BINDING})
+        self.assertEqual(current['allowlist'], old['allowlist'] | {'script.module.pytz': '2023.3.0+matrix.1'})
         self.assertNotEqual(old['snapshot'], current['snapshot'])
 
     def test_actual_core_source_manifests_and_abi_proof(self):
@@ -119,6 +121,11 @@ class OfficialMetadata(unittest.TestCase):
     def test_retained_omega_reconstructs_all_32_approved_providers_and_81_edges(self):
         spec = json.loads((ROOT / 'config/production.json').read_text())['external_dependencies']['official_omega']
         report = load('omega-refreshed-closure.json')
+        # Preserve the historical Aura-only reconstruction after the separately
+        # reviewed exact TV Guide root is added to the current production proposal.
+        self.assertEqual({aid: spec['allowlist'][aid] for aid in report['external_versions']}, report['external_versions'])
+        spec['roots'] = {'skin.aura': spec['roots']['skin.aura']}
+        spec['allowlist'] = report['external_versions']
         root = ET.Element('addon', id='skin.aura', version='2.1.0')
         group = ET.SubElement(root, 'requires')
         for edge in report['edges']:
@@ -142,7 +149,7 @@ class OfficialMetadata(unittest.TestCase):
         self.assertEqual(len(report['edges']), 81)
         self.assertEqual(load('omega-closure-comparison.json')['differences'], {})
 
-    def test_nexus_public_spec_and_existing_nexus_only_production_intake(self):
+    def test_nexus_public_spec_and_final_nexus_omega_only_production_intake(self):
         external = load('tvguide-nexus-enrollment.json')
         spec = external['official_nexus']
         self.assertEqual(spec['roots'], {official_nexus.ROOT_ID: official_nexus.ROOT_BINDING})
@@ -155,8 +162,13 @@ class OfficialMetadata(unittest.TestCase):
         self.assertEqual(production['external_dependencies']['official_nexus'], spec)
         tv = [p for p in production['packages'] if 'tvguide' in p['zip']]
         self.assertEqual(len(tv), 1)
-        self.assertEqual(tv[0]['lanes'], ['nexus'])
+        self.assertEqual(tv[0]['lanes'], ['nexus', 'omega'])
         self.assertEqual(tv[0]['sha256'], official_nexus.ROOT_BINDING['package_sha256'])
+        self.assertEqual(tv[0]['review_record'], 'tvguide-0.1.1-review-v2-nexus-omega-final-r1.json')
+        self.assertEqual(tv[0]['review_record_sha256'], 'b1f223586f0402b13365683522ff7bdfce27a188d0eebd4d74c7a3a1926a3850')
+        self.assertEqual(production['external_dependencies']['official_omega'], load('tvguide-omega-enrollment.json')['official_omega'])
+        self.assertNotIn('official_matrix', production['external_dependencies'])
+        self.assertTrue(set(tv[0]['lanes']).isdisjoint({'matrix', 'piers'}))
 
 
 if __name__ == '__main__': unittest.main()
