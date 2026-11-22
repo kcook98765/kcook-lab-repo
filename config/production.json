@@ -1,5 +1,33 @@
 {
   "external_dependencies": {
+    "official_nexus": {
+      "allowlist": {
+        "script.module.beautifulsoup4": "4.12.2",
+        "script.module.certifi": "2023.5.7",
+        "script.module.chardet": "5.1.0",
+        "script.module.dateutil": "2.8.2",
+        "script.module.idna": "3.10.0",
+        "script.module.pytz": "2023.3.0+matrix.1",
+        "script.module.requests": "2.31.0",
+        "script.module.six": "1.16.0+matrix.1",
+        "script.module.soupsieve": "2.4.1",
+        "script.module.urllib3": "2.2.3"
+      },
+      "core_commit": "4b95737efaddf7c869736e539318f18433413ff1",
+      "expires_at": "2026-11-29T07:21:50Z",
+      "retrieved_at": "2026-11-22T07:21:50Z",
+      "roots": {
+        "script.tvguide.fullscreen": {
+          "package_sha256": "76533fcb570cd813e2deb885c919b59eea21171c6ce344d5a40ef5d8fba287b9",
+          "source_commit": "f936c0a514e0de126e62e24fd3d24b66b0c74097",
+          "version": "0.1.1"
+        }
+      },
+      "schema": 1,
+      "snapshot": "official/nexus-32dc7aae6108.xml",
+      "snapshot_sha256": "32dc7aae6108c633a4ae788500b20ee043ef814af6a22967fdc1e891fc262aa6",
+      "source_url": "https://mirrors.kodi.tv/addons/nexus/addons.xml.gz"
+    },
     "official_omega": {
       "allowlist": {
         "plugin.video.themoviedb.helper": "5.4.16",
@@ -78,6 +106,15 @@
       "review_record_sha256": "3129f77ab37dacbd8be6421025a1ff4e66fe92d8b714a3704b7c060948a61720",
       "sha256": "7309fc3f60429e4ba638d36046565ae48fa2b75f56f653df5200a960aa3ce9c0",
       "zip": "aura-original-assets-7309fc3f6042/skin.aura-2.1.0.zip"
+    },
+    {
+      "lanes": [
+        "nexus"
+      ],
+      "review_record": "tvguide-0.1.1-review-v2-independent-final-r2.json",
+      "review_record_sha256": "8a78e12b85edfe2824e326078667debd31526c0c7d86d54a3ef019b3045008ad",
+      "sha256": "76533fcb570cd813e2deb885c919b59eea21171c6ce344d5a40ef5d8fba287b9",
+      "zip": "script.tvguide.fullscreen-0.1.1.zip"
     }
   ],
   "retained_installers": [
