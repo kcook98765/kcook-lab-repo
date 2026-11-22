@@ -91,6 +91,37 @@ Keeps Kodi's native views and playback controls. Includes original generic icon 
       <news>0.1.2 ALPHA: adds the project support route, reproducible original artwork and explicit Omega-only alpha limitations. No new functional acceptance is claimed. 0.1.1 pre-release: Settings and Connection accept the same numeric DVR IP address forms and use HTTP port 8089 when omitted. Address requirements and automatic connection behavior are explained in settings. 0.1.0: local Channels DVR Hub identity alignment with a separate Kodi add-on/profile identity. Dashboard, guide, recording management, explicit native Play and programme-only/Series pass management retained. 0.1.2 native acceptance pending; Hub 0.1.0 and old EPG results remain historical.</news>
     </extension>
   </addon>
+  <addon id="script.tvguide.fullscreen" name="TV Guide Fullscreen" version="0.1.1" provider-name="primaeval">
+    <requires>
+      <import addon="xbmc.python" version="3.0.0" />
+      <import addon="script.module.requests" version="2.31.0" />
+      <import addon="script.module.dateutil" version="2.8.2" />
+      <import addon="script.module.pytz" version="2023.3.0+matrix.1" />
+      <import addon="script.module.pil" version="5.1.0" />
+      <import addon="script.module.beautifulsoup4" version="4.12.2" />
+    </requires>
+    <extension point="xbmc.python.script" library="addon.py">
+      <provides>executable</provides>
+    </extension>
+    <extension point="xbmc.service" library="service.py" />
+    <extension point="xbmc.addon.metadata">
+      <summary lang="en_GB">Fullscreen XMLTV guide — artwork-only Beta successor; runtime unchanged.</summary>
+      <description lang="en_GB">Maintained modernization Beta of TV Guide Fullscreen: XMLTV listings, stream mappings, search, reminders and ordinary AutoPlay. Bounded Nexus 20.5 core evidence is reused for unchanged code; audio, timer delivery and broader compatibility remain limited. Thanks for the major contributions from: iainmacleod, im85288, RayW1986, bluezed, andy, Zomboided, tycoo, kjb86, Doctor-Eggs</description>
+      <disclaimer lang="en_GB">Based on the original TV Guide addon by twinther, FTV Guide and Midraal's fork.</disclaimer>
+      <platform>all</platform>
+      <license>GPLv2</license>
+      <forum>http://forum.kodi.tv/showthread.php?tid=282157</forum>
+      <source>https://github.com/kcook98765/script.tvguide.fullscreen</source>
+      <website>https://github.com/kcook98765/script.tvguide.fullscreen</website>
+      <email>primaeval</email>
+      <news>0.1.1 Beta: artwork-only successor; runtime unchanged. Original geometric icon/fanart replace inherited Earth images; four promotional screenshots omitted, channel-management capture retained. Reuses bounded Nexus 20.5 code evidence, not new native ZIP/upgrade/repository UI acceptance. Audio UNTESTED; optional timed notification and actual timer-fired AutoPlay UNOBSERVED; logs non-clean. Inherited static gate FAIL; other beta lanes deferred. See the maintained fork README for status and artwork provenance.</news>
+      <assets>
+        <icon>icon.png</icon>
+        <fanart>fanart.jpg</fanart>
+        <screenshot>resources/screenshots/channel-management.png</screenshot>
+      </assets>
+    </extension>
+  </addon>
   <addon id="skin.aura" name="Aura" provider-name="kcook98765" version="2.1.0">
     <requires>
       <import addon="xbmc.gui" version="5.17.0" />
