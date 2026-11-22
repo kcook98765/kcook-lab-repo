@@ -1,39 +1,40 @@
-# TV Guide Fullscreen 0.1.0 Beta — preparation-only intake draft
+# TV Guide Fullscreen 0.1.0 Beta — private qualification / pending intake
 
-**Outcome: PARTIAL — source/package prepared; repository admission BLOCKED.**
-Prepared source is `42997e3c80784262be4e35c8d37e772c62bc5d6f`, version `0.1.0`;
-private ZIP SHA-256 is
-`0b25379c9eb71bd6e9014704114e5b3a7104c6fbbd9e209a97f5e189f7464492`.
-[Source draft PR #72](https://github.com/kcook98765/script.tvguide.fullscreen/pull/72)
-has independent bounded source/ZIP-structure PASS; existing repository tools
-reject the exact package. No lane is approved, no approval boolean becomes true,
-and no complete candidate/production site digest exists. This is a preparation
-plan, not an approval record or publication request.
+**Current outcome: independent private structural qualification PASS; production
+admission BLOCKED with eight retained blockers.** No lane or package is approved
+for production and no publication is requested. This plan is not an approval
+record. All material-rights, static/technical, exact Nexus and final package
+decisions remain false/pending.
+
+The current frozen candidate is the notice-only successor below, not the original
+321-member packet. [Code draft PR #7](https://github.com/kcook98765/kcook-lab-repo/pull/7)
+supplies the separately reviewed parser/enrollment/snapshot corrections at exact
+head **`7b8fdaef1d881141421315e1a1a40bf73ec4ddc4`**. Codex independently reviewed
+that exact tree and qualified an isolated private candidate using the actual
+builder, verifier, independent auditor and qualifier. These are private structural
+results, not production admission, successful public deployment or native tests.
 
 ## Scope, baseline and authority
 
 - Destination: `kcook98765/kcook-lab-repo`, immutable GitHub ID `1428864210`;
   origin `https://github.com/kcook98765/kcook-lab-repo.git`.
-- Distribution preparation baseline:
-  `6388e95ecd7926ba711d28314fc8ee014dd61c7d`; documentation branch
-  `prepare/tvguide-beta-010`. Existing unrelated work is outside this change.
-- Local `origin/gh-pages` is `05bed49610e81bf98d16a417bb2e39c5bf9b5a01`, matching
-  the owner's supplied current Pages baseline. This is local-ref inspection, not
-  a fresh remote or public HTTPS verification. Preserve that site and its ledger.
-- Read-only GitHub inspection confirmed repository ID/default branch and legacy
-  Pages source `gh-pages:/`. The only listed Actions workflow is GitHub's generated
-  `pages-build-deployment`; this branch has no tracked `.github` workflow. No
-  repository-configured automation was found that promotes this docs branch/PR;
-  pushing it does not change the configured Pages source. This is not a claim
-  about unobservable external account integrations.
-- Authorized distribution change: this plan only, its commit, preparation branch
-  push and draft PR against `main`. No gate, architecture, dependency-adapter,
-  configuration, ledger, approval or package changes. No merge, tag, release
-  (including draft release), asset upload, Pages change or publication.
-- The owner read the private final report and accepted bounded core scope for
-  source/docs/private packaging/offline preparation. Codex independently reviews
-  the candidate. Private evidence is retained separately, not uploaded with this
-  plan. This documentation review does not claim to rerun those private checks.
+- Distribution baseline: `6388e95ecd7926ba711d28314fc8ee014dd61c7d`;
+  this docs branch remains `prepare/tvguide-beta-010`. Its original plan commit
+  `a7a05f969c86fd4ec3fe98e2d0e0159802e19f87` and original candidate history remain.
+- This PR changes **only this plan**. The owner separately authorized the code
+  campaign in PR #7; that authority does not expand this documentation diff into
+  configuration, policy, approval, ledger, package or source edits.
+- The owner authorized the notice-only source successor in its separate source
+  project. This distribution operator did not read or edit that source checkout,
+  execute add-on code, rebuild a TV Guide ZIP, run native tests or issue approvals.
+- Code PR #7 and this PR remain draft and unmerged. No tag/release (including
+  draft release), public Beta asset, Pages/settings change, final approval or
+  merge is authorized by these PRs.
+- Historical Pages recovery baseline is
+  `05bed49610e81bf98d16a417bb2e39c5bf9b5a01`. Earlier read-only inspection found
+  `gh-pages:/` and GitHub-generated `pages-build-deployment`, with no tracked
+  promotion workflow for the docs branch. This is retained historical evidence,
+  not a fresh public-site/automation audit or a claim about external integrations.
 
 Authoritative references: [workflow entry](../docs/AGENT-INTEGRATION.md),
 [release procedure](../docs/RELEASE-WORKFLOW.md),
@@ -41,357 +42,317 @@ Authoritative references: [workflow entry](../docs/AGENT-INTEGRATION.md),
 [architecture](../docs/ARCHITECTURE.md),
 [record schema](../docs/REVIEW-RECORD-SCHEMA.json),
 [intake rules](../incoming/README.md) and [installation guide](../README.md).
-This plan neither supersedes those contracts nor changes restricted role grants.
+This plan does not supersede those contracts or alter restricted role permissions.
 
-## Frozen identity and evidence provenance
+## Current frozen notice-only successor
 
-The following source/runtime facts are supplied by Codex's independently reviewed
-packet. The owner authorized preparation; this documentation review did not rerun
-the packet's tests or byte verification.
-
-| Item | Planning value / limitation |
+| Item | Exact identity / limitation |
 | --- | --- |
 | Add-on | TV Guide Fullscreen, `script.tvguide.fullscreen` |
-| Beta manifest/package version | Standard numeric `0.1.0` |
-| Proposed source prerelease tag | `v0.1.0-beta`; not created or approved here |
-| Proposed private deterministic ZIP | `script.tvguide.fullscreen-0.1.0.zip` |
+| Manifest/package version | Standard numeric `0.1.0` |
 | Source repository | `https://github.com/kcook98765/script.tvguide.fullscreen` |
-| Exact Beta commit | [42997e3c80784262be4e35c8d37e772c62bc5d6f](https://github.com/kcook98765/script.tvguide.fullscreen/commit/42997e3c80784262be4e35c8d37e772c62bc5d6f) |
-| Exact source tree | `d92962e7fbdc5475860976ab7dec64fc856d8f57` (also confirmed by read-only commit API metadata) |
-| Parent / accepted core source | `cc411d933a269d4cba080a3bdf646b5eddc71e22` |
-| ZIP size / SHA-256 | 2,136,204 bytes; `0b25379c9eb71bd6e9014704114e5b3a7104c6fbbd9e209a97f5e189f7464492` |
-| Source tar | OpenCode-generated prefix `script.tvguide.fullscreen/`; SHA-256 `e7c6f1ef9e30f888d1fe6e875cad92c87967942a183383362099838ac4392fb5`; not the installable ZIP |
-| Inventory | 321 files; 319 unchanged accepted payloads; 45 runtime Python files and all resources unchanged; 69 catalogs and five screenshots intact |
-| Package licensing | GPL and embedded MIT pyaes notices reported retained; affirmative all-material review still pending |
-| Beta delta | Only `addon.xml` and changelog changed; Codex independent bounded delta/archive audit PASS reported below |
-| Version order | Codex's independently reviewed packet reports fresh official Nexus `CompareComponent` compilation: `0.1.0 > 0.0.446~alpha1`; retain original receipt/hash, not rerun here |
+| Source draft PR | [PR 73](https://github.com/kcook98765/script.tvguide.fullscreen/pull/73), open/draft; independently reviewed; depends on original draft PR 72 |
+| Source commit | [`c19f256333efbe7af12418312f17e00f99792dc2`](https://github.com/kcook98765/script.tvguide.fullscreen/commit/c19f256333efbe7af12418312f17e00f99792dc2) |
+| Source tree | `b51337779aa4a07dec43ac74530d95954ea5f16c` |
+| Private deterministic installer | `script.tvguide.fullscreen-0.1.0.zip`, **2,137,274 bytes**, **322 members** |
+| ZIP SHA-256 | `da5f38eed4707aa6de9ac7d9648008565ac332f51e93dc6cc5dab6f11f00f82e` |
+| Exact archive delta | All original 321 payloads are byte-identical; only `THIRD-PARTY-NOTICES.txt` added; all 45 runtime Python files/resources unchanged |
+| Source-only delta | README, Beta documentation, full third-party MIT notice and inert notice-preservation check; no application logic, dependency or resource change |
+| Independent source/package review | Codex verified all 322 payloads against final Git blobs, equal twin builds and the complete exact upstream OrderedDict MIT notice |
+| Proposed source prerelease tag | `v0.1.0-beta`; not created or approved here |
 
-Retain the full private handoff binding this tuple, clean-state disposition,
-per-file SHA-256 inventory, packaging allowlist/exclusions, notice/asset inventory,
-packaging Python/zlib versions, actual manifest/category declarations, dependencies,
-lane-specific evidence and evidence hashes. Source draft PR
-[#72](https://github.com/kcook98765/script.tvguide.fullscreen/pull/72) is reported
-OPEN/DRAFT with exact head `42997e3c80784262be4e35c8d37e772c62bc5d6f` and accepted
-parent base `cc411d933a269d4cba080a3bdf646b5eddc71e22`. Codex's independent bounded
-review is posted there; repository admission remains blocked. PR metadata does
-not change the add-on package.
+Both actual repository archive readers also matched the supplied complete
+322-member per-file inventory. No second candidate hash is enrolled in the code
+adapter. Original artifacts remain privately retained, not overwritten by the
+same-named successor. These checks establish structure/delta/provenance only.
 
-Codex's independently reviewed packet reports exact-candidate audit **PASS for
-bounded source delta and archive structure**: a third independent Git-blob rebuild is byte-identical
-to both source OpenCode builds; all 321 members match the exact commit's Git blobs;
-all 45 Python files/resources are unchanged; only two metadata/changelog payloads
-changed; five screenshots, 69 catalogs and GPL/MIT notices remain intact. No vendored
-pytz or vpnapi. This is not a rights, static, native, admission or publication PASS.
-Source OpenCode reports five focused package and eight inert VPN tests plus a
-dependency/settings assertion script passed. Invalid-escape warnings and expected
-negative diagnostics remain; integrated static gate **FAIL** was not rerun.
-These reports are supplied evidence, not reruns by this documentation implementer.
-Do not fabricate zero hashes, actors, timestamps, receipts or acceptance fields.
-Any changed commit, ZIP or inventory requires a new frozen packet and current
-review; historical acceptance does not silently transfer.
+The missing inherited OrderedDict MIT copyright/permission notice was a real
+rights blocker in the original packet. The successor corrects that notice gap;
+it does **not** establish affirmative distribution rights for inherited artwork
+or screenshot broadcast/listing imagery. GPL and embedded pyaes MIT notices remain
+byte-identical. Broad rights stay false/pending; no legal clearance or blanket
+infringement conclusion is claimed.
+
+## Current code and official dependency evidence
+
+PR #7 contains three distinct commits, not an intake or approval record:
+
+1. `2ca8c0e402cff5d59d14569d4a4675972d94a2c0` — narrowly separate Kodi dependency
+   grammar/ordering from strict numeric `x.y.z` distributed package identities,
+   independently in producer and auditor. The valid pytz floor remains
+   **`2023.3.0+matrix.1`**; no lowering, bundling or false builtin.
+2. `b64f3ca563afa69c4fb83eef3c7be3661da7786e` — exact successor-only official
+   Nexus metadata enrollment, separate independent auditor and coexistence with
+   existing exact Aura/Omega enrollment. Unknown keys and foreign roots/source/
+   hashes/lanes reject; unrelated packages cannot borrow either enrollment.
+3. `7b8fdaef1d881141421315e1a1a40bf73ec4ddc4` — genuinely reacquire the expired
+   Omega snapshot with actual retrieval time, retained previous bytes/record,
+   authoritative provenance and unchanged approved Aura closure.
+
+The actual six required imports remain Python API **3.0.0**, requests **2.31.0**,
+dateutil **2.8.2**, pytz **2023.3.0+matrix.1**, PIL **5.1.0**, and BeautifulSoup
+**4.12.2**. Both Nexus resolvers reconstruct exactly **10 external providers** and
+**24 total edges**. Official `20.5-Nexus` resolves directly to core commit
+`4b95737efaddf7c869736e539318f18433413ff1`; exact core manifests prove actual
+Python API **3.0.1**, ABI **3.0.0**, PIL **5.1.0**, and core **0.1.0**, ABI **0.1**.
+Python API is not runtime CPython. No other Nexus patch or Kodi lane gains native
+acceptance from this evidence.
+
+The public code change retains exact HTTPS compressed catalog bytes, matching
+official SHA-256/MD5 sidecars, source/final URLs, headers, actual UTC times and
+local compressed/XML SHA-256 provenance. Maximum validity remains seven days.
+
+| Catalog | XML SHA-256 | Retrieved UTC | Expires UTC |
+| --- | --- | --- | --- |
+| Nexus | `32dc7aae6108c633a4ae788500b20ee043ef814af6a22967fdc1e891fc262aa6` | 2026-11-22T07:21:50Z | 2026-11-29T07:21:50Z |
+| Omega | `800fc70454c9e942d83a4e30c12871e0ac603db85a9ad909941dd8ebba70cb2b` | 2026-11-22T07:21:54Z | 2026-11-29T07:21:54Z |
+
+Only four Omega acquisition fields change in PR #7's production configuration.
+All **32 approved external provider versions / 81 edges**, core facts, roots,
+approved package and review-record entries/hashes, existing installers and ledger
+remain unchanged. Both configured adapters independently validate their own
+inputs even while inactive; at most one report is active per lane, returned
+unchanged. Nothing downloads at build time. No official provider ZIP is bundled,
+mirrored or installed. Codex additionally reports independent private verification
+of ten actual official Nexus provider ZIPs, SHA-256 sidecars, CRC, ID/version and
+complete manifest edges against the catalog closure.
+
+The exact reusable spec/provenance and restore procedure are part of
+[the frozen code change](https://github.com/kcook98765/kcook-lab-repo/blob/7b8fdaef1d881141421315e1a1a40bf73ec4ddc4/docs/OFFICIAL-NEXUS-DEPENDENCIES.md),
+not files silently added to this docs branch. Expired metadata needs a genuine
+new acquisition/review, never a timestamp extension or historical receipt reuse.
+
+## Actual focused checks and independent private qualification
+
+OpenCode's captured campaign receipts contain **80 distinct unittest methods
+across seven focused modules**, all passing without double-counting reruns:
+dependency versions **7**, Nexus **16**, public metadata **5**, intake **19**,
+official Omega **15**, Aura admission **7**, and skin-alpha controls **11**.
+No full repository or add-on source suite was run. Both archive readers checked
+the actual frozen successor; fresh independent closure reports agree.
+
+Retain the pre-fix parser baseline failure in both consumers. A later old-control
+run failed only an existing diagnostic-text assertion while correctly rejecting
+the bad provider configuration; compatible error wording was restored without
+weakening the test or gate, and the same 41 controls passed on rerun. Source audit
+passed within its selected Git-source and configured credential/private-path
+pattern scope, not as proof of secret absence, raw runtime-log review or production
+publication preflight. No private source/ZIP/settings/raw logs are uploaded.
+
+Codex independently extracted exact code HEAD
+**`7b8fdaef1d881141421315e1a1a40bf73ec4ddc4`** into an isolated private staging
+copy, configured **both `official_nexus` and `official_omega`**, and retained a
+truthful pending schema-2 / `strict-v1` record with the exact successor inventory.
+**TV Guide appears only in the private Nexus catalog.**
+
+| Actual documented candidate command | Child exit | Result |
+| --- | ---: | --- |
+| `python3 -B scripts/repository.py build --profile candidate` | 0 | PASS |
+| `python3 -B scripts/repository.py verify --profile candidate` | 0 | PASS |
+| `python3 -B scripts/audit_candidate.py --profile candidate` | 0 | PASS |
+| `python3 -B scripts/qualify.py --profile candidate` | 0 | PASS |
+
+The qualified private site contains **27 files**. Its canonical inventory digest
+is **`7d1e459f72f8db4a3feb8484ed830c61ad791173672e41ffcff55589276ea8c5`**:
+SHA-256 of the UTF-8 canonical compact sorted-key `path -> {bytes, sha256}` mapping.
+Whole-site repeat-build reproducibility and loopback URL/selection checks passed;
+inputs remained unchanged. This is a **private candidate** digest, not a public
+site or approved production-site digest.
+
+The first independent audit attempt failed because Codex's staging copy omitted
+the four candidate repository installer source files. The failed attempt and logs
+remain retained. Corrected staging materialized those four files through the
+established `repo.installer(config, candidate)` procedure, then reran all actual
+stages successfully. **No repository code repair or TV Guide ZIP rebuild was
+required.** This is a supported staging correction, not a waived audit control.
+
+These independent results are supplied by Codex's retained actual receipt summaries;
+reading them here is not an OpenCode rerun of the private build campaign. Whole
+production build/qualification and production-only publication preflight were
+**not run** for this unapproved candidate. Qualification temporarily served the
+27 private paths over loopback HTTP (`127.0.0.1`) for HEAD/GET and selection checks;
+there was no shared/public deployment, native installation or promotion. The
+preview namespace's empty ledger is not complete source-release
+history or evidence of initial-release eligibility.
+
+## Remaining admission blockers and native scope
+
+The unchanged production assessment retains exactly eight blockers:
+
+1. `Explicit technical release approval missing`
+2. `Per-lane acceptance missing: nexus`
+3. `Runtime testing pending: nexus`
+4. `Unresolved risk: RIGHTS-ALL-MATERIALS`
+5. `Unresolved risk: RUNTIME-BETA-COVERAGE`
+6. `Unresolved risk: TECHNICAL-STATIC-DISPOSITION`
+7. `release_approved`
+8. `rights_approved`
+
+Rights/material review, static/technical disposition, exact attributed Nexus scope
+acceptance and final package decisions remain false/pending. Owner acknowledgment
+is not recorded. The MIT notice fix does not clear inherited-art/screenshot rights;
+the inherited integrated static gate **FAIL** is retained, not transformed into
+PASS by successful repository tests or structural qualification.
+
+Accepted source **`cc411d933a269d4cba080a3bdf646b5eddc71e22`** has bounded native
+Nexus **20.5** observations: clean ordinary ZIP install/official dependencies;
+direct/plugin moving frames; alternative/fallback/Stop; Reminder/AutoPlay creation
+and selective cancellation; unrelated-rule preservation; reminder restart
+persistence; actual background service work and graceful exit. Exact-code reuse
+with independently reviewed metadata/archive/notice delta is legitimate.
+
+There was **no exact successor 0.1.0 native install or Alpha-to-Beta upgrade test**.
+That observation remains absent; it does not establish failure or invent a
+mandatory repeat native campaign. **Audio UNTESTED** is an owner-accepted Beta
+limit. Optional timed notification and actual timer-fired AutoPlay remain
+**UNOBSERVED**, not observed failures. Retain non-clean logs, historical plugin
+EOF behavior, Matrix crash and Piers foreground/input limits; no clean-log,
+all-feature or all-platform claim is made. Genuine independent required-scope
+review must classify actual findings without shrinking required scope merely to
+pass or fabricating observations.
+
+The unchanged contract does not impose universal audible-audio or optional timed
+notification tests on every release. A genuinely reviewed finite Nexus 20.5 scope
+can legitimately retain those accepted disclosures. If the owner makes an
+observation required, strict-v2 requires its actual completion; it supplies no
+deferred-required-test waiver. Do not retroactively claim PASS, remove previously
+required scope or reinterpret a failure as an optional disclosure to gain admission.
+
+| Lane | Current decision / limit |
+| --- | --- |
+| Nexus 20 / actual core 20.5 | Sole proposed private lane; dependency and structural PASS, accepted unchanged-code native scope retained; exact attributed repository acceptance pending, **not production-approved** |
+| Matrix 19 / native 19.4, static 19.5 | Historical crash unresolved and versions differ; **not approved** |
+| Omega 21 / 21.3 | Historical TV Guide evidence only; no borrowed Nexus acceptance or Aura admission; **not approved** |
+| Piers 22 / 22 RC2 | Preview and foreground/input limitations; no final Kodi 22 claim; **not approved** |
+
+## Historical original candidate and failures — preserved, not current enrollment
+
+The earlier packet and original draft source
+[PR 72](https://github.com/kcook98765/script.tvguide.fullscreen/pull/72) remain
+preserved, open/draft and unmerged. They are the successor's history/dependency,
+not a second enrolled artifact:
+
+| Original item | Historical value |
+| --- | --- |
+| Commit | `42997e3c80784262be4e35c8d37e772c62bc5d6f` |
+| Tree | `d92962e7fbdc5475860976ab7dec64fc856d8f57` |
+| Version / ZIP | `0.1.0` / `script.tvguide.fullscreen-0.1.0.zip` |
+| Size / members | 2,136,204 bytes / 321 |
+| ZIP SHA-256 | `0b25379c9eb71bd6e9014704114e5b3a7104c6fbbd9e209a97f5e189f7464492` |
+| Accepted source baseline | `cc411d933a269d4cba080a3bdf646b5eddc71e22` |
+| Original archive delta | Only addon.xml/changelog changed versus accepted source; 319 payloads and all 45 Python files/resources unchanged |
+| Prefixed source tar SHA-256 | `e7c6f1ef9e30f888d1fe6e875cad92c87967942a183383362099838ac4392fb5`; source archive, not installer |
+
+Original source packet review reported a third identical Git-blob ZIP rebuild,
+five focused package methods, eight inert VPN-removal methods and dependency/
+settings assertions passing, with invalid-escape warnings and integrated static
+FAIL retained. Those are historical supplied source results, not new reruns.
+
+At unchanged repository baseline `6388e95`, the isolated original pending-v2
+candidate build exited **1 at 06:59:37 UTC on 2026-11-22**, reporting
+`Only reviewed numeric x.y.z versions are supported`; both actual archive readers
+rejected the valid pytz floor. Existing un-enrolled resolvers separately failed
+at requests across all four lanes. Verify/qualify/preflight were not run after
+that failure and no site digest existed **at that stage**. Those failures remain
+retained; they are corrected by separately reviewed PR #7, not rewritten as PASS.
+
+The original Aura metadata expired `2026-11-22T01:46:57Z`; the prior read-only
+host observation `2026-11-22T06:57:30Z` was after expiry. The original snapshot
+bytes/hash/record remain preserved by PR #7; fresh acquisition changes neither
+the historical failure nor the approved closure entries.
 
 ### Public Alpha1 remains history
 
-- Public source tag/version: `v0.0.446-alpha1`; commit
+- Source tag `v0.0.446-alpha1`; commit
   `fc2f021ef6edc8c957e1ca91bfaa024d17c5f510`.
-- Manifest: `0.0.446~alpha1`; asset:
-  `script.tvguide.fullscreen-0.0.446.alpha1.zip`.
-- ZIP SHA-256:
-  `dd10ec02c5a3e9c8f133c87c3cc0ac1806a650473cad7ef877554346daa903e7`.
+- Manifest `0.0.446~alpha1`; asset `script.tvguide.fullscreen-0.0.446.alpha1.zip`.
+- ZIP SHA-256 `dd10ec02c5a3e9c8f133c87c3cc0ac1806a650473cad7ef877554346daa903e7`.
 
-No Alpha edits, replacement, retagging or removal. Preserve its release evidence
-when reconstructing complete initial-release chronology; absence of TV Guide in
-the distribution ledger does not erase an already public source release.
+No Alpha replacement, retagging or removal. The reviewed official Nexus comparator
+shows `0.1.0 > 0.0.446~alpha1`; that proves ordering, not migration, automatic
+updating or native Beta installation. Earlier anonymous Alpha/installer byte checks
+remain supplied historical evidence, not a fresh public download by this update.
 
-## Evidence scope and individual lane assessment
+## Policy legitimacy — no changes or approvals here
 
-Accepted source **`cc411d933a269d4cba080a3bdf646b5eddc71e22`** was reportedly
-tested on standalone disposable **Nexus 20.5**: clean ordinary ZIP installation
-with official dependencies; direct and plugin moving frames; alternatives,
-fallback and Stop; Reminder/AutoPlay creation and selective cancellation;
-unrelated-rule preservation; reminder restart persistence; actual background work
-and graceful exit. These are scoped observations on that source, not an exact
-Beta ZIP native test or complete release approval.
+Ordinary **schema 2 / `strict-v1`** requires genuine affirmative rights, technical,
+runtime-scope and final decisions. Every unresolved risk and deferred required
+test blocks production even when acknowledged. Honest finite-scope review and
+legitimate exact-code evidence reuse may be considered under the actual contract;
+no retrospective scope reduction, chat-to-boolean conversion or optional-limit
+relabeling is permitted.
 
-There has been **no exact 0.1.0 native install or Alpha-to-Beta upgrade test**.
-That factual gap does not itself impose a repeat native campaign: the owner
-accepted bounded core scope and requests no unnecessary native rerun. Scoped
-reuse of accepted code evidence together with independent metadata/archive delta
-review is legitimate because all Python/resources are byte-identical. Independent
-admission review must decide the genuinely required scope and applicable policy;
-it must not fabricate missing observations or assume source evidence is worthless.
+Schema 3 `unofficial-integration-initial-release-v1` is not a generic Beta waiver.
+It inherits genuine nonempty provider-terms findings, independent all-materials
+and service reviews, disclosures and attributable owner actions. Do not invent
+provider findings or relabel bundled-art rights as service terms. It additionally
+requires complete initial chronology, exact source/ZIP/lane/scenario binding,
+finite expiry, truthful deferred observations, independent scoped native/offline
+verification, all-risk acknowledgment and a separate final digest-bound decision.
+The existing public Alpha1 cannot be erased by an empty distribution lookup;
+initial public release versus first distribution intake is not automatically
+resolved by this plan. No such policy decision or exception is issued here.
 
-| Lane | Actual supplied evidence | Current intake conclusion |
-| --- | --- | --- |
-| Nexus 20 / native 20.5 | Sole current-source core acceptance candidate described above; Beta ZIP not native-tested | Conditional Nexus-first recommendation **only after** exact delta/package, dependency, static, rights and admission review; not approved |
-| Matrix 19 / native 19.4, static 19.5 | Historical native crash unresolved; static version differs from runtime version | Not approved; do not relabel crash as an unavailable environment or unobserved test |
-| Omega 21 / 21.3 | Historical evidence only, not current Beta acceptance | Not approved; no borrowed Nexus acceptance |
-| Piers 22 / 22 RC2 | Preview evidence, foreground/input limitations | Not approved; no final Kodi 22 compatibility claim |
-
-Retain **audio UNTESTED**, an owner-accepted Beta limit; optional timed notification
-**UNOBSERVED**; timer-fired AutoPlay **unobserved**; non-clean logs; historical
-Matrix crash and Piers foreground/input limitations; and full static **FAIL**.
-No static PASS, clean-log claim, full feature PASS or `runtime_accepted=true` is
-established here. Do not invent or enable runtime flags. Independent review must
-classify actual static findings and failures, not rewrite them as coverage gaps.
-Source-code equality alone does not prove ordinary installation of the Beta ZIP.
-Untested audio and unobserved optional notification are accepted Beta disclosures,
-not observed functional failures. Their policy effect depends on substantive
-scope review; optional observations alone do not prove Beta is inadmissible under
-every current scope.
-
-## Demonstrable current tooling and dependency blockers
-
-These limitations were inspected at the preparation baseline, not inferred from a historical
-PASS or tested by running add-on code:
-
-1. `scripts/repository.py` `version()` accepts numeric `x.y.z` only (lines 37–39).
-   `manifest_files()` calls it on every import floor (line 122). Consequently the
-   supplied required official pytz floor `2023.3.0+matrix.1`, valid Kodi syntax,
-   cannot pass this path. `scripts/audit_candidate.py` independently declares the
-   same numeric regex and calls `numeric()` on dependency floors (lines 24,
-   63–65, 133–137). Beta's numeric package version does not fix this import gate.
-   Code inspection here agrees with the fresh exact-ZIP failures reported below.
-2. `scripts/official_omega.py` and `scripts/audit_official_omega.py` independently
-   restrict external admission to exact source/ZIP-bound `skin.aura` 2.1.0 and
-   Omega. Other packages cannot borrow that admission. Current
-   [production intake](../config/production.json) has no pytz allowlist entry and
-   no TV Guide root. The adapter's Kodi-version comparator does not bypass the
-   earlier ordinary manifest parser. No dependency floor reduction, vendoring or
-   bundling as a bypass, false builtin or ad hoc enrollment is allowed.
-3. Codex's independently reviewed packet reports fresh official metadata showing
-   ten external modules per lane across four lanes, with no missing required external edge. This is
-   useful dependency evidence, not TV Guide enrollment, a gate PASS, or actual
-   installation/compatibility proof. Receive pinned original bytes, retrieval and
-   expiry, closure edges and lane/core identity before independent review.
-4. `script.module.pil` 5.1.0 is reportedly proven an actual Nexus builtin. Other
-   actual core builds need pinned proof. Current [lane config](../config/repository.json)
-   does not itself enroll PIL for Nexus; the Aura adapter's Omega core table does
-   not establish other lanes' actual builds or authorize configuration changes.
-5. Configured Aura official snapshot expiry is `2026-11-22T01:46:57Z`.
-   Read-only host UTC observation was `2026-11-22T06:57:30Z`, after expiry.
-   Both resolvers check current expiry and enforce at most seven days' validity.
-   A download elsewhere does not renew this exact configured snapshot. Preserve
-   the expired state; this also blocks an otherwise coherent future whole-site
-   production build until separately reviewed maintenance supplies current inputs.
-
-Do not implement any parser, adapter, policy, dependency or configuration repair
-in this task. Missing production prerequisites block admission/publication, not
-truthful isolated private preparation. A private attempt may itself fail these
-structural gates; retain that failure rather than weakening them.
-
-### Fresh empirical results supplied by Codex
-
-The following actual unchanged-tool results are supplied by Codex's independently
-reviewed packet; this documentation implementer did not execute them or inspect
-the private original receipts:
-
-- At repository `6388e95`, the isolated task-bound pending-v2 candidate build with
-  proposed **diagnostic Nexus** lane exited **1 at 06:59:37 UTC**. JSON stdout:
-  `{"status":"FAIL","error":"ValueError","detail":"Only reviewed numeric x.y.z versions are supported"}`.
-- Producer `inspect_zip` and independent auditor `archive_files` both freshly
-  reject this exact ZIP at the valid official pytz dependency version. Codex's
-  independent bounded archive/delta PASS above does not turn either existing
-  consumer's actual rejection into PASS.
-- Direct existing dependency-resolver diagnostics in **each of four configured
-  lanes** report `Required dependency unavailable/too old: script.module.requests`
-  because official providers are not enrolled. Fresh official metadata separately
-  contains ten modules per lane with no missing required external edge. Those are
-  different claims; metadata availability does not satisfy configured admission.
-- Verify, qualify and preflight were correctly **NOT RUN** after prerequisite
-  failure. No complete candidate or production site digest exists.
-- Unchanged `approval_contract.assess` on an honest pending-v2 proposed-Nexus
-  record reports `rights_approved`, `release_approved`,
-  `Explicit technical release approval missing`, `Per-lane acceptance missing: nexus`,
-  `Runtime testing pending: nexus`, and unresolved `RIGHTS-ALL-MATERIALS`,
-  `RUNTIME-BETA-COVERAGE`, `TECHNICAL-STATIC-DISPOSITION`. No fields are approved.
-- The private candidate-context empty ledger belongs **only** to its preview
-  namespace. The complete original production ledger remains unchanged; this
-  empty preview ledger is not initial source-release eligibility evidence.
-- Anonymous public Alpha and installer 0.1.0/0.1.1 bytes were independently
-  reported verified against their unchanged hashes. This is supplied evidence,
-  not a fresh public download by this documentation review.
-
-## Policy legitimacy and decision checkpoint
-
-Ordinary **schema 2 / `strict-v1`** (the strict v2 record contract) requires genuine
-affirmative rights, technical, complete runtime and final decisions. Every
-unresolved risk and required test deferral blocks production even if acknowledged.
-The accepted Beta limitations cannot become ordinary strict-v2 admission by chat.
-Strict-v2 may still be considered if genuine independent required-scope review
-can satisfy its actual requirements, legitimately reuse exact-code evidence and
-substantively dispose of findings without hiding unresolved risks, retroactively
-shrinking required scope or claiming absent observations. The current pending-v2
-assessment above remains blocked; no such decision is made here. This is policy
-interpretation for review, not a policy change or a claim that every optional
-observation requires a new native test.
-
-Schema 3 **`unofficial-integration-initial-release-v1`** is not a generic Beta
-waiver. It inherits the real nonempty `provider_terms` findings, independent
-all-distributed-materials review, service review, disclosures and attributable
-owner distribution action of the unofficial-integration contract. Do not invent
-provider concerns to gain eligibility or relabel inherited-art rights as terms.
-It additionally requires:
-
-- Complete checked first-release chronology, not merely an empty TV Guide ledger
-  lookup. The contract says only no prior artifact or the exact first artifact
-  qualifies; public Alpha1 versus first *distribution* intake presents a material
-  scope/eligibility question. **No automatic eligibility:** require a reviewed
-  owner policy decision on that ambiguity before proposing this route. This plan
-  cannot reinterpret history, amend policy or erase Alpha1.
-- Exact source/ZIP/ID/version/lane binding, named unobserved/unavailable scenarios,
-  deferred outstanding IDs, false runtime acceptance, finite current expiry,
-  independent scoped native **and** offline core verification with supported
-  no-known-security-defects assertion, and attributable owner coverage acceptance.
-- Separate owner acknowledgment of **all** unresolved risks, genuine independent
-  actions, and separate final owner decision binding the complete exception digest.
-  Required failures, unknown/unlisted tests and rights/security defects do not
-  become waivable coverage. Preserve original observations and supplemental scope.
-
-Schemas **4 and 5 are skin/Aura-only** and cannot admit this executable script.
-Material-rights affirmative review is pending for inherited artwork and actual
-guide screenshot content, as well as the complete bundled/exported inventory.
-GPL/MIT notices alone are not all-material clearance. Neither legal clearance nor
-a blanket assertion of infringement is established. Source/editor documentation,
-owner Beta acceptance and approval to prepare supply no repository all-risk,
-technical, coverage, final-package or publication approval. All unissued decisions
-remain pending; no approval booleans are set true by this document.
+Schemas **4 and 5 are skin/Aura-only**, not routes for this executable script.
+Neither package notices, owner Beta scope acceptance, structural PASS nor approval
+to prepare supplies broad material rights, technical approval, exact repository
+acceptance, final package approval or publication authority. Actual required
+failures and unresolved rights/security risks cannot become waived coverage.
 
 ## Proposed installation/update communication — unavailable now
 
-TV Guide Beta is **NOT presently available from this repository**. After a future
-approved admission and coherent deployment, proposed ordinary instructions are:
+TV Guide Beta is **not presently published by this repository**. After genuine
+admission and separately approved coherent deployment, the proposed route is:
 
 1. File manager source `https://kcook98765.github.io/kcook-lab-repo/`.
-2. Install the current `repository.ai.kodi` **0.1.1** ZIP using Kodi's normal
-   Install from zip file flow; no new installer is proposed.
-3. Open **Install from repository → kcook-lab-repo → Program add-ons → TV Guide
-   Fullscreen** on an explicitly approved lane.
+2. Install current `repository.ai.kodi` **0.1.1** by the normal ZIP flow; preserve
+   installer 0.1.0/0.1.1 mirrors and sidecars. No new installer release is proposed.
+3. **Install from repository → kcook-lab-repo → Program add-ons → TV Guide
+   Fullscreen**, only on an explicitly approved lane.
 
-The Program add-ons mapping follows the packet's reported `xbmc.python.script` with
-`provides=executable` declaration, not video-plugin categorization. Verify those
-exact declarations in the frozen Beta manifest when supplied; no source manifest
-was read for this documentation review. This is a declaration-derived proposed category, not an
-observed Beta repository GUI listing.
+Program categorization follows the executable script manifest, not video-plugin
+classification; no Beta repository GUI listing is claimed. Root bootstrap still
+offers the repository installer, not per-add-on root links. The future nested
+package path and source prerelease/asset URLs below remain code literals only:
 
-Generator inspection confirms `packages/{id}/{id}-{version}.zip` in
-`scripts/repository.py:548`; the auditor independently reconstructs that layout in
-`scripts/audit_candidate.py:691`. The proposed future public nested path is
-`packages/script.tvguide.fullscreen/script.tvguide.fullscreen-0.1.0.zip`, with its
-SHA-256 sidecar, not a root add-on download link. The root remains the sole-current-
-installer bootstrap. Retain installer 0.1.0 and 0.1.1 mirrors/sidecars unchanged.
+- `https://kcook98765.github.io/kcook-lab-repo/packages/script.tvguide.fullscreen/script.tvguide.fullscreen-0.1.0.zip`
+- `https://github.com/kcook98765/script.tvguide.fullscreen/releases/tag/v0.1.0-beta`
+- `https://github.com/kcook98765/script.tvguide.fullscreen/releases/download/v0.1.0-beta/script.tvguide.fullscreen-0.1.0.zip`
 
-A source README alternative GitHub Beta installer is proposed only after exact
-asset upload and download verification under separate authority. Until then use
-an existing Releases index, clearly marked Beta pending, rather than an active
-nonexistent tag/asset link. No source README edits or uploads occur here.
+Numeric 0.1.0 can be offered as an update over Alpha1 in an ordinary Kodi catalog;
+a GitHub prerelease label is not a Kodi opt-in/update filter. The owner must decide
+lanes and existing-user update exposure before admission. Retain profile/settings/
+guide/rule backups and no-reset guidance; no actual Alpha-to-Beta migration PASS.
 
-Proposed URLs below are **pending**, code literals only; no availability is claimed:
+## Conditional later sequence and current review checkpoint
 
-- Source Beta tag: `https://github.com/kcook98765/script.tvguide.fullscreen/releases/tag/v0.1.0-beta`.
-- Source Beta installer: `https://github.com/kcook98765/script.tvguide.fullscreen/releases/download/v0.1.0-beta/script.tvguide.fullscreen-0.1.0.zip`.
-- Future repository package: `https://kcook98765.github.io/kcook-lab-repo/packages/script.tvguide.fullscreen/script.tvguide.fullscreen-0.1.0.zip`.
+1. Independently review this updated plan and code PR #7; both remain draft and
+   unmerged. Preserve exact successor/source/code/evidence bindings. A changed
+   source, package or toolchain needs fresh binding and current evidence.
+2. Resolve affirmative material rights, substantive inherited static disposition,
+   exact attributed Nexus scope acceptance and all genuine admission decisions.
+   No broad native campaign is invented; required unknowns cannot be concealed.
+3. Obtain separate concrete source merge/tag/prerelease/assets authority binding
+   the exact source tree, ZIP/checksum and asset set. Verify eventual uploaded bytes
+   before using them in feeds. No source release action is requested here.
+4. Under separately scoped approved intake, prepare and independently review the
+   **complete production site** using all historical packages, exact approved
+   records, current official inputs and immutable retention ledger. Run actual
+   production build/verify/audit/qualify/preflight; never promote this private
+   27-file candidate or a TV Guide-only subset. All existing Tastemade, Hub, Aura,
+   packages, records and installers remain byte-identical; ledger history is retained.
+5. Obtain separate owner Pages authorization binding the qualified whole-site
+   digest, exact destination and intended actions. Only an authorized publisher
+   may deploy; then verify public bytes. Any Kodi install/update testing requires
+   separately authorized runtime scope. HTTP/loopback is not native behavior.
 
-Numeric `0.1.0` in an ordinary catalog can be offered as an update over Alpha1;
-GitHub's prerelease label is not a Kodi prerelease opt-in or update filter. The
-owner must explicitly decide selected lanes and existing-user update exposure
-before any catalog admission. No four-lane rollout is implied by packaging.
+No merge/publication or final approval is requested now. Preserve the historical
+Pages recovery baseline; catalog rollback does not downgrade installed add-ons.
+Private logs/config/evidence remain private, including original failed attempts;
+never alter them to manufacture clean results. Public summaries exclude private
+paths, tokens, account/channel/guide identifiers and viewing details.
 
-## Future private evidence procedure — documented, NOT executed
-
-With the assigned tuple and explicit follow-up scope, a separately authorized
-preparer can freeze an isolated source-only toolchain copy in the private offline
-packet. Exclude Git/agent configuration, secrets, existing outputs and unrelated
-work; retain toolchain hashes and baseline config/ledger digests. Place
-only exact task ZIP/evidence in that copy's `incoming/` and truthful pending input
-in its ignored `config/candidate.json`. Never write those into canonical intake or
-the documentation branch under the present scope.
-
-From that isolated copy, the documented real candidate sequence is:
-
-```sh
-python3 -B scripts/repository.py build --profile candidate
-python3 -B scripts/repository.py verify --profile candidate
-python3 -B scripts/audit_candidate.py --profile candidate
-python3 -B scripts/qualify.py --profile candidate
-```
-
-Capture each stage's full stdout/stderr and actual exit status separately in the
-private packet, preserving failed attempts before any rerun. Do not chain in a
-way that hides child failures. If a prior failure leaves no fresh inputs for a
-later stage, record that stage as blocked/not run, not PASS against stale output.
-Use the actual independent auditor without Python optimization, not fixture
-adapters, synthetic acceptance or historical receipts. A structural PASS with
-release blockers remains private/publication-ineligible. Do not run production
-preflight on candidate output or install/host the preview feed. The documented
-production-identity preview can also fail installer-ledger retention; do not
-change retention/history or invent another identity to get a pass in this task.
-
-Retain original private logs/config only in private evidence; sanitize tokens,
-authenticated URLs, account/channel/guide identifiers, home/profile paths and
-personal viewing details from public summaries. Hash retained originals and
-redacted derivatives distinctly with their provenance; never alter originals to
-simulate clean logs. Public notices describe actual limitations without private
-paths/content. This documentation review has not inspected private runtime logs or report
-bytes and claims no independently executed static, runtime, build, audit or
-qualification result. The supplied empirical outcomes are labeled above.
-
-## Conditional later release order — no action requested now
-
-1. Retain the assigned Beta tuple and bounded Codex audit; complete substantive
-   admission review and retain the original pinned receipts. Under separate
-   explicit authority, use a frozen source PR and normal merge; verify merged
-   release tree equality with
-   the reviewed candidate (a changed merge commit must be rebound explicitly).
-   Do not tag an unreviewed tree or reuse stale package acceptance.
-2. Obtain owner approval for the exact source repository/commit/tree, proposed
-   `v0.1.0-beta` tag, prerelease state, exact artifact hashes and asset set before
-   tag/release/upload actions. Source asset hosting and distribution Pages are
-   distinct permissions. Download uploaded bytes and verify digests before feeds.
-3. Resolve legitimate admission policy/history, affirmative material rights,
-   dependency parser/adapter enrollment and fresh official/core evidence through
-   separately reviewed work. Refresh technical/static/runtime evidence and exact
-   owner/independent decisions, expiry, all-risk acknowledgment, package admission,
-   lanes and update exposure. Retain FAILs/limitations; no chat-to-boolean shortcut.
-4. Only under separately scoped distribution intake work, prepare the **whole**
-   coherent production site with all exact historical inputs, current dependencies
-   and approved new intake. Run production build, verify, independent audit,
-   `qualify.py --profile production` and `check_publication.py` without `--https`.
-   Require whole-site repeat-build determinism, complete site/input/toolchain
-   digests, independent frozen-site review and exact retention checks. Do not
-   promote a TV Guide-only subset, partial preview or old successful report.
-5. Obtain exact owner Pages authorization binding the complete site digest,
-   source/intake/ledger baseline, destination and intended remote actions. Only
-   then may an authorized publisher promote that complete site. Afterwards check
-   deployed bytes with production `check_publication.py --https`; any Kodi
-   install/update/feature checks require separately authorized disposable runtime
-   scope and remain separate from HTTP verification.
-6. Preserve installer 0.1.0/0.1.1 and all existing Tastemade, Hub, Aura and package
-   records/artifacts byte-identically. This draft leaves the entire ledger
-   unchanged; any future authorized ledger operation is append-only with exact
-   history retained. Back up the approved site/ledger and retain the Pages
-   `05bed49610e81bf98d16a417bb2e39c5bf9b5a01` recovery baseline. Catalog rollback
-   does **not** downgrade installed add-ons; recovery may require a corrective
-   higher version or explicitly approved manual downgrade with profile backup.
-
-No publication request is made now. Later explicitly authorized GitHub PR
-operations for this destination must all specify
-`--repo kcook98765/kcook-lab-repo` or an explicit API `repos/kcook98765/kcook-lab-repo/...`
-path, never an inferred upstream. Source-repository operations, if ever requested,
-need their own exact identity and authority; this change includes no source edits.
-
-## Current review outcome and pending authorizations
-
-The exact tuple, source draft PR #72 and bounded audit are supplied. Substantive
-rights/static/technical/runtime policy decisions and hard tooling/dependency
-blockers remain. No complete-site digest or publication readiness is claimed.
-No further source/code changes or comprehensive native campaign are requested.
-The distribution documentation draft PR does not authorize policy changes, source
-merge, package admission, asset upload, tag/release or Pages publication; those
-require the separate concrete decisions described above.
-
-Documentation validation for this preparation: local relative-link targets were
-checked against repository files, the active source commit URL/tree was confirmed
-through the read-only API, and plan-only Git whitespace checking passed before
-commit. Pending tag/download/package URLs remain code literals, not active
-Beta links. No broad tests are appropriate or run for this documentation change.
+This documentation update is limited to plan consistency, local relative links,
+source/private-path pattern checks and Git whitespace/diff checks. It adds no
+tests or approvals and reruns no source or whole-repository suite. The next step
+is **Codex independent review of this updated PR6**, not admission or publication.
