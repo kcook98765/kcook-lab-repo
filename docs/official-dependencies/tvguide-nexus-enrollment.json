@@ -17,9 +17,9 @@
     "retrieved_at": "2026-11-22T07:21:50Z",
     "roots": {
       "script.tvguide.fullscreen": {
-        "package_sha256": "da5f38eed4707aa6de9ac7d9648008565ac332f51e93dc6cc5dab6f11f00f82e",
-        "source_commit": "c19f256333efbe7af12418312f17e00f99792dc2",
-        "version": "0.1.0"
+        "package_sha256": "76533fcb570cd813e2deb885c919b59eea21171c6ce344d5a40ef5d8fba287b9",
+        "source_commit": "f936c0a514e0de126e62e24fd3d24b66b0c74097",
+        "version": "0.1.1"
       }
     },
     "schema": 1,

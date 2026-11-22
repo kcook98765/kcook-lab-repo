@@ -26,7 +26,7 @@ class OfficialNexus(unittest.TestCase):
         self.addCleanup(temp.cleanup)
         self.base = Path(temp.name)
         self.now = datetime(2026, 11, 22, 12, tzinfo=timezone.utc)
-        self.root = ET.fromstring('''<addon id="script.tvguide.fullscreen" version="0.1.0"><requires>
+        self.root = ET.fromstring('''<addon id="script.tvguide.fullscreen" version="0.1.1"><requires>
           <import addon="xbmc.python" version="3.0.0"/>
           <import addon="script.module.requests" version="2.31.0"/>
           <import addon="script.module.dateutil" version="2.8.2"/>
@@ -92,9 +92,12 @@ class OfficialNexus(unittest.TestCase):
 
     def test_exact_source_zip_root_pins_cannot_be_rebound(self):
         self.assertEqual(producer.ROOT_BINDING, auditor.ENROLLED)
-        self.assertEqual(producer.ROOT_BINDING['source_commit'], 'c19f256333efbe7af12418312f17e00f99792dc2')
-        self.assertEqual(producer.ROOT_BINDING['package_sha256'], 'da5f38eed4707aa6de9ac7d9648008565ac332f51e93dc6cc5dab6f11f00f82e')
-        for key, value in [('source_commit', 'a' * 40), ('package_sha256', 'b' * 64), ('version', '0.1.1'),
+        self.assertEqual(producer.ROOT_BINDING['version'], '0.1.1')
+        self.assertEqual(producer.ROOT_BINDING['source_commit'], 'f936c0a514e0de126e62e24fd3d24b66b0c74097')
+        self.assertEqual(producer.ROOT_BINDING['package_sha256'], '76533fcb570cd813e2deb885c919b59eea21171c6ce344d5a40ef5d8fba287b9')
+        for key, value in [('source_commit', 'a' * 40), ('package_sha256', 'b' * 64), ('version', '0.1.0'),
+                           ('source_commit', 'c19f256333efbe7af12418312f17e00f99792dc2'),
+                           ('package_sha256', 'da5f38eed4707aa6de9ac7d9648008565ac332f51e93dc6cc5dab6f11f00f82e'),
                            ('source_commit', '42997e3c80784262be4e35c8d37e772c62bc5d6f'),
                            ('package_sha256', '0b25379c9eb71bd6e9014704114e5b3a7104c6fbbd9e209a97f5e189f7464492')]:
             old = self.spec['roots'][producer.ROOT_ID][key]
@@ -104,6 +107,19 @@ class OfficialNexus(unittest.TestCase):
         for key in ('source_commit', 'package_sha256', 'source_repository'):
             old = self.binding[producer.ROOT_ID][key]
             self.binding[producer.ROOT_ID][key] = 'wrong'
+            self.rejected('binding mismatch')
+            self.binding[producer.ROOT_ID][key] = old
+
+    def test_former_010_cannot_borrow_successor_enrollment(self):
+        # A former manifest must fail even with the successor's spec/bindings.
+        self.root.set('version', '0.1.0')
+        self.rejected('manifest mismatch')
+        self.root.set('version', '0.1.1')
+        # A successor manifest must not launder the former source or ZIP either.
+        for key, value in [('source_commit', 'c19f256333efbe7af12418312f17e00f99792dc2'),
+                           ('package_sha256', 'da5f38eed4707aa6de9ac7d9648008565ac332f51e93dc6cc5dab6f11f00f82e')]:
+            old = self.binding[producer.ROOT_ID][key]
+            self.binding[producer.ROOT_ID][key] = value
             self.rejected('binding mismatch')
             self.binding[producer.ROOT_ID][key] = old
 
