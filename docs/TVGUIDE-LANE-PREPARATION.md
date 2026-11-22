@@ -1,11 +1,11 @@
 # TV Guide 0.1.1: bounded dependency-lane preparation
 
-This is repository adapter and **Nexus/Omega production proposal** preparation,
-not a new add-on release, crash fix or publication. The initial adapter/private
-qualification commit `339d8f6` retained Nexus-only intake. A subsequent genuine
-Codex strict-v2 final package review now supports proposed Nexus/Omega admission.
-**Actual Pages remains Nexus-only until separate exact-site owner approval and
-promotion.** Matrix is policy-blocked; Piers is excluded. The release ledger,
+This is focused **Matrix production admission preparation**, not a new add-on
+release, crash fix or publication. The initial adapter/private qualification
+commit `339d8f6` retained Nexus-only intake; the subsequent Nexus/Omega proposal
+was merged at `47644e2` and independently promoted/HTTPS-verified by Codex.
+**Actual public availability is Nexus/Omega. Matrix is prepared only until a
+separate exact-site owner approval and promotion.** Piers is excluded. The release ledger,
 installer, other packages, existing ZIPs and artwork remain unchanged. No new
 native result is produced by these code/intake edits; no add-on code is executed.
 
@@ -81,11 +81,74 @@ Nexus and Omega snapshots **were not refreshed**. Nexus XML SHA-256 remains
 `32dc7aae6108c633a4ae788500b20ee043ef814af6a22967fdc1e891fc262aa6`, expiry
 `2026-11-29T07:21:50Z`. Omega remains
 `800fc70454c9e942d83a4e30c12871e0ac603db85a9ad909941dd8ebba70cb2b`, expiry
-`2026-11-29T07:21:54Z`. Public enrollment/closure proposals are not production
-configuration, approvals or dependency ZIPs. Restore selected XML using the
+`2026-11-29T07:21:54Z`. Production now selects all three exact enrollment specs;
+the public metadata is neither approval evidence nor dependency ZIPs. Restore selected XML using the
 [hash-checking procedure](official-dependencies/README.md). Builds/audits fetch nothing.
 
-## Matrix policy block versus metadata/smoke success
+## Current Matrix acceptance and historical-risk disposition
+
+Codex's new substantive independent Matrix decision accepts the already observed
+exact-package finite Linux Matrix 19.4 scope: native ZIP/dependency installation,
+populated guide/navigation, visible moving owned local video, Stop/guide return,
+close/reopen, actual background service update and normal GUI exit 0. All 318
+installed members match the exact ZIP; stopped-profile double-read and seven
+SQLite integrity checks passed. Setup used seeded synthetic preferences, not
+seeded code or DB; no GUI settings-edit result is claimed. No new native run is
+required merely because the earlier review withheld acceptance. OpenCode reuses
+these attributed Codex observations; it did not run Kodi or the add-on.
+
+The owner clarified repeated older-version crashes across multiple devices, not
+just Lab, accepts that historical risk and excludes investigation/reproduction/fix.
+Codex corrected its prior unsupported inference that the historical crash was an
+applicable current-package blocker: no reproduced current 0.1.1 failure or causal
+link established that attribution. This is **not a crash-resolution claim, proof
+of a fix, or proof that no current defect exists**. Old crash and blocked records
+remain immutable. The historical event stays unresolved history, with the owner's
+context and acceptance pinned separately, not a fabricated current risk waiver.
+
+The new strict-v2 three-lane final review SHA-256 is
+`d3d235fda503f98cda087be49ac04802e7f8f0c3ebaf6d3084172227c39782e9`.
+Codex is the independent AI reviewer, not an owner/human signature. Its new
+technical/runtime/final decision finds no identified unresolved mandatory current
+Matrix failure in this finite evidence. Every genuine current unresolved v2 risk,
+missing required test or contradictory approval still blocks admission. The
+structured owner acknowledgment remains `not_recorded` for the empty current-risk
+inventory; separate historical acceptance is retained as evidence, not omitted.
+
+Audio remains UNTESTED; optional notification and timer-fired AutoPlay remain
+UNOBSERVED; inherited integrated static FAIL, non-clean logs, optional-feature,
+source-delta, upgrade/full-parity and finite Linux-only limits remain disclosed.
+No diagnostic becomes PASS and no broader stability claim is made. All six floors,
+adapters, producer/auditor, approval contract, schema and guards remain unchanged.
+Reuse the accepted 65 distinct adapter/code cases and existing three-lane private
+qualification; only affected metadata checks are rerun for these intake edits.
+
+The new production configuration adds exactly the documented `official_matrix`
+spec and changes only TV Guide's lanes/final-record reference/hash. The complete
+Aura-plus-TV-Guide Omega spec, Nexus spec, other three package items, ZIPs, old
+approvals, installers, global configuration and all six ledger entries stay exact.
+No manifest-ledger edit is needed for an unchanged already-retained package.
+
+Preservation baseline is now the **published 46-file** Pages commit
+`f73bc7567083cdb39cb9cc049ac1795c2606327f`, independently qualified/promoted by
+Codex with complete-site digest
+`203722a6dde39239a1ca72bfce8195b573ba3ff6acdb3662b7d975d5d81041a5`.
+Complete real production build/verify/independent audit/deterministic qualification,
+normal Git/index-bound source scan, site scan and publication preflight must pass
+on final clean committed source. Retain all 46 old paths: only Matrix catalog and
+sidecar may change; add exactly three existing artwork copies under Matrix for
+49 files. All other old bytes, including Nexus/Omega/Piers catalogs, ZIPs,
+installers and index, remain exact. Existing Matrix manifest comparison ignores
+only its outer XML separator tail; no semantic field or site byte is normalized.
+Freshly reconstruct Matrix's ten providers/24 edges from existing valid metadata;
+preserve Nexus closure and the Aura/full Omega closure. No metadata acquisition,
+public HTTPS check against undeployed Matrix bytes, merge, tag/release/assets or
+Pages write occurs here. Separate exact Matrix-inclusive site owner approval is
+**PENDING**, followed by independent Codex review and the authorized promotion path.
+
+## Historical blocked review — 2026-11-22, before successor decision
+
+The following dated assessment is retained as history, not current admission state.
 
 Codex's separately supplied independent review reports bounded exact-package
 Matrix 19.4 and Omega 21.3 disposable smoke observations. Those are attributed
@@ -122,7 +185,7 @@ the final clean committed source. Public HTTPS validation must not be run agains
 unpublished expected bytes. No release/tag/asset/Pages promotion or merge occurs
 in this preparation; exact complete-site owner approval remains pending.
 
-## Supported private qualification
+## Historical supported private qualification
 
 The isolated candidate has a separate repository namespace/empty candidate ledger,
 never a cleared production ledger. Its only add-on is TV Guide, selected on

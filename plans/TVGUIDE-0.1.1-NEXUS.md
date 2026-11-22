@@ -1,4 +1,15 @@
-# TV Guide 0.1.1 Beta — Nexus-only preparation
+# TV Guide 0.1.1 Beta — original Nexus preparation history
+
+Current state (2026-11-22): Nexus/Omega is published at Pages `f73bc756`.
+The new genuine Codex strict-v2 decision supports finite Matrix 19.4 admission
+using the same exact ZIP and existing observations. Matrix is **prepared only**;
+separate exact complete-site owner approval remains pending. See
+[current lane preparation and historical-risk disposition](../docs/TVGUIDE-LANE-PREPARATION.md).
+The owner reports repeated older-version crashes across multiple devices and
+accepts that historical risk; no fix/resolution or supported current-defect
+attribution is claimed. All mandatory controls and finite-scope limitations stay
+unchanged. The original Nexus-only plan below is retained as dated history,
+not an instruction to revert published lanes or repeat native testing.
 
 Status: private proposed intake; **no publication authorized**. OpenCode implements
 the narrow distribution enrollment; Codex independently reviews materials,
