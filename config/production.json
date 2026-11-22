@@ -36,8 +36,8 @@
         "script.xbmcbackup": "1.7.3"
       },
       "core_commit": "a3a448d26b8d560a65655dab2cd122994dc4e146",
-      "expires_at": "2026-11-22T01:46:57Z",
-      "retrieved_at": "2026-11-15T01:46:57Z",
+      "expires_at": "2026-11-29T07:21:54Z",
+      "retrieved_at": "2026-11-22T07:21:54Z",
       "roots": {
         "skin.aura": {
           "package_sha256": "7309fc3f60429e4ba638d36046565ae48fa2b75f56f653df5200a960aa3ce9c0",
@@ -46,8 +46,8 @@
         }
       },
       "schema": 1,
-      "snapshot": "official/omega-addons.xml",
-      "snapshot_sha256": "6296b93298117faccab8d97b84c3ad6656f1298660cdf5d031a7a715c503ad0b",
+      "snapshot": "official/omega-800fc70454c9.xml",
+      "snapshot_sha256": "800fc70454c9e942d83a4e30c12871e0ac603db85a9ad909941dd8ebba70cb2b",
       "source_url": "https://mirrors.kodi.tv/addons/omega/addons.xml.gz"
     }
   },

@@ -65,6 +65,43 @@ def numeric(value):
     return tuple(map(int, value.split('.')))
 
 
+def dependency_version(value):
+    """Independent bounded Kodi grammar; numeric x.y.z package rules stay intact.
+
+    Source: Kodi a3a448d26b8d560a65655dab2cd122994dc4e146,
+    xbmc/addons/AddonVersion.cpp. Invalid/fallback and overflowing inputs are
+    unsupported, not normalized into apparently valid dependency floors.
+    """
+    assert isinstance(value, str) and 0 < len(value) <= 128
+    assert re.fullmatch(r'(?:[0-9]+:)?[0-9][a-zA-Z0-9]*(?:[.+_@~][a-zA-Z0-9]+)*'
+                        r'(?:-[a-zA-Z0-9]+(?:[.+_@~][a-zA-Z0-9]+)*)?', value)
+    assert all(len(n) <= 10 and int(n) <= 2147483647 for n in re.findall('[0-9]+', value))
+    pieces = value.lower().split(':')
+    epoch, body = (int(pieces[0]), pieces[1]) if len(pieces) == 2 else (0, pieces[0])
+    upstream, _, revision = body.partition('-')
+    return epoch, re.findall('[0-9]+|[^0-9]', upstream), re.findall('[0-9]+|[^0-9]', revision)
+
+
+def dependency_ge(provided, minimum):
+    a, b = dependency_version(provided), dependency_version(minimum)
+    if a[0] != b[0]: return a[0] > b[0]
+    for left, right in zip(a[1:], b[1:]):
+        offset = 0
+        while offset < min(len(left), len(right)):
+            x, y = left[offset], right[offset]
+            xd, yd = x[0].isdigit(), y[0].isdigit()
+            if xd and yd:
+                if int(x) != int(y): return int(x) > int(y)
+            elif x != y:
+                if x == '~': return False
+                if y == '~': return True
+                return not xd if xd != yd else x > y
+            offset += 1
+        if len(left) != len(right):
+            return left[offset] != '~' if offset < len(left) else right[offset] == '~'
+    return True
+
+
 def configuration(profile):
     """Independent candidate identity/retention selection; never imports builder."""
     production_file = path(ROOT, 'config/repository.json')
@@ -133,7 +170,7 @@ def archive_files(blob):
     for dep in manifest.findall('requires/import'):
         name = dep.get('addon', '')
         assert ID.fullmatch(name) and name not in seen
-        seen.add(name); numeric(dep.get('version'))
+        seen.add(name); dependency_version(dep.get('version'))
         assert dep.get('optional', 'false') in ('true', 'false')
     return manifest, files
 
@@ -425,7 +462,7 @@ def reviewed_inputs(config, profile):
         return expected
     inputs = json.loads((ROOT/f'config/{profile}.json').read_text())
     assert isinstance(inputs['external_dependencies'], dict)
-    assert not inputs['external_dependencies'] or set(inputs['external_dependencies']) == {'official_omega'}
+    assert set(inputs['external_dependencies']) <= {'official_omega', 'official_nexus'}
     for item in inputs['packages']:
         blob = path(ROOT/'incoming', item['zip']).read_bytes()
         assert digest(blob) == item['sha256']
@@ -601,8 +638,17 @@ def external_dependency_report(profile, manifests, builtins, lane, bindings):
     assert isinstance(spec, dict)
     if not spec:
         return {}
-    import audit_official_omega
-    return audit_official_omega.resolve(manifests, builtins, spec, ROOT/'incoming', lane, bindings)
+    assert set(spec) <= {'official_omega', 'official_nexus'}
+    results = []
+    if 'official_omega' in spec:
+        import audit_official_omega
+        results.append(audit_official_omega.resolve(manifests, builtins, {'official_omega': spec['official_omega']}, ROOT/'incoming', lane, bindings))
+    if 'official_nexus' in spec:
+        import audit_official_nexus
+        results.append(audit_official_nexus.resolve(manifests, builtins, {'official_nexus': spec['official_nexus']}, ROOT/'incoming', lane, bindings))
+    enabled = [result for result in results if result['active']]
+    assert len(enabled) <= 1, 'Conflicting active exact-root dependency adapters'
+    return enabled[0] if enabled else results[0]
 
 
 def check_dependencies(manifests, builtins, external_versions=None):
@@ -613,11 +659,8 @@ def check_dependencies(manifests, builtins, external_versions=None):
         aid = manifest.get('id'); edges[aid] = []
         for dep in manifest.findall('requires/import'):
             name = dep.get('addon')
-            if name in external_versions:
-                from audit_official_omega import version_ge
-                satisfied = version_ge(available[name], dep.get('version'))
-            else:
-                satisfied = name in available and numeric(available[name]) >= numeric(dep.get('version'))
+            dependency_version(dep.get('version'))
+            satisfied = name in available and dependency_ge(available[name], dep.get('version'))
             if dep.get('optional') == 'true': continue
             assert satisfied, 'Required dependency unavailable/too old: '+name
             if name not in builtins: edges[aid].append(name)
@@ -653,7 +696,12 @@ def audit(profile='fixture'):
         assert plan['toolchain'][name+'_sha256'] == digest((Path(__file__).parent/filename).read_bytes())
     assert plan['toolchain']['review_schema_sha256'] == digest((Path(__file__).parents[1]/'docs/REVIEW-RECORD-SCHEMA.json').read_bytes())
     if profile != 'fixture' and json.loads((ROOT/f'config/{profile}.json').read_text())['external_dependencies']:
-        for name in ('official_omega', 'audit_official_omega'):
+        adapters = json.loads((ROOT/f'config/{profile}.json').read_text())['external_dependencies']
+        assert set(adapters) <= {'official_omega', 'official_nexus'}
+        names = ['official_omega', 'audit_official_omega']
+        if 'official_nexus' in adapters:
+            names += ['official_nexus', 'audit_official_nexus']
+        for name in names:
             assert plan['toolchain'].get(name+'_sha256') == digest((Path(__file__).parent/(name+'.py')).read_bytes())
     expected = reviewed_inputs(config, profile)
     if any(item.get('provenance', {}).get('schema_version') == 5 for item in expected.values()):
@@ -740,7 +788,7 @@ def audit(profile='fixture'):
                     for key,item in expected.items() if lane in item['lanes'] and 'source_commit' in item.get('provenance',{})}
         external = external_dependency_report(profile, list(root), settings['builtins'], lane, bindings)
         assert record.get('official_dependencies', {}) == external, 'Official dependency report differs from actual inputs'
-        check_dependencies(list(root), settings['builtins'], external.get('external_versions'))
+        check_dependencies(list(root), {**settings['builtins'], **external.get('core_versions', {})}, external.get('external_versions'))
         for m in root:
             manifest, files = selected[(m.get('id'), m.get('version'))]
             assert structure(m) == structure(manifest)

@@ -36,7 +36,10 @@ def check(value, message):
 
 def parse_version(value):
     check(isinstance(value, str) and len(value) <= 128 and re.fullmatch(
-        r'(?:[0-9]+:)?[A-Za-z0-9.+_@~]+(?:-[A-Za-z0-9.+_@~]+)?', value), 'invalid Kodi dependency version')
+        r'(?:[0-9]+:)?[0-9][a-zA-Z0-9]*(?:[.+_@~][a-zA-Z0-9]+)*'
+        r'(?:-[a-zA-Z0-9]+(?:[.+_@~][a-zA-Z0-9]+)*)?', value), 'invalid Kodi dependency version')
+    check(all(len(n) <= 10 and int(n) <= 2147483647 for n in re.findall('[0-9]+', value)),
+          'Kodi dependency numeric component out of range')
     colon = value.find(':')
     epoch = int(value[:colon]) if colon >= 0 else 0
     value = value[colon + 1:] if colon >= 0 else value
