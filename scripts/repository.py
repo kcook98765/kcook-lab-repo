@@ -404,8 +404,8 @@ def production_packages(config, profile='production'):
     require(profile in ('production', 'candidate'), 'Invalid intake profile')
     inputs = json.loads((ROOT/f'config/{profile}.json').read_text())
     require(isinstance(inputs['external_dependencies'], dict), 'Malformed external dependency configuration')
-    require(not inputs['external_dependencies'] or set(inputs['external_dependencies']) == {'official_omega'},
-            'External dependencies require the separately reviewed adapter official_omega')
+    require(set(inputs['external_dependencies']) <= {'official_omega', 'official_nexus'},
+            'External dependencies require a separately reviewed adapter (exact-root official enrollment)')
     ledger = json.loads(ledger_path(profile).read_text())
     packages = []
     for item in inputs['packages']:
@@ -486,8 +486,17 @@ def external_dependency_report(profile, manifests, builtins, lane, bindings):
     require(isinstance(spec, dict), 'Malformed external dependency configuration')
     if not spec:
         return {}
-    import official_omega
-    return official_omega.resolve(manifests, builtins, spec, ROOT/'incoming', lane, bindings)
+    require(set(spec) <= {'official_omega', 'official_nexus'}, 'Unsupported external provider')
+    reports = []
+    if 'official_omega' in spec:
+        import official_omega
+        reports.append(official_omega.resolve(manifests, builtins, {'official_omega': spec['official_omega']}, ROOT/'incoming', lane, bindings))
+    if 'official_nexus' in spec:
+        import official_nexus
+        reports.append(official_nexus.resolve(manifests, builtins, {'official_nexus': spec['official_nexus']}, ROOT/'incoming', lane, bindings))
+    active = [report for report in reports if report['active']]
+    require(len(active) <= 1, 'Conflicting active exact-root dependency adapters')
+    return active[0] if active else reports[0]
 
 
 def original_assets_toolchain(profile):
@@ -509,8 +518,12 @@ def original_assets_toolchain(profile):
 def dependency_toolchain(profile):
     if profile == 'fixture' or not json.loads((ROOT/f'config/{profile}.json').read_text())['external_dependencies']:
         return {}
-    return {name+'_sha256':sha((Path(__file__).parent/filename).read_bytes()) for name,filename in
-            [('official_omega','official_omega.py'), ('audit_official_omega','audit_official_omega.py')]}
+    spec = json.loads((ROOT/f'config/{profile}.json').read_text())['external_dependencies']
+    require(set(spec) <= {'official_omega', 'official_nexus'}, 'Unsupported external provider')
+    names = ['official_omega', 'audit_official_omega']
+    if 'official_nexus' in spec:
+        names += ['official_nexus', 'audit_official_nexus']
+    return {name+'_sha256':sha((Path(__file__).parent/(name+'.py')).read_bytes()) for name in names}
 
 
 def dependencies(selected, builtins, external_versions=None):
@@ -613,7 +626,7 @@ def build(profile):
         bindings = {m.get('id'):{'package_sha256':sha(item['blob']), 'source_commit':item['provenance']['source_commit'], 'source_repository':item['provenance']['source_repository']}
                     for item,m,_ in selected if 'source_commit' in item['provenance']}
         external = external_dependency_report(profile, [m for _,m,_ in selected], settings['builtins'], lane, bindings)
-        warnings = dependencies([m for _,m,_ in selected], settings['builtins'], external.get('external_versions'))
+        warnings = dependencies([m for _,m,_ in selected], {**settings['builtins'], **external.get('core_versions', {})}, external.get('external_versions'))
         catalog = ET.Element('addons')
         for item,m,files in sorted(selected,key=lambda v:v[1].get('id')):
             catalog.append(copy.deepcopy(m))
@@ -756,7 +769,7 @@ def verify(profile):
         require(actual == record['ids'], 'Catalog identity mismatch')
         external = external_dependency_report(profile, list(root), config['lanes'][lane]['builtins'], lane, bindings)
         require(record.get('official_dependencies', {}) == external, 'Official dependency report differs from pinned inputs')
-        dependencies(list(root), config['lanes'][lane]['builtins'], external.get('external_versions'))
+        dependencies(list(root), {**config['lanes'][lane]['builtins'], **external.get('core_versions', {})}, external.get('external_versions'))
         for entry in root:
             package = next(r for r in plan['packages'] if r['id']==entry.get('id') and r['version']==entry.get('version'))
             manifest, files = inspect_zip((site/package['path']).read_bytes())

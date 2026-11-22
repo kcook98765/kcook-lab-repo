@@ -98,7 +98,11 @@ never use candidate data as a public HTTPS expectation. Ordinary approved
 packages and historical downloads replace the initial installer-only assumptions.
 Canonical ZIP order, 1980 timestamps and regular 0644 entries remain required by
 the independent audit. Numeric x.y.z versions, file-based library declarations
-and the existing external dependency-snapshot restriction remain unchanged.
+and the closed external dependency-snapshot enrollment restriction remain unchanged.
+Dependency imports use bounded Kodi epoch/upstream/revision grammar and ordering,
+including `~` and `+matrix.N`; this never widens numeric `x.y.z` distributed package
+identity. See the [exact TV Guide/Nexus metadata enrollment](OFFICIAL-NEXUS-DEPENDENCIES.md)
+and [retained official acquisition procedure](official-dependencies/README.md).
 
 Schema 3 / `unofficial-integration-v1` is an opt-in alternative only for an
 independently developed package with supported package-distribution rights and

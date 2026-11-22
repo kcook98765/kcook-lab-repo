@@ -462,7 +462,7 @@ def reviewed_inputs(config, profile):
         return expected
     inputs = json.loads((ROOT/f'config/{profile}.json').read_text())
     assert isinstance(inputs['external_dependencies'], dict)
-    assert not inputs['external_dependencies'] or set(inputs['external_dependencies']) == {'official_omega'}
+    assert set(inputs['external_dependencies']) <= {'official_omega', 'official_nexus'}
     for item in inputs['packages']:
         blob = path(ROOT/'incoming', item['zip']).read_bytes()
         assert digest(blob) == item['sha256']
@@ -638,8 +638,17 @@ def external_dependency_report(profile, manifests, builtins, lane, bindings):
     assert isinstance(spec, dict)
     if not spec:
         return {}
-    import audit_official_omega
-    return audit_official_omega.resolve(manifests, builtins, spec, ROOT/'incoming', lane, bindings)
+    assert set(spec) <= {'official_omega', 'official_nexus'}
+    results = []
+    if 'official_omega' in spec:
+        import audit_official_omega
+        results.append(audit_official_omega.resolve(manifests, builtins, {'official_omega': spec['official_omega']}, ROOT/'incoming', lane, bindings))
+    if 'official_nexus' in spec:
+        import audit_official_nexus
+        results.append(audit_official_nexus.resolve(manifests, builtins, {'official_nexus': spec['official_nexus']}, ROOT/'incoming', lane, bindings))
+    enabled = [result for result in results if result['active']]
+    assert len(enabled) <= 1, 'Conflicting active exact-root dependency adapters'
+    return enabled[0] if enabled else results[0]
 
 
 def check_dependencies(manifests, builtins, external_versions=None):
@@ -687,7 +696,12 @@ def audit(profile='fixture'):
         assert plan['toolchain'][name+'_sha256'] == digest((Path(__file__).parent/filename).read_bytes())
     assert plan['toolchain']['review_schema_sha256'] == digest((Path(__file__).parents[1]/'docs/REVIEW-RECORD-SCHEMA.json').read_bytes())
     if profile != 'fixture' and json.loads((ROOT/f'config/{profile}.json').read_text())['external_dependencies']:
-        for name in ('official_omega', 'audit_official_omega'):
+        adapters = json.loads((ROOT/f'config/{profile}.json').read_text())['external_dependencies']
+        assert set(adapters) <= {'official_omega', 'official_nexus'}
+        names = ['official_omega', 'audit_official_omega']
+        if 'official_nexus' in adapters:
+            names += ['official_nexus', 'audit_official_nexus']
+        for name in names:
             assert plan['toolchain'].get(name+'_sha256') == digest((Path(__file__).parent/(name+'.py')).read_bytes())
     expected = reviewed_inputs(config, profile)
     if any(item.get('provenance', {}).get('schema_version') == 5 for item in expected.values()):
@@ -774,7 +788,7 @@ def audit(profile='fixture'):
                     for key,item in expected.items() if lane in item['lanes'] and 'source_commit' in item.get('provenance',{})}
         external = external_dependency_report(profile, list(root), settings['builtins'], lane, bindings)
         assert record.get('official_dependencies', {}) == external, 'Official dependency report differs from actual inputs'
-        check_dependencies(list(root), settings['builtins'], external.get('external_versions'))
+        check_dependencies(list(root), {**settings['builtins'], **external.get('core_versions', {})}, external.get('external_versions'))
         for m in root:
             manifest, files = selected[(m.get('id'), m.get('version'))]
             assert structure(m) == structure(manifest)

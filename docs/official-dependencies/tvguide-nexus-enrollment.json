@@ -1,0 +1,30 @@
+{
+  "official_nexus": {
+    "allowlist": {
+      "script.module.beautifulsoup4": "4.12.2",
+      "script.module.certifi": "2023.5.7",
+      "script.module.chardet": "5.1.0",
+      "script.module.dateutil": "2.8.2",
+      "script.module.idna": "3.10.0",
+      "script.module.pytz": "2023.3.0+matrix.1",
+      "script.module.requests": "2.31.0",
+      "script.module.six": "1.16.0+matrix.1",
+      "script.module.soupsieve": "2.4.1",
+      "script.module.urllib3": "2.2.3"
+    },
+    "core_commit": "4b95737efaddf7c869736e539318f18433413ff1",
+    "expires_at": "2026-11-29T07:21:50Z",
+    "retrieved_at": "2026-11-22T07:21:50Z",
+    "roots": {
+      "script.tvguide.fullscreen": {
+        "package_sha256": "da5f38eed4707aa6de9ac7d9648008565ac332f51e93dc6cc5dab6f11f00f82e",
+        "source_commit": "c19f256333efbe7af12418312f17e00f99792dc2",
+        "version": "0.1.0"
+      }
+    },
+    "schema": 1,
+    "snapshot": "official/nexus-32dc7aae6108.xml",
+    "snapshot_sha256": "32dc7aae6108c633a4ae788500b20ee043ef814af6a22967fdc1e891fc262aa6",
+    "source_url": "https://mirrors.kodi.tv/addons/nexus/addons.xml.gz"
+  }
+}
