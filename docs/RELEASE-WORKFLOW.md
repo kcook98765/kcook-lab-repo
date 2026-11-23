@@ -1,5 +1,11 @@
 # Approval-controlled release workflow
 
+The exact owner-requested [Aura 2.1.1 patch route](AURA-2.1.1-CAST-FIX.md) records
+fresh task authority for that successor and no further behavioral testing. It
+retains false rights/native flags, original findings/failures, independent review,
+mechanical build/audit and all current release retention. It is not an expansion
+or migration of the initial 2.1.0 policy or a new general successor framework.
+
 This foundation implements offline preparation and inspection only. It contains
 no publisher, GitHub write adapter, credential injection, enabled GitHub Actions
 workflow, timer or daemon. An approved operator publishes through a separately

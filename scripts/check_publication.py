@@ -32,6 +32,7 @@ INTEGRATION_SOURCES = {
 POLICY_SOURCES = {
     'policies/aura-original-assets-2.1.0.json',
     'policies/aura-original-assets-owner-approval.json',
+    'policies/aura-cast-fix-2.1.1.json',
 }
 SECRET_PATTERNS = [
     rb'-----BEGIN (?:RSA |EC |OPENSSH )?PRIVATE KEY-----',

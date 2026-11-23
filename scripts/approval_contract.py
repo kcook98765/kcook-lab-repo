@@ -492,6 +492,11 @@ def assess(record, lanes, package_identity=None, release_history=None, package_m
     """
     version = record.get('schema_version', 1)
     require(type(version) is int and version in (1, 2, 3, 4, 5), 'unsupported schema_version')
+    patch_policy = version == 5 and record.get('approval_policy') == 'aura-cast-fix-2.1.1-v1'
+    require(patch_policy or 'aura_patch_admission' not in record, 'Aura patch evidence requires its exact policy')
+    if patch_policy:
+        import aura_patch
+        return aura_patch.assess(record, lanes, package_identity, release_history, package_manifest)
     require(version == 3 or 'unofficial_integration' not in record, 'v3 fields require schema_version=3')
     initial_policy = version == 3 and record.get('approval_policy') == INITIAL_POLICY
     material_policy = version == 5 and record.get('approval_policy') == ORIGINAL_ASSETS_POLICY

@@ -1,5 +1,13 @@
 # Review record contract
 
+The separately pinned [Aura 2.1.1 cast-fix successor](AURA-2.1.1-CAST-FIX.md)
+uses schema 5 with `approval_policy=aura-cast-fix-2.1.1-v1`. It represents the actual
+fresh owner update/skip-tests task, not a transfer or alteration of the initial
+2.1.0 policy below. Only its exact frozen source/ZIP/inventory and Omega are
+enrolled. Rights remain false/pending, native acceptance false/deferred, all old
+material findings/scenarios remain, and independent review is mandatory. All
+other policies below retain their existing meanings and artifact scope.
+
 The repository retains **strict admission for legacy/v1 and v2**. Rights authorization, owner risk
 acknowledgment, technical release approval, observed runtime acceptance, final
 release approval and operator publication authority are separate assertions.

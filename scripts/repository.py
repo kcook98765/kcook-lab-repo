@@ -308,6 +308,10 @@ def fixture_packages():
     return result
 
 def skin_alpha_notice(approval):
+    if approval.get('approval_policy') == 'aura-cast-fix-2.1.1-v1':
+        import aura_patch
+        return escape('Omega skin ALPHA; incomplete formal coverage.\n' +
+                      json.dumps(aura_patch.public_notice(approval), sort_keys=True, ensure_ascii=True))
     value = approval.get('skin_alpha_evidence')
     if value is None:
         return ''
@@ -442,9 +446,11 @@ def production_packages(config, profile='production'):
         manifest, files = inspect_zip(blob, record['runtime_files'])
         verify_skin_evidence_files(record)
         if record.get('schema_version') == 5:
-            import original_assets
-            original_assets.destination(json.loads((ROOT/'config/repository.json').read_text())
-                                        if 'candidate_context' in config else config)
+            import importlib
+            material = importlib.import_module('aura_patch' if record.get('approval_policy') ==
+                'aura-cast-fix-2.1.1-v1' else 'original_assets')
+            material.destination(json.loads((ROOT/'config/repository.json').read_text())
+                                 if 'candidate_context' in config else config)
         approval = approval_contract.assess(record, item['lanes'],
             package_identity=(manifest.get('id'), manifest.get('version')), release_history=ledger['packages'],
             package_manifest=manifest)
@@ -521,7 +527,12 @@ def original_assets_toolchain(profile):
                for item in inputs['packages']):
         return {}
     import original_assets
-    return original_assets.toolchain()
+    result = original_assets.toolchain()
+    if any(json.loads(safe_path(ROOT/'incoming', item['review_record']).read_text()).get('approval_policy') ==
+           'aura-cast-fix-2.1.1-v1' for item in inputs['packages']):
+        import aura_patch
+        result.update(aura_patch.toolchain())
+    return result
 
 
 def dependency_toolchain(profile):

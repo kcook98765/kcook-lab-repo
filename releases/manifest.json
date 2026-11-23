@@ -29,6 +29,11 @@
       "id": "script.tvguide.fullscreen",
       "sha256": "76533fcb570cd813e2deb885c919b59eea21171c6ce344d5a40ef5d8fba287b9",
       "version": "0.1.1"
+    },
+    {
+      "id": "skin.aura",
+      "sha256": "a5dc17aadfc5f14ed4807a2c16d55e23e3dd5fb5320fb9eb93885d3a0cbddb92",
+      "version": "2.1.1"
     }
   ],
   "schema": 1

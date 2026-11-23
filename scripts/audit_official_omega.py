@@ -130,7 +130,11 @@ def resolve(manifests, builtins, external_dependencies, incoming_root, lane, bin
           set(data['roots']) <= {'skin.aura', TVGUIDE}, 'only Aura and exact TV Guide are enrolled')
     if 'skin.aura' in data['roots']:
         bind = data['roots']['skin.aura']
-        check(isinstance(bind, dict) and set(bind) == {'version', 'package_sha256', 'source_commit'} and bind['version'] == '2.1.0' and
+        check(isinstance(bind, dict) and set(bind) == {'version', 'package_sha256', 'source_commit'} and
+              (bind['version'] == '2.1.0' or bind == {
+                  'version':'2.1.1',
+                  'package_sha256':'a5dc17aadfc5f14ed4807a2c16d55e23e3dd5fb5320fb9eb93885d3a0cbddb92',
+                  'source_commit':'bf4f74a2a0d4b80670213f0b6fdb8728b33dd5ab'}) and
               isinstance(bind['package_sha256'], str) and re.fullmatch('[0-9a-f]{64}', bind['package_sha256']) and
               isinstance(bind['source_commit'], str) and re.fullmatch('[0-9a-f]{40}', bind['source_commit']), 'invalid Aura artifact binding')
     if TVGUIDE in data['roots']:
@@ -162,7 +166,7 @@ def resolve(manifests, builtins, external_dependencies, incoming_root, lane, bin
         node, actual = selected[root_id], bindings.get(root_id, {})
         if root_id == 'skin.aura':
             bind = data['roots'][root_id]
-            check(node.get('version') == '2.1.0' and node.find("extension[@point='xbmc.gui.skin']") is not None, 'enrolled root is not Aura 2.1.0 skin')
+            check(node.get('version') == data['roots']['skin.aura']['version'] and node.find("extension[@point='xbmc.gui.skin']") is not None, 'enrolled root is not the exact enrolled Aura skin')
             check(actual.get('package_sha256') == bind['package_sha256'] and actual.get('source_commit') == bind['source_commit'] and actual.get('source_repository') == 'https://github.com/kcook98765/skin.aura', 'Aura artifact/source binding mismatch')
         else:
             expected = (('script.module.beautifulsoup4', '4.12.2', False), ('script.module.dateutil', '2.8.2', False),
