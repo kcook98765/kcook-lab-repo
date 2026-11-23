@@ -153,7 +153,11 @@ def resolve(manifests, builtins, external_dependencies, incoming_root, lane, bin
     if 'skin.aura' in spec['roots']:
         binding = spec['roots']['skin.aura']
         require(isinstance(binding, dict) and set(binding) == {'version', 'package_sha256', 'source_commit'} and
-                binding['version'] == '2.1.0' and isinstance(binding['package_sha256'], str) and HEX.fullmatch(binding['package_sha256']) and
+                (binding['version'] == '2.1.0' or binding == {
+                    'version': '2.1.1',
+                    'package_sha256': 'a5dc17aadfc5f14ed4807a2c16d55e23e3dd5fb5320fb9eb93885d3a0cbddb92',
+                    'source_commit': 'bf4f74a2a0d4b80670213f0b6fdb8728b33dd5ab'}) and
+                isinstance(binding['package_sha256'], str) and HEX.fullmatch(binding['package_sha256']) and
                 isinstance(binding['source_commit'], str) and re.fullmatch(r'[0-9a-f]{40}', binding['source_commit']), 'invalid Aura artifact binding')
     if TVGUIDE in spec['roots']:
         require(spec['roots'][TVGUIDE] == TV_BINDING, 'only exact frozen TV Guide beta is enrolled')
@@ -183,7 +187,7 @@ def resolve(manifests, builtins, external_dependencies, incoming_root, lane, bin
     if not enrolled: return empty
     if 'skin.aura' in enrolled:
         aura = selected['skin.aura']
-        require(aura.get('version') == '2.1.0' and aura.find("extension[@point='xbmc.gui.skin']") is not None, 'enrolled root is not Aura 2.1.0 skin')
+        require(aura.get('version') == spec['roots']['skin.aura']['version'] and aura.find("extension[@point='xbmc.gui.skin']") is not None, 'enrolled root is not the exact enrolled Aura skin')
         binding, actual = spec['roots']['skin.aura'], bindings.get('skin.aura', {})
         require(actual.get('package_sha256') == binding['package_sha256'] and actual.get('source_commit') == binding['source_commit'] and actual.get('source_repository') == 'https://github.com/kcook98765/skin.aura', 'Aura artifact/source binding mismatch')
     if TVGUIDE in enrolled:

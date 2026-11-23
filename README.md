@@ -22,8 +22,10 @@ https://kcook98765.github.io/kcook-lab-repo/
    approved installer shown there).
 4. After the installed notification, open **Install from repository → kcook-lab-repo**.
 5. Browse the normal Kodi categories and install the desired compatible add-on.
-   On Omega, **Video add-ons → Tastemade 0.1.0** is published. Other current lanes
-   contain the repository installer only; Aura and disposable fixtures are not published.
+   Omega publishes **Aura 2.1.1 ALPHA**, **Tastemade 0.1.0**, **Channels DVR Hub 0.1.2**
+   and **TV Guide 0.1.1**. TV Guide 0.1.1 is also published in Matrix and Nexus;
+   Piers contains the repository installer only. Historical packages are retained,
+   disposable fixtures are not published, and catalog availability is not native acceptance.
 
 The root ZIP is a byte-identical copy of the canonical installer, with a
 SHA-256 sidecar. Ordinary add-ons are installed through **Install from repository**;

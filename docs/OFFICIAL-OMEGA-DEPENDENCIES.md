@@ -1,5 +1,12 @@
 # Narrow official Omega dependency adapter
 
+The [exact Aura 2.1.1 cast-fix successor](AURA-2.1.1-CAST-FIX.md) additionally permits
+only source `bf4f74a2a0d4b80670213f0b6fdb8728b33dd5ab` and package
+`a5dc17aadfc5f14ed4807a2c16d55e23e3dd5fb5320fb9eb93885d3a0cbddb92`
+as the selected Aura root. Both independent implementations enforce that finite
+binding; all old Aura, TV Guide, source/snapshot/expiry/allowlist controls remain.
+Current valid Nov-22 snapshot bytes and acquisition/expiry dates are unchanged.
+
 This opt-in adapter supports `skin.aura` **2.1.0**, its reviewed source commit/ZIP,
 the `xbmc.gui.skin` extension and the **Omega** catalog, plus only the exact
 [TV Guide 0.1.1 enrollment](TVGUIDE-LANE-PREPARATION.md). It

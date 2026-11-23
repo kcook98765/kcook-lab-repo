@@ -102,9 +102,9 @@
           "version": "0.1.1"
         },
         "skin.aura": {
-          "package_sha256": "7309fc3f60429e4ba638d36046565ae48fa2b75f56f653df5200a960aa3ce9c0",
-          "source_commit": "88564fd2883d2d286bdf0e887dc0bee634fd8c4e",
-          "version": "2.1.0"
+          "package_sha256": "a5dc17aadfc5f14ed4807a2c16d55e23e3dd5fb5320fb9eb93885d3a0cbddb92",
+          "source_commit": "bf4f74a2a0d4b80670213f0b6fdb8728b33dd5ab",
+          "version": "2.1.1"
         }
       },
       "schema": 1,
@@ -133,13 +133,20 @@
       "zip": "script.channelsdvr.hub-0.1.2.zip"
     },
     {
+      "lanes": [],
+      "review_record": "aura-2.1.0-retained-v5-r1.json",
+      "review_record_sha256": "1eefbf3fcb4b96511f4c6b01aeb9c25b7e48839f295c532c29fe1a6040e2a754",
+      "sha256": "7309fc3f60429e4ba638d36046565ae48fa2b75f56f653df5200a960aa3ce9c0",
+      "zip": "aura-original-assets-7309fc3f6042/skin.aura-2.1.0.zip"
+    },
+    {
       "lanes": [
         "omega"
       ],
-      "review_record": "aura-2.1.0-original-assets-alpha-v5-approved-r1.json",
-      "review_record_sha256": "3129f77ab37dacbd8be6421025a1ff4e66fe92d8b714a3704b7c060948a61720",
-      "sha256": "7309fc3f60429e4ba638d36046565ae48fa2b75f56f653df5200a960aa3ce9c0",
-      "zip": "aura-original-assets-7309fc3f6042/skin.aura-2.1.0.zip"
+      "review_record": "aura-2.1.1-cast-fix-v5-approved-r2.json",
+      "review_record_sha256": "a5211685200fd89e1e7cdaf75efe9004396b6bad7bf1417a29e59e5c75af29c4",
+      "sha256": "a5dc17aadfc5f14ed4807a2c16d55e23e3dd5fb5320fb9eb93885d3a0cbddb92",
+      "zip": "aura-cast-fix-a5dc17aadfc5/skin.aura-2.1.1.zip"
     },
     {
       "lanes": [

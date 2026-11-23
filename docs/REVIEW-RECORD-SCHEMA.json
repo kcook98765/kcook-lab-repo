@@ -86,7 +86,8 @@
         "unofficial-integration-v1",
         "unofficial-integration-initial-release-v1",
         "initial-release-skin-alpha-v1",
-        "aura-original-assets-alpha-v1"
+        "aura-original-assets-alpha-v1",
+        "aura-cast-fix-2.1.1-v1"
       ]
     },
     "approval_lanes": {
@@ -454,6 +455,24 @@
     "skin_alpha_evidence": {
       "$ref": "#/$defs/skinAlphaEvidence"
     },
+    "aura_patch_admission": {
+      "type": "object",
+      "required": ["scope", "policy_sha256", "expires_at", "baseline_review", "source_audit", "independent_artifact_review", "historical_native_use", "scenarios", "technical_findings", "actor_fix_native_accepted", "evidence"],
+      "properties": {
+        "scope": {"const": "exact_aura_2.1.1_cast_fix_successor_only"},
+        "policy_sha256": {"const": "49c684aaee6651fc8430bfec9498af02869adea201bf1d4a0dc291a914ebae7e"},
+        "expires_at": {"const": "2026-12-15T02:11:01Z"},
+        "baseline_review": {"type": "string", "pattern": " sha256:3129f77ab37dacbd8be6421025a1ff4e66fe92d8b714a3704b7c060948a61720$"},
+        "source_audit": {"type": "string", "pattern": " sha256:88a23e280dd081a8606bedc5a7e48a2875b53b45810426c59812229df5eb6f70$"},
+        "independent_artifact_review": {"type": "string", "pattern": " sha256:8b93ef096d9023f096b912d28b6cb0c639b9d5c6177ac811c4c6522dfcbcdc61$"},
+        "historical_native_use": {"type": "object"},
+        "scenarios": {"type": "array", "minItems": 7, "maxItems": 7},
+        "technical_findings": {"type": "object"},
+        "actor_fix_native_accepted": {"const": false},
+        "evidence": {"$ref": "#/$defs/pinnedEvidence"}
+      },
+      "additionalProperties": false
+    },
     "original_assets_admission": {
       "type": "object",
       "properties": {
@@ -659,6 +678,31 @@
     }
   },
   "allOf": [
+    {
+      "if": {"required": ["approval_policy"], "properties": {"approval_policy": {"const": "aura-cast-fix-2.1.1-v1"}}},
+      "then": {
+        "required": ["schema_version", "aura_patch_admission"],
+        "properties": {
+          "schema_version": {"const": 5},
+          "source_repository": {"const": "https://github.com/kcook98765/skin.aura"},
+          "source_commit": {"const": "bf4f74a2a0d4b80670213f0b6fdb8728b33dd5ab"},
+          "package_sha256": {"const": "a5dc17aadfc5f14ed4807a2c16d55e23e3dd5fb5320fb9eb93885d3a0cbddb92"},
+          "runtime_files": {"minProperties": 1806, "maxProperties": 1806},
+          "rights_approved": {"const": false},
+          "rights_review": {"const": {"status": "pending"}},
+          "owner_acknowledgment": {"const": {"status": "not_recorded"}},
+          "approval_lanes": {"enum": [["omega"], []]},
+          "compatibility": {
+            "required": ["omega"], "propertyNames": {"const": "omega"},
+            "properties": {"omega": {"properties": {
+              "static_accepted": {"const": true}, "runtime_accepted": {"const": false},
+              "runtime_test": {"properties": {"status": {"const": "deferred"}}}
+            }}}
+          }
+        }
+      },
+      "else": {"not": {"required": ["aura_patch_admission"]}}
+    },
     {
       "if": {
         "required": [
@@ -969,7 +1013,8 @@
             "enum": [
               "strict-v1",
               "initial-release-skin-alpha-v1",
-              "aura-original-assets-alpha-v1"
+              "aura-original-assets-alpha-v1",
+              "aura-cast-fix-2.1.1-v1"
             ]
           },
           "unresolved_risks": {
@@ -1058,6 +1103,9 @@
               4,
               5
             ]
+          },
+          "approval_policy": {
+            "enum": ["initial-release-skin-alpha-v1", "aura-original-assets-alpha-v1"]
           }
         }
       },
@@ -1176,6 +1224,9 @@
         "properties": {
           "schema_version": {
             "const": 5
+          },
+          "approval_policy": {
+            "const": "aura-original-assets-alpha-v1"
           }
         }
       },

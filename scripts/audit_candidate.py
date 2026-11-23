@@ -452,6 +452,108 @@ def skin_alpha_gate(record, manifest, history, approval, material_actions=None):
     assert approval['skin_alpha_evidence'] == value and approval['cleaned_package_native_accepted'] is False
 
 
+def aura_patch_gate(record, manifest, history, config, files, production):
+    """Independent finite successor conjunction; never imports aura_patch producer."""
+    raw_policy = (ROOT/'policies/aura-cast-fix-2.1.1.json').read_bytes()
+    policy_hash = '49c684aaee6651fc8430bfec9498af02869adea201bf1d4a0dc291a914ebae7e'
+    assert digest(raw_policy) == policy_hash
+    policy = json.loads(raw_policy)
+    assert set(record) == {'schema_version','approval_policy','approval_lanes','package_sha256',
+        'source_repository','source_commit','fixture_only','runtime_files','rights_approved',
+        'rights_review','release_approved','release_decision','technical_release','owner_acknowledgment',
+        'unresolved_risks','compatibility','aura_patch_admission','limitations'}
+    assert (manifest.get('id'), manifest.get('version')) == ('skin.aura', '2.1.1')
+    assert record['source_commit'] == 'bf4f74a2a0d4b80670213f0b6fdb8728b33dd5ab'
+    assert record['package_sha256'] == 'a5dc17aadfc5f14ed4807a2c16d55e23e3dd5fb5320fb9eb93885d3a0cbddb92'
+    assert record['source_repository'] == 'https://github.com/kcook98765/skin.aura'
+    assert record['schema_version'] == 5 and record['approval_policy'] == 'aura-cast-fix-2.1.1-v1'
+    assert record['rights_approved'] is False and record['rights_review'] == {'status':'pending'}
+    assert record['owner_acknowledgment'] == {'status':'not_recorded'}
+    assert not any(k in record for k in ('skin_alpha_evidence', 'original_assets_admission',
+                                       'unofficial_integration', 'runtime_acceptance_exception'))
+    assert record['approval_lanes'] in (['omega'], []) and set(record['compatibility']) == {'omega'}
+    assert {k:config.get(k) for k in policy['destination']} == policy['destination']
+    assert any(p == {'id':'skin.aura','version':'2.1.0','sha256':policy['baseline_package_sha256']} for p in history)
+    if not record['approval_lanes']:
+        assert any(p == {'id':'skin.aura','version':'2.1.1','sha256':record['package_sha256']} for p in history)
+    value = record['aura_patch_admission']
+    assert set(value) == {'scope','policy_sha256','expires_at','baseline_review','source_audit',
+                         'independent_artifact_review','historical_native_use','scenarios','technical_findings',
+                         'actor_fix_native_accepted','evidence'}
+    assert value['scope'] == 'exact_aura_2.1.1_cast_fix_successor_only'
+    assert value['policy_sha256'] == policy_hash and value['expires_at'] == '2026-12-15T02:11:01Z'
+    assert value['actor_fix_native_accepted'] is False
+
+    def load(ref, expected):
+        assert audit_pinned_evidence([ref])
+        name, checksum = ref.rsplit(' sha256:', 1)
+        assert checksum == expected
+        raw = path(ROOT/'incoming', name).read_bytes()
+        assert digest(raw) == expected
+        return json.loads(raw)
+
+    old = load(value['baseline_review'], '3129f77ab37dacbd8be6421025a1ff4e66fe92d8b714a3704b7c060948a61720')
+    source = load(value['source_audit'], '88a23e280dd081a8606bedc5a7e48a2875b53b45810426c59812229df5eb6f70')
+    independent = load(value['independent_artifact_review'], '8b93ef096d9023f096b912d28b6cb0c639b9d5c6177ac811c4c6522dfcbcdc61')
+    assert old['package_sha256'] == policy['baseline_package_sha256']
+    assert len(files) == 1806 and set(files) == set(old['runtime_files'])
+    expected_files = old['runtime_files'] | policy['allowed_runtime_changes']
+    assert {n:digest(data) for n,data in files.items()} == record['runtime_files'] == expected_files
+    assert {n:data['sha256'] for n,data in source['files'].items()} == expected_files
+    assert source['merged_main_commit'] == independent['main'] == record['source_commit']
+    assert source['zip']['sha256'] == independent['zip_sha256'] == record['package_sha256']
+    assert independent['all_members_match_actual_merged_git_blobs'] is True
+    assert independent['all_published_fonts_artwork_and_supplemental_notices_retained_identically'] is True
+    assert independent['native_acceptance'] is False and independent['rights_verified'] is False
+    assert record['unresolved_risks'] == old['unresolved_risks']
+    assert value['scenarios'] == old['skin_alpha_evidence']['scenarios']
+    assert value['historical_native_use'] == old['skin_alpha_evidence']['owner_native_use']
+    assert value['technical_findings'] == old['original_assets_admission']['technical_findings']
+    assert len(manifest.findall("extension[@point='xbmc.gui.skin']")) == 1
+    assert all(n.get('point') in ('xbmc.gui.skin','xbmc.addon.metadata') for n in manifest.findall('extension'))
+    assert manifest.find("requires/import[@addon='xbmc.gui']").get('version') == '5.17.0'
+    accepted = record['compatibility']['omega']; test = accepted['runtime_test']
+    assert accepted['static_accepted'] is True and accepted['runtime_accepted'] is False
+    assert test['status'] == 'deferred'
+    assert test['outstanding_tests'] == [s['id'] for s in value['scenarios']] + ['AURA-CAST-2.1.1']
+    now = datetime.now(timezone.utc)
+    assert now < datetime.strptime(value['expires_at'],'%Y-%m-%dT%H:%M:%SZ').replace(tzinfo=timezone.utc)
+    assert datetime.strptime(test['recorded_at'],'%Y-%m-%dT%H:%M:%SZ').replace(tzinfo=timezone.utc) <= now
+    assert test['recorded_at'] < value['expires_at']
+    for key in ('technical_release','release_decision'):
+        action = record[key]
+        assert action['status'] in ('pending','approved','rejected','revoked')
+        if action['status'] == 'approved':
+            assert set(action) == {'status','actor','role','recorded_at','rationale','evidence'}
+            assert action['role'] == ('independent_reviewer' if key == 'technical_release' else 'operator')
+            assert action['actor'].strip().casefold() != 'kcook98765'
+            assert audit_pinned_evidence(action['evidence'])
+            assert datetime.strptime(action['recorded_at'],'%Y-%m-%dT%H:%M:%SZ').replace(tzinfo=timezone.utc) <= now
+            assert action['recorded_at'] < value['expires_at']
+        if production:
+            assert action['status'] == 'approved', 'Exact successor technical/operator recording incomplete'
+    assert record['release_approved'] is (record['release_decision']['status']=='approved')
+    if all(record[k]['status'] == 'approved' for k in ('technical_release','release_decision')):
+        assert record['technical_release']['actor'].strip().casefold() != record['release_decision']['actor'].strip().casefold(), 'Reviewer and operator must be independent'
+        assert record['technical_release']['recorded_at'] <= record['release_decision']['recorded_at']
+
+
+def aura_patch_public(record):
+    """Independently reconstruct the exact public factual subset, not private paths."""
+    value = record['aura_patch_admission']
+    return {'alpha':True, 'admission':'owner_task_directed_exact_2.1.1_patch',
+        'rights_approved':False, 'rights_review':'pending', 'third_party_permission_established':False,
+        'native_candidate_accepted':False, 'actor_fix_native_accepted':False,
+        'historical_owner_use':'Previous general-use report is not native acceptance of this successor.',
+        'testing':'Owner requested no further testing; formal scenarios and actor-fix native bad-library route remain deferred.',
+        'outstanding_scenarios':[{k:s[k] for k in ('id','lane','kind','observation','description')} for s in value['scenarios']],
+        'additional_outstanding_scenario':'AURA-CAST-2.1.1: native actor-art bad-library-route acceptance not performed',
+        'material_findings':[{k:r[k] for k in ('id','category','description')} for r in record['unresolved_risks'] if r['category']=='rights'],
+        'technical_findings':{k:v for k,v in value['technical_findings'].items() if k != 'evidence'},
+        'notice':'This bounded repository admission grants no third-party rights, legal clearance or license override.',
+        'expires_at':'2026-12-15T02:11:01Z'}
+
+
 def reviewed_inputs(config, profile):
     expected = {}
     if profile == 'fixture':
@@ -469,6 +571,7 @@ def reviewed_inputs(config, profile):
         raw = path(ROOT/'incoming', item['review_record']).read_bytes()
         assert digest(raw) == item['review_record_sha256']
         record = json.loads(raw)
+        patch_policy = record.get('schema_version') == 5 and record.get('approval_policy') == 'aura-cast-fix-2.1.1-v1'
         if 'candidate_context' in config:
             old_pending = (record.get('schema_version') == 2 and record.get('approval_policy') == 'strict-v1' and
                 record['rights_approved'] is False and record['release_approved'] is False and
@@ -496,14 +599,16 @@ def reviewed_inputs(config, profile):
         history = json.loads(configuration(profile)[2].read_text())['packages']
         verify_skin_evidence_files(record)
         assert record.get('schema_version') == 5 or 'original_assets_admission' not in record
-        if record.get('schema_version') == 5:
+        if record.get('schema_version') == 5 and not patch_policy:
             assert (manifest.get('id'),manifest.get('version')) == ('skin.aura','2.1.0')
-        material_actions = original_assets_gate(record, config) if record.get('schema_version') == 5 else None
+        if patch_policy:
+            aura_patch_gate(record, manifest, history, config, files, profile == 'production')
+        material_actions = original_assets_gate(record, config) if record.get('schema_version') == 5 and not patch_policy else None
         approval = approval_contract.assess(record, item['lanes'],
             package_identity=(manifest.get('id'), manifest.get('version')), release_history=history, package_manifest=manifest)
         approval['review_record_sha256'] = digest(raw)
         approval['package_sha256'] = digest(blob)
-        if record.get('schema_version') == 5:
+        if record.get('schema_version') == 5 and not patch_policy:
             material = record['original_assets_admission']
             assert approval['rights_approved'] is False and approval['rights_status'] == 'pending'
             assert approval['third_party_permission_established'] is False
@@ -521,7 +626,7 @@ def reviewed_inputs(config, profile):
             assert not approval['release_blockers'], 'Outstanding approval gates'
             for lane in item['lanes']:
                 accepted = record['compatibility'][lane]
-                assert accepted['static_accepted'] and (accepted['runtime_accepted'] or initial_policy or skin_policy) and accepted['evidence']
+                assert accepted['static_accepted'] and (accepted['runtime_accepted'] or initial_policy or skin_policy or patch_policy) and accepted['evidence']
             if record.get('schema_version', 1) not in (3, 5):
                 assert record['rights_approved']
             if record.get('schema_version', 1) in (2, 3, 4, 5):
@@ -720,6 +825,9 @@ def audit(profile='fixture'):
                              ('original_assets_policy_sha256','policies/aura-original-assets-2.1.0.json'),
                              ('original_assets_owner_approval_sha256','policies/aura-original-assets-owner-approval.json')]:
             assert plan['toolchain'][key] == digest((Path(__file__).resolve().parents[1]/filename).read_bytes())
+    if any(item.get('provenance', {}).get('approval_policy') == 'aura-cast-fix-2.1.1-v1' for item in expected.values()):
+        assert plan['toolchain']['aura_patch_module_sha256'] == digest((ROOT/'scripts/aura_patch.py').read_bytes())
+        assert plan['toolchain']['aura_patch_policy_sha256'] == digest((ROOT/'policies/aura-cast-fix-2.1.1.json').read_bytes())
     installer_version = config['fixture_version'] if profile == 'fixture' else config['version']
     installer_source = ROOT/'packages'/config['addon_id']
     installer_files = {p.relative_to(installer_source).as_posix():p.read_bytes() for p in installer_source.rglob('*') if p.is_file()}
@@ -838,6 +946,11 @@ def audit(profile='fixture'):
     for key,item in expected.items():
         record = item.get('provenance', {})
         if record.get('schema_version') not in (4, 5):
+            continue
+        if record.get('approval_policy') == 'aura-cast-fix-2.1.1-v1':
+            text = escape('Omega skin ALPHA; incomplete formal coverage.\n' +
+                          json.dumps(aura_patch_public(record),sort_keys=True,ensure_ascii=True))
+            notices.append('<section data-skin-alpha-package="'+key[0]+'-'+key[1]+'"><h2>'+key[0]+' '+key[1]+' ALPHA</h2><pre>'+text+'</pre></section>')
             continue
         value = record['skin_alpha_evidence']; native = value['owner_native_use']
         public = {'alpha':True, 'native_evidence':'owner_reported_general_use',

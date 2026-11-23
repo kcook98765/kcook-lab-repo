@@ -1,0 +1,47 @@
+{
+  "policy": "aura-cast-fix-2.1.1-v1",
+  "scope": "exact_aura_2.1.1_cast_fix_successor_only",
+  "addon_id": "skin.aura",
+  "addon_version": "2.1.1",
+  "source_repository": "https://github.com/kcook98765/skin.aura",
+  "source_commit": "bf4f74a2a0d4b80670213f0b6fdb8728b33dd5ab",
+  "package_sha256": "a5dc17aadfc5f14ed4807a2c16d55e23e3dd5fb5320fb9eb93885d3a0cbddb92",
+  "runtime_file_count": 1806,
+  "lanes": ["omega"],
+  "expires_at": "2026-12-15T02:11:01Z",
+  "baseline_review_sha256": "3129f77ab37dacbd8be6421025a1ff4e66fe92d8b714a3704b7c060948a61720",
+  "baseline_package_sha256": "7309fc3f60429e4ba638d36046565ae48fa2b75f56f653df5200a960aa3ce9c0",
+  "source_audit_sha256": "88a23e280dd081a8606bedc5a7e48a2875b53b45810426c59812229df5eb6f70",
+  "independent_final_artifact_review_sha256": "8b93ef096d9023f096b912d28b6cb0c639b9d5c6177ac811c4c6522dfcbcdc61",
+  "destination": {
+    "github_repository": "kcook98765/kcook-lab-repo",
+    "github_repository_id": 1428864210,
+    "base_url": "https://kcook98765.github.io/kcook-lab-repo/",
+    "addon_id": "repository.ai.kodi"
+  },
+  "task_authority": {
+    "kind": "operator_record_of_actual_current_owner_instructions_relayed_by_Codex_supervisor",
+    "owner": "kcook98765",
+    "verbatim_instructions": [
+      "skip further testing. merge and also update kcook lb repo with this version fix",
+      "opencode should have capabilities to merge to aura github and do update to kcook lab repo",
+      "will also need update README for aura"
+    ],
+    "interpretation": "The current task authorizes the reviewed actor-art patch, README and notice preservation, its exact 2.1.1 distribution update/publication, and proceeding without further runtime testing. Final artifact binding is recorded by the operator, not falsely quoted as an owner hash-shaped reply.",
+    "third_party_rights_granted": false,
+    "native_acceptance_supplied": false,
+    "item_by_item_risk_acknowledgment_claimed": false,
+    "historical_approval_transferred": false
+  },
+  "allowed_runtime_changes": {
+    "1080i/DialogVideoInfo.xml": "e13fb94250bb71aa352701376057d4a8cf7db5b45cfeb3c5b60e069add6397a9",
+    "1080i/Includes_Object.xml": "aa3ece5203c9023c2222f1254dafeafce964ce096459d9f12bbd6c0e9507760e",
+    "1080i/Includes_View.xml": "87eccd81794de4e4febe80661c747402ea87ae3d9962aad11fe32ffb92bc9364",
+    "1080i/script-script.extendedinfo-DialogVideoInfo.xml": "8ca71a6cba212234a581ac0c3e59a2b04101508862e8df921c1df7e131d33fdd",
+    "README": "fac3108ed3872b5f882be11b81af95c3cb0fa847a7eaccc92ae2ebde0661bff5",
+    "THIRD-PARTY-NOTICES.txt": "434452be047385a8637632ee660ff5e9f638a016c3f552e107bc8f7d4ed96d4b",
+    "addon.xml": "2110d8eb1fe1fd2ac0fda8976552f1d5ac4005d267d745889c143ea7353a9f3c",
+    "changelog.txt": "8e6913d321b8bb3f047e67fbf26f9704408cf011ceb711d334dce271b0e48c2a"
+  },
+  "safeguards": "All other runtime member hashes, every original material finding and coverage scenario, all notices, actual checker failures, archive/provenance/security/dependency/retention and independent review controls remain. No wildcard, new lane, third-party permission, fabricated PASS or extension of historical expiry is created. Old policy and owner receipts remain unchanged."
+}
