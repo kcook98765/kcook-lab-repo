@@ -13,6 +13,9 @@ ENROLLED = {'version': '0.1.1', 'package_sha256': '76533fcb570cd813e2deb885c919b
 TVGUIDE_012 = {'version': '0.1.2',
                'source_commit': '8fe6ede7c84cabd4d7d699335ed4e739a542b7d4',
                'package_sha256': 'cc2df0ccc16f2b5c8323723598153fb3f8afd490af206091c26b4f8075fce90b'}
+TVGUIDE_013 = {'version': '0.1.3',
+               'source_commit': '079b1cff0e5385c2a5f79ec288519a737ac5add0',
+               'package_sha256': 'b5d9e9e6a402a051f6b4e59b904973a87ff715bff5567abe1a75fb8acb7bc339'}
 # Independently checked exact 20.5 tag/commit manifests; no Omega ABI borrowing.
 PROVIDED = {'xbmc.core': ('0.1.0', '0.1'), 'xbmc.python': ('3.0.1', '3.0.0'),
             'script.module.pil': ('5.1.0', None)}
@@ -42,7 +45,7 @@ def resolve(manifests, builtins, external_dependencies, incoming_root, lane, bin
         check(isinstance(aid, str) and re.fullmatch(parsing.IDENTIFIER, aid) and aid not in PROVIDED, 'invalid official allowlist')
         parsing.parse_version(ver)
     release = data['roots'].get(ADDON) if isinstance(data['roots'], dict) else None
-    check(data['roots'] == {ADDON: release} and release in (ENROLLED, TVGUIDE_012), 'only exact frozen TV Guide beta is enrolled')
+    check(data['roots'] == {ADDON: release} and release in (ENROLLED, TVGUIDE_012, TVGUIDE_013), 'only exact frozen TV Guide beta is enrolled')
     raw = parsing.file_bytes(incoming_root, data['snapshot'])
     check(hashlib.sha256(raw).hexdigest() == data['snapshot_sha256'], 'snapshot checksum mismatch')
     check(b'\0' not in raw, 'only UTF-8 snapshot XML is accepted')

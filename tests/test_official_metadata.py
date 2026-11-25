@@ -161,17 +161,19 @@ class OfficialMetadata(unittest.TestCase):
         production = json.loads((ROOT / 'config/production.json').read_text())
         providers = production['external_dependencies']
         self.assertEqual(set(providers), {'official_matrix', 'official_omega', 'official_nexus'})
-        pin = official_nexus.TVGUIDE_012
+        pin = official_nexus.TVGUIDE_013
         self.assertEqual(providers['official_nexus'], {**nexus, 'roots': {addon: pin}})
         self.assertEqual(providers['official_matrix'], load('tvguide-matrix-enrollment.json')['official_matrix'])
         self.assertEqual(providers['official_omega']['roots'][addon], pin)
         self.assertEqual(providers['official_omega']['roots']['skin.aura']['version'], '2.1.1')
         tv = {p['zip']: p for p in production['packages'] if 'tvguide' in p['zip']}
-        self.assertEqual(set(tv), {addon + '-0.1.1.zip', addon + '-0.1.2.zip'})
+        self.assertEqual(set(tv), {addon + '-0.1.1.zip', addon + '-0.1.2.zip', addon + '-0.1.3.zip'})
         self.assertEqual(tv[addon + '-0.1.1.zip']['lanes'], ['matrix'])
         self.assertEqual(tv[addon + '-0.1.1.zip']['sha256'], official_nexus.ROOT_BINDING['package_sha256'])
-        self.assertEqual(tv[addon + '-0.1.2.zip']['lanes'], ['nexus', 'omega'])
-        self.assertEqual(tv[addon + '-0.1.2.zip']['sha256'], pin['package_sha256'])
+        self.assertEqual(tv[addon + '-0.1.2.zip']['lanes'], [])
+        self.assertEqual(tv[addon + '-0.1.2.zip']['sha256'], official_nexus.TVGUIDE_012['package_sha256'])
+        self.assertEqual(tv[addon + '-0.1.3.zip']['lanes'], ['nexus', 'omega'])
+        self.assertEqual(tv[addon + '-0.1.3.zip']['sha256'], pin['package_sha256'])
 
 
 if __name__ == '__main__': unittest.main()

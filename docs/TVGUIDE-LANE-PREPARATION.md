@@ -254,3 +254,14 @@ python3 -B -m unittest discover -s tests -p 'test_tvguide_lanes.py' -v
 Retained-metadata tests reconstruct at a fixed in-window time, a historical
 repeatability check. Fresh operator build/verify/audit/qualification uses actual
 current time and fails after configured metadata expiry.
+
+## 0.1.3 Beta publication scope
+
+Nexus and Omega select the exact qualified 0.1.3 Beta installer. The Matrix
+catalog retains 0.1.1 Beta and Piers retains its existing installer-only catalog.
+The 0.1.2 download and checksum remain available as immutable history. The
+repository installer, package paths, artwork and unrelated entries are unchanged.
+The 0.1.3 Nexus and Omega official dependency allowlists and graph are unchanged
+from 0.1.2. The producer and independent auditor pin the exact new package and
+source separately. See the [upstream prerelease](https://github.com/kcook98765/script.tvguide.fullscreen/releases/tag/v0.1.3-beta)
+for native qualification and the remaining Matrix and programme search issues.

@@ -33,6 +33,9 @@ TV_ENROLLED = {'version': '0.1.1', 'package_sha256': '76533fcb570cd813e2deb885c9
 TVGUIDE_012 = {'version': '0.1.2',
                'source_commit': '8fe6ede7c84cabd4d7d699335ed4e739a542b7d4',
                'package_sha256': 'cc2df0ccc16f2b5c8323723598153fb3f8afd490af206091c26b4f8075fce90b'}
+TVGUIDE_013 = {'version': '0.1.3',
+               'source_commit': '079b1cff0e5385c2a5f79ec288519a737ac5add0',
+               'package_sha256': 'b5d9e9e6a402a051f6b4e59b904973a87ff715bff5567abe1a75fb8acb7bc339'}
 
 
 def check(value, message):
@@ -141,7 +144,7 @@ def resolve(manifests, builtins, external_dependencies, incoming_root, lane, bin
               isinstance(bind['package_sha256'], str) and re.fullmatch('[0-9a-f]{64}', bind['package_sha256']) and
               isinstance(bind['source_commit'], str) and re.fullmatch('[0-9a-f]{40}', bind['source_commit']), 'invalid Aura artifact binding')
     if TVGUIDE in data['roots']:
-        check(data['roots'][TVGUIDE] in (TV_ENROLLED, TVGUIDE_012), 'only exact frozen TV Guide beta is enrolled')
+        check(data['roots'][TVGUIDE] in (TV_ENROLLED, TVGUIDE_012, TVGUIDE_013), 'only exact frozen TV Guide beta is enrolled')
     raw = file_bytes(incoming_root, data['snapshot'])
     check(hashlib.sha256(raw).hexdigest() == data['snapshot_sha256'], 'snapshot checksum mismatch')
     check(b'\0' not in raw, 'only UTF-8 snapshot XML is accepted')
