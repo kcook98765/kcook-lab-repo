@@ -91,7 +91,7 @@ Keeps Kodi's native views and playback controls. Includes original generic icon 
       <news>0.1.2 ALPHA: adds the project support route, reproducible original artwork and explicit Omega-only alpha limitations. No new functional acceptance is claimed. 0.1.1 pre-release: Settings and Connection accept the same numeric DVR IP address forms and use HTTP port 8089 when omitted. Address requirements and automatic connection behavior are explained in settings. 0.1.0: local Channels DVR Hub identity alignment with a separate Kodi add-on/profile identity. Dashboard, guide, recording management, explicit native Play and programme-only/Series pass management retained. 0.1.2 native acceptance pending; Hub 0.1.0 and old EPG results remain historical.</news>
     </extension>
   </addon>
-  <addon id="script.tvguide.fullscreen" name="TV Guide Fullscreen" version="0.1.2" provider-name="primaeval">
+  <addon id="script.tvguide.fullscreen" name="TV Guide Fullscreen" version="0.1.3" provider-name="primaeval">
     <requires>
       <import addon="xbmc.python" version="3.0.0" />
       <import addon="script.module.requests" version="2.31.0" />
@@ -114,7 +114,7 @@ Keeps Kodi's native views and playback controls. Includes original generic icon 
       <source>https://github.com/kcook98765/script.tvguide.fullscreen</source>
       <website>https://github.com/kcook98765/script.tvguide.fullscreen</website>
       <email>primaeval</email>
-      <news>0.1.2 Beta: restores Stream Setup tab visibility and navigation in Default, Dark and CatBar. Browse and Addons show their contents again. See release notes for Kodi version coverage and the unresolved Matrix startup limitation.</news>
+      <news>0.1.3 Beta prepared, pending owner publication: same-path XMLTV refresh with saved guide settings and mappings retained; subtitle and strict category-scoped search; native Favorites return; category mouse interaction and membership order. Fresh XMLTV declaration order applies unless explicit M3U ordering is enabled; saved weights and visibility stay. Ordinary title misses in #86 remain open. Planned for Nexus/Omega; Matrix startup remains blocked and Piers is preview-only. Versioned ZIP native qualification is pending.</news>
       <assets>
         <icon>icon.png</icon>
         <fanart>fanart.jpg</fanart>
