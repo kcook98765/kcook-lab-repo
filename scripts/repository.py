@@ -506,9 +506,8 @@ def external_dependency_report(profile, manifests, builtins, lane, bindings):
         report = importlib.import_module(name).resolve(selected, builtins, {name: spec[name]}, ROOT/'incoming', lane, bindings)
         reports.append(report)
         if name == current and report['active']:
-            tv_enrolled = report.get('roots', {}).get('script.tvguide.fullscreen') == {
-                'version': '0.1.1', 'source_commit': 'f936c0a514e0de126e62e24fd3d24b66b0c74097',
-                'package_sha256': '76533fcb570cd813e2deb885c919b59eea21171c6ce344d5a40ef5d8fba287b9'}
+            root = report.get('roots', {}).get('script.tvguide.fullscreen')
+            tv_enrolled = root is not None and root == spec[name]['roots'].get('script.tvguide.fullscreen')
     active = [report for report in reports if report['active']]
     require(len(active) <= 1, 'Conflicting active exact-root dependency adapters')
     return active[0] if active else reports[0]
@@ -755,12 +754,15 @@ def verify(profile):
     for key,value in dependency_toolchain(profile).items():
         require(plan['toolchain'].get(key) == value, 'Stale official dependency adapter')
     reviewed = production_packages(config, profile) if profile != 'fixture' else []
-    bindings = {}
+    bindings_by_lane = {lane: {} for lane in config['lanes']}
     for item in reviewed:
         manifest, _ = inspect_zip(item['blob'])
         provenance = item['provenance']
         if 'source_commit' in provenance:
-            bindings[manifest.get('id')] = {'package_sha256':sha(item['blob']), 'source_commit':provenance['source_commit'], 'source_repository':provenance['source_repository']}
+            binding = {'package_sha256':sha(item['blob']), 'source_commit':provenance['source_commit'],
+                       'source_repository':provenance['source_repository']}
+            for lane in item['lanes']:
+                bindings_by_lane[lane][manifest.get('id')] = binding
         if 'approval' in item:
             pinned = next(r for r in plan['packages'] if r['sha256'] == sha(item['blob']))
             require(pinned.get('approval') == item['approval'], 'Stale package approval evidence')
@@ -789,7 +791,7 @@ def verify(profile):
         require(root.tag == 'addons', 'Invalid catalog root')
         actual = {m.get('id'):m.get('version') for m in root}
         require(actual == record['ids'], 'Catalog identity mismatch')
-        external = external_dependency_report(profile, list(root), config['lanes'][lane]['builtins'], lane, bindings)
+        external = external_dependency_report(profile, list(root), config['lanes'][lane]['builtins'], lane, bindings_by_lane[lane])
         require(record.get('official_dependencies', {}) == external, 'Official dependency report differs from pinned inputs')
         dependencies(list(root), {**config['lanes'][lane]['builtins'], **external.get('core_versions', {})}, external.get('external_versions'))
         for entry in root:

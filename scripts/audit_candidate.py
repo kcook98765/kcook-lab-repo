@@ -757,9 +757,7 @@ def external_dependency_report(profile, manifests, builtins, lane, bindings):
         results.append(result)
         if provider == own and result['active']:
             root = result.get('roots', {}).get('script.tvguide.fullscreen')
-            exact_current_root = root == {'version': '0.1.1',
-                'package_sha256': '76533fcb570cd813e2deb885c919b59eea21171c6ce344d5a40ef5d8fba287b9',
-                'source_commit': 'f936c0a514e0de126e62e24fd3d24b66b0c74097'}
+            exact_current_root = root is not None and root == spec[provider]['roots'].get('script.tvguide.fullscreen')
     enabled = [result for result in results if result['active']]
     assert len(enabled) <= 1, 'Conflicting active exact-root dependency adapters'
     return enabled[0] if enabled else results[0]

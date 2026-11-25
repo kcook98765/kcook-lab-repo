@@ -149,26 +149,29 @@ class OfficialMetadata(unittest.TestCase):
         self.assertEqual(len(report['edges']), 81)
         self.assertEqual(load('omega-closure-comparison.json')['differences'], {})
 
-    def test_nexus_public_spec_and_final_three_lane_production_intake(self):
-        external = load('tvguide-nexus-enrollment.json')
-        spec = external['official_nexus']
-        self.assertEqual(spec['roots'], {official_nexus.ROOT_ID: official_nexus.ROOT_BINDING})
-        self.assertEqual(spec['roots'], {audit_official_nexus.ADDON: audit_official_nexus.ENROLLED})
-        self.assertEqual(len(spec['allowlist']), 10)
-        self.assertNotIn('script.module.pil', spec['allowlist'])
-        self.assertNotIn('xbmc.python', spec['allowlist'])
+    def test_frozen_nexus_and_matrix_specs_and_successor_intake(self):
+        nexus = load('tvguide-nexus-enrollment.json')['official_nexus']
+        addon = official_nexus.ROOT_ID
+        self.assertEqual(nexus['roots'], {addon: official_nexus.ROOT_BINDING})
+        self.assertEqual(nexus['roots'], {audit_official_nexus.ADDON: audit_official_nexus.ENROLLED})
+        self.assertEqual(len(nexus['allowlist']), 10)
+        self.assertNotIn('script.module.pil', nexus['allowlist'])
+        self.assertNotIn('xbmc.python', nexus['allowlist'])
+
         production = json.loads((ROOT / 'config/production.json').read_text())
-        self.assertEqual(set(production['external_dependencies']), {'official_matrix', 'official_omega', 'official_nexus'})
-        self.assertEqual(production['external_dependencies']['official_nexus'], spec)
-        tv = [p for p in production['packages'] if 'tvguide' in p['zip']]
-        self.assertEqual(len(tv), 1)
-        self.assertEqual(tv[0]['lanes'], ['matrix', 'nexus', 'omega'])
-        self.assertEqual(tv[0]['sha256'], official_nexus.ROOT_BINDING['package_sha256'])
-        self.assertEqual(tv[0]['review_record'], 'tvguide-0.1.1-review-v2-three-lane-final-r1.json')
-        self.assertEqual(tv[0]['review_record_sha256'], 'd3d235fda503f98cda087be49ac04802e7f8f0c3ebaf6d3084172227c39782e9')
-        self.assertEqual(production['external_dependencies']['official_omega'], load('tvguide-omega-enrollment.json')['official_omega'])
-        self.assertEqual(production['external_dependencies']['official_matrix'], load('tvguide-matrix-enrollment.json')['official_matrix'])
-        self.assertNotIn('piers', tv[0]['lanes'])
+        providers = production['external_dependencies']
+        self.assertEqual(set(providers), {'official_matrix', 'official_omega', 'official_nexus'})
+        pin = official_nexus.TVGUIDE_012
+        self.assertEqual(providers['official_nexus'], {**nexus, 'roots': {addon: pin}})
+        self.assertEqual(providers['official_matrix'], load('tvguide-matrix-enrollment.json')['official_matrix'])
+        self.assertEqual(providers['official_omega']['roots'][addon], pin)
+        self.assertEqual(providers['official_omega']['roots']['skin.aura']['version'], '2.1.1')
+        tv = {p['zip']: p for p in production['packages'] if 'tvguide' in p['zip']}
+        self.assertEqual(set(tv), {addon + '-0.1.1.zip', addon + '-0.1.2.zip'})
+        self.assertEqual(tv[addon + '-0.1.1.zip']['lanes'], ['matrix'])
+        self.assertEqual(tv[addon + '-0.1.1.zip']['sha256'], official_nexus.ROOT_BINDING['package_sha256'])
+        self.assertEqual(tv[addon + '-0.1.2.zip']['lanes'], ['nexus', 'omega'])
+        self.assertEqual(tv[addon + '-0.1.2.zip']['sha256'], pin['package_sha256'])
 
 
 if __name__ == '__main__': unittest.main()

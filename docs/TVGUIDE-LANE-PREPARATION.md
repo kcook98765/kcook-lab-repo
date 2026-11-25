@@ -1,4 +1,27 @@
-# TV Guide 0.1.1: bounded dependency-lane preparation
+# TV Guide repository lane preparation
+
+## 0.1.2 Beta maintenance update
+
+[TV Guide Fullscreen 0.1.2 Beta](https://github.com/kcook98765/script.tvguide.fullscreen/releases/tag/v0.1.2-beta)
+restores Stream Setup tab visibility across Default, Dark and CatBar.
+The production selection is 0.1.2 for Nexus and Omega, with the previously
+published 0.1.1 and its existing catalog entry retained for Matrix. Piers still
+contains only the repository installer.
+
+The separate producer and auditor accept the exact enrolled source commit,
+ZIP digest and version on each lane. Both reconstruct the same six manifest
+requirements, ten official external providers and 24 dependency edges for TV
+Guide. The 0.1.2 Matrix metadata check is static. Native qualification remains
+blocked before Stream Setup by a recurring unclassified
+[Matrix startup fault](https://github.com/kcook98765/script.tvguide.fullscreen/issues/82).
+That lane keeps its prior artifact and its original recorded evidence. The
+strict-v2 runtime admission policy is unchanged.
+
+The release ledger retains the earlier artifacts. Only the Nexus and Omega TV
+Guide catalog entries and corresponding sidecars change. Read the live catalogs
+for current public availability.
+
+## Historical 0.1.1 preparation
 
 This is focused **Matrix production admission preparation**, not a new add-on
 release, crash fix or publication. The initial adapter/private qualification

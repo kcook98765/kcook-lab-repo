@@ -30,6 +30,9 @@ IDENTIFIER = r'[a-z0-9]+(?:[._-][a-z0-9]+)+'
 TVGUIDE = 'script.tvguide.fullscreen'
 TV_ENROLLED = {'version': '0.1.1', 'package_sha256': '76533fcb570cd813e2deb885c919b59eea21171c6ce344d5a40ef5d8fba287b9',
                'source_commit': 'f936c0a514e0de126e62e24fd3d24b66b0c74097'}
+TVGUIDE_012 = {'version': '0.1.2',
+               'source_commit': '8fe6ede7c84cabd4d7d699335ed4e739a542b7d4',
+               'package_sha256': 'cc2df0ccc16f2b5c8323723598153fb3f8afd490af206091c26b4f8075fce90b'}
 
 
 def check(value, message):
@@ -138,7 +141,7 @@ def resolve(manifests, builtins, external_dependencies, incoming_root, lane, bin
               isinstance(bind['package_sha256'], str) and re.fullmatch('[0-9a-f]{64}', bind['package_sha256']) and
               isinstance(bind['source_commit'], str) and re.fullmatch('[0-9a-f]{40}', bind['source_commit']), 'invalid Aura artifact binding')
     if TVGUIDE in data['roots']:
-        check(data['roots'][TVGUIDE] == TV_ENROLLED, 'only exact frozen TV Guide beta is enrolled')
+        check(data['roots'][TVGUIDE] in (TV_ENROLLED, TVGUIDE_012), 'only exact frozen TV Guide beta is enrolled')
     raw = file_bytes(incoming_root, data['snapshot'])
     check(hashlib.sha256(raw).hexdigest() == data['snapshot_sha256'], 'snapshot checksum mismatch')
     check(b'\0' not in raw, 'only UTF-8 snapshot XML is accepted')
@@ -169,14 +172,15 @@ def resolve(manifests, builtins, external_dependencies, incoming_root, lane, bin
             check(node.get('version') == data['roots']['skin.aura']['version'] and node.find("extension[@point='xbmc.gui.skin']") is not None, 'enrolled root is not the exact enrolled Aura skin')
             check(actual.get('package_sha256') == bind['package_sha256'] and actual.get('source_commit') == bind['source_commit'] and actual.get('source_repository') == 'https://github.com/kcook98765/skin.aura', 'Aura artifact/source binding mismatch')
         else:
+            release = data['roots'][TVGUIDE]
             expected = (('script.module.beautifulsoup4', '4.12.2', False), ('script.module.dateutil', '2.8.2', False),
                         ('script.module.pil', '5.1.0', False), ('script.module.pytz', '2023.3.0+matrix.1', False),
                         ('script.module.requests', '2.31.0', False), ('xbmc.python', '3.0.0', False))
             extensions = sorted((e.get('point'), e.get('library')) for e in node.findall('extension') if e.get('point') != 'xbmc.addon.metadata')
-            check(node.get('version') == '0.1.1' and imports(node) == expected and
+            check(node.get('version') == release['version'] and imports(node) == expected and
                   extensions == [('xbmc.python.script', 'addon.py'), ('xbmc.service', 'service.py')], 'enrolled root manifest mismatch')
             check(set(actual) == {'source_commit', 'package_sha256', 'source_repository'} and
-                  actual['source_commit'] == TV_ENROLLED['source_commit'] and actual['package_sha256'] == TV_ENROLLED['package_sha256'] and
+                  actual['source_commit'] == release['source_commit'] and actual['package_sha256'] == release['package_sha256'] and
                   actual['source_repository'] == 'https://github.com/kcook98765/script.tvguide.fullscreen', 'TV Guide artifact/source binding mismatch')
     for aid in set(builtins).intersection(PROVIDED): check(builtins[aid] == PROVIDED[aid][0], 'configured built-in differs from pinned Omega core')
     for aid, node in selected.items():
