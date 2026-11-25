@@ -34,6 +34,11 @@
       "id": "skin.aura",
       "sha256": "a5dc17aadfc5f14ed4807a2c16d55e23e3dd5fb5320fb9eb93885d3a0cbddb92",
       "version": "2.1.1"
+    },
+    {
+      "id": "script.tvguide.fullscreen",
+      "sha256": "cc2df0ccc16f2b5c8323723598153fb3f8afd490af206091c26b4f8075fce90b",
+      "version": "0.1.2"
     }
   ],
   "schema": 1

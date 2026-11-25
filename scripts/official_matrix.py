@@ -1,4 +1,4 @@
-"""Offline Matrix 19.4 evidence for the exact TV Guide 0.1.1 package only."""
+"""Offline Matrix 19.4 evidence for exact enrolled TV Guide packages."""
 from datetime import datetime, timedelta, timezone
 from functools import cmp_to_key
 import hashlib
@@ -10,6 +10,9 @@ CORE_COMMIT = 'e12e66e019af29ba9d5f5a2614315b15a138b81a'
 ROOT_ID = 'script.tvguide.fullscreen'
 ROOT_BINDING = {'version': '0.1.1', 'source_commit': 'f936c0a514e0de126e62e24fd3d24b66b0c74097',
                 'package_sha256': '76533fcb570cd813e2deb885c919b59eea21171c6ce344d5a40ef5d8fba287b9'}
+TVGUIDE_012 = {'version': '0.1.2',
+               'source_commit': '8fe6ede7c84cabd4d7d699335ed4e739a542b7d4',
+               'package_sha256': 'cc2df0ccc16f2b5c8323723598153fb3f8afd490af206091c26b4f8075fce90b'}
 # Exact 19.4-Matrix source manifests, not Nexus/Omega API versions.
 CORE = {'xbmc.core': ('0.1.0', '0.1'), 'xbmc.python': ('3.0.0', '3.0.0'),
         'script.module.pil': ('5.1.0', None)}
@@ -40,7 +43,8 @@ def resolve(manifests, builtins, external_dependencies, incoming_root, lane, bin
     require(isinstance(allow, dict) and 0 < len(allow) <= 128 and all(
         isinstance(k, str) and parsing.ID.fullmatch(k) and k not in CORE for k in allow), 'invalid official allowlist')
     for version in allow.values(): parsing._parts(version)
-    require(spec['roots'] == {ROOT_ID: ROOT_BINDING}, 'only exact frozen TV Guide beta is enrolled')
+    release = spec['roots'].get(ROOT_ID) if isinstance(spec['roots'], dict) else None
+    require(spec['roots'] == {ROOT_ID: release} and release in (ROOT_BINDING, TVGUIDE_012), 'only exact frozen TV Guide beta is enrolled')
     raw = parsing._read_snapshot(incoming_root, spec['snapshot'])
     require(hashlib.sha256(raw).hexdigest() == spec['snapshot_sha256'], 'snapshot checksum mismatch')
     require(b'\0' not in raw, 'only UTF-8 snapshot XML is accepted')
@@ -59,10 +63,10 @@ def resolve(manifests, builtins, external_dependencies, incoming_root, lane, bin
         return empty
     if ROOT_ID not in selected: return empty
     root = selected[ROOT_ID]
-    require(root.get('version') == ROOT_BINDING['version'] and parsing._requirements(root) == REQUIRED and
+    require(root.get('version') == release['version'] and parsing._requirements(root) == REQUIRED and
             sorted((n.get('point'), n.get('library')) for n in root.findall('extension') if n.get('point') != 'xbmc.addon.metadata') ==
             [('xbmc.python.script', 'addon.py'), ('xbmc.service', 'service.py')], 'enrolled root manifest mismatch')
-    require(bindings.get(ROOT_ID) == {k: ROOT_BINDING[k] for k in ('source_commit', 'package_sha256')} |
+    require(bindings.get(ROOT_ID) == {k: release[k] for k in ('source_commit', 'package_sha256')} |
             {'source_repository': 'https://github.com/kcook98765/script.tvguide.fullscreen'}, 'TV Guide artifact/source binding mismatch')
     for aid in set(builtins) & set(CORE): require(builtins[aid] == CORE[aid][0], 'configured built-in differs from pinned Matrix core')
     for aid, manifest in selected.items():

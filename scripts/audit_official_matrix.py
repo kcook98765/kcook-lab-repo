@@ -11,6 +11,9 @@ REVISION = 'e12e66e019af29ba9d5f5a2614315b15a138b81a'
 ADDON = 'script.tvguide.fullscreen'
 ENROLLED = {'version': '0.1.1', 'package_sha256': '76533fcb570cd813e2deb885c919b59eea21171c6ce344d5a40ef5d8fba287b9',
             'source_commit': 'f936c0a514e0de126e62e24fd3d24b66b0c74097'}
+TVGUIDE_012 = {'version': '0.1.2',
+               'source_commit': '8fe6ede7c84cabd4d7d699335ed4e739a542b7d4',
+               'package_sha256': 'cc2df0ccc16f2b5c8323723598153fb3f8afd490af206091c26b4f8075fce90b'}
 PROVIDED = {'xbmc.core': ('0.1.0', '0.1'), 'xbmc.python': ('3.0.0', '3.0.0'),
             'script.module.pil': ('5.1.0', None)}
 
@@ -37,7 +40,8 @@ def resolve(manifests, builtins, external_dependencies, incoming_root, lane, bin
     for aid, ver in listed.items():
         check(isinstance(aid, str) and re.fullmatch(parsing.IDENTIFIER, aid) and aid not in PROVIDED, 'invalid official allowlist')
         parsing.parse_version(ver)
-    check(data['roots'] == {ADDON: ENROLLED}, 'only exact frozen TV Guide beta is enrolled')
+    release = data['roots'].get(ADDON) if isinstance(data['roots'], dict) else None
+    check(data['roots'] == {ADDON: release} and release in (ENROLLED, TVGUIDE_012), 'only exact frozen TV Guide beta is enrolled')
     raw = parsing.file_bytes(incoming_root, data['snapshot'])
     check(hashlib.sha256(raw).hexdigest() == data['snapshot_sha256'], 'snapshot checksum mismatch')
     check(b'\0' not in raw, 'only UTF-8 snapshot XML is accepted')
@@ -60,11 +64,11 @@ def resolve(manifests, builtins, external_dependencies, incoming_root, lane, bin
                         ('script.module.pil', '5.1.0', False), ('script.module.pytz', '2023.3.0+matrix.1', False),
                         ('script.module.requests', '2.31.0', False), ('xbmc.python', '3.0.0', False))
     extensions = [(e.get('point'), e.get('library')) for e in root.findall('extension') if e.get('point') != 'xbmc.addon.metadata']
-    check(root.get('version') == '0.1.1' and parsing.imports(root) == expected_imports and
+    check(root.get('version') == release['version'] and parsing.imports(root) == expected_imports and
           sorted(extensions) == [('xbmc.python.script', 'addon.py'), ('xbmc.service', 'service.py')], 'enrolled root manifest mismatch')
     binding = bindings.get(ADDON, {})
     check(set(binding) == {'source_commit', 'package_sha256', 'source_repository'} and
-          binding['source_commit'] == ENROLLED['source_commit'] and binding['package_sha256'] == ENROLLED['package_sha256'] and
+          binding['source_commit'] == release['source_commit'] and binding['package_sha256'] == release['package_sha256'] and
           binding['source_repository'] == 'https://github.com/kcook98765/script.tvguide.fullscreen', 'TV Guide artifact/source binding mismatch')
     for aid in set(builtins).intersection(PROVIDED):
         check(builtins[aid] == PROVIDED[aid][0], 'configured built-in differs from pinned Matrix core')

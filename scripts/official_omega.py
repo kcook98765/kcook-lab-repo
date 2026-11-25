@@ -37,6 +37,9 @@ HEX = re.compile(r'[0-9a-f]{64}\Z')
 TVGUIDE = 'script.tvguide.fullscreen'
 TV_BINDING = {'version': '0.1.1', 'source_commit': 'f936c0a514e0de126e62e24fd3d24b66b0c74097',
               'package_sha256': '76533fcb570cd813e2deb885c919b59eea21171c6ce344d5a40ef5d8fba287b9'}
+TVGUIDE_012 = {'version': '0.1.2',
+               'source_commit': '8fe6ede7c84cabd4d7d699335ed4e739a542b7d4',
+               'package_sha256': 'cc2df0ccc16f2b5c8323723598153fb3f8afd490af206091c26b4f8075fce90b'}
 
 
 def require(ok, reason):
@@ -160,7 +163,7 @@ def resolve(manifests, builtins, external_dependencies, incoming_root, lane, bin
                 isinstance(binding['package_sha256'], str) and HEX.fullmatch(binding['package_sha256']) and
                 isinstance(binding['source_commit'], str) and re.fullmatch(r'[0-9a-f]{40}', binding['source_commit']), 'invalid Aura artifact binding')
     if TVGUIDE in spec['roots']:
-        require(spec['roots'][TVGUIDE] == TV_BINDING, 'only exact frozen TV Guide beta is enrolled')
+        require(spec['roots'][TVGUIDE] in (TV_BINDING, TVGUIDE_012), 'only exact frozen TV Guide beta is enrolled')
     raw = _read_snapshot(incoming_root, spec['snapshot'])
     require(hashlib.sha256(raw).hexdigest() == spec['snapshot_sha256'], 'snapshot checksum mismatch')
     require(b'\0' not in raw, 'only UTF-8 snapshot XML is accepted')
@@ -192,13 +195,14 @@ def resolve(manifests, builtins, external_dependencies, incoming_root, lane, bin
         require(actual.get('package_sha256') == binding['package_sha256'] and actual.get('source_commit') == binding['source_commit'] and actual.get('source_repository') == 'https://github.com/kcook98765/skin.aura', 'Aura artifact/source binding mismatch')
     if TVGUIDE in enrolled:
         tv = selected[TVGUIDE]
-        require(tv.get('version') == '0.1.1' and _requirements(tv) == [
+        release = spec['roots'][TVGUIDE]
+        require(tv.get('version') == release['version'] and _requirements(tv) == [
             ('script.module.beautifulsoup4', '4.12.2', False), ('script.module.dateutil', '2.8.2', False),
             ('script.module.pil', '5.1.0', False), ('script.module.pytz', '2023.3.0+matrix.1', False),
             ('script.module.requests', '2.31.0', False), ('xbmc.python', '3.0.0', False)] and
             sorted((n.get('point'), n.get('library')) for n in tv.findall('extension') if n.get('point') != 'xbmc.addon.metadata') ==
             [('xbmc.python.script', 'addon.py'), ('xbmc.service', 'service.py')], 'enrolled root manifest mismatch')
-        require(bindings.get(TVGUIDE) == {k: TV_BINDING[k] for k in ('source_commit', 'package_sha256')} |
+        require(bindings.get(TVGUIDE) == {k: release[k] for k in ('source_commit', 'package_sha256')} |
                 {'source_repository': 'https://github.com/kcook98765/script.tvguide.fullscreen'}, 'TV Guide artifact/source binding mismatch')
     for aid, version in builtins.items():
         if aid in CORE: require(version == CORE[aid][0], 'configured built-in differs from pinned Omega core')
