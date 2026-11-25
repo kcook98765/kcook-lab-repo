@@ -40,6 +40,9 @@ TV_BINDING = {'version': '0.1.1', 'source_commit': 'f936c0a514e0de126e62e24fd3d2
 TVGUIDE_012 = {'version': '0.1.2',
                'source_commit': '8fe6ede7c84cabd4d7d699335ed4e739a542b7d4',
                'package_sha256': 'cc2df0ccc16f2b5c8323723598153fb3f8afd490af206091c26b4f8075fce90b'}
+TVGUIDE_013 = {'version': '0.1.3',
+               'source_commit': '079b1cff0e5385c2a5f79ec288519a737ac5add0',
+               'package_sha256': 'b5d9e9e6a402a051f6b4e59b904973a87ff715bff5567abe1a75fb8acb7bc339'}
 
 
 def require(ok, reason):
@@ -163,7 +166,7 @@ def resolve(manifests, builtins, external_dependencies, incoming_root, lane, bin
                 isinstance(binding['package_sha256'], str) and HEX.fullmatch(binding['package_sha256']) and
                 isinstance(binding['source_commit'], str) and re.fullmatch(r'[0-9a-f]{40}', binding['source_commit']), 'invalid Aura artifact binding')
     if TVGUIDE in spec['roots']:
-        require(spec['roots'][TVGUIDE] in (TV_BINDING, TVGUIDE_012), 'only exact frozen TV Guide beta is enrolled')
+        require(spec['roots'][TVGUIDE] in (TV_BINDING, TVGUIDE_012, TVGUIDE_013), 'only exact frozen TV Guide beta is enrolled')
     raw = _read_snapshot(incoming_root, spec['snapshot'])
     require(hashlib.sha256(raw).hexdigest() == spec['snapshot_sha256'], 'snapshot checksum mismatch')
     require(b'\0' not in raw, 'only UTF-8 snapshot XML is accepted')

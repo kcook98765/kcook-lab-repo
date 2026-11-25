@@ -46,9 +46,9 @@
       "retrieved_at": "2026-11-22T07:21:50Z",
       "roots": {
         "script.tvguide.fullscreen": {
-          "package_sha256": "cc2df0ccc16f2b5c8323723598153fb3f8afd490af206091c26b4f8075fce90b",
-          "source_commit": "8fe6ede7c84cabd4d7d699335ed4e739a542b7d4",
-          "version": "0.1.2"
+          "package_sha256": "b5d9e9e6a402a051f6b4e59b904973a87ff715bff5567abe1a75fb8acb7bc339",
+          "source_commit": "079b1cff0e5385c2a5f79ec288519a737ac5add0",
+          "version": "0.1.3"
         }
       },
       "schema": 1,
@@ -97,9 +97,9 @@
       "retrieved_at": "2026-11-22T07:21:54Z",
       "roots": {
         "script.tvguide.fullscreen": {
-          "package_sha256": "cc2df0ccc16f2b5c8323723598153fb3f8afd490af206091c26b4f8075fce90b",
-          "source_commit": "8fe6ede7c84cabd4d7d699335ed4e739a542b7d4",
-          "version": "0.1.2"
+          "package_sha256": "b5d9e9e6a402a051f6b4e59b904973a87ff715bff5567abe1a75fb8acb7bc339",
+          "source_commit": "079b1cff0e5385c2a5f79ec288519a737ac5add0",
+          "version": "0.1.3"
         },
         "skin.aura": {
           "package_sha256": "a5dc17aadfc5f14ed4807a2c16d55e23e3dd5fb5320fb9eb93885d3a0cbddb92",
@@ -158,14 +158,21 @@
       "zip": "script.tvguide.fullscreen-0.1.1.zip"
     },
     {
+      "lanes": [],
+      "review_record": "tvguide-0.1.2-review-v2-retained.json",
+      "review_record_sha256": "7d43542f9479b92dc6819d6ebabd46573e970e40dd37ff28a336bb299792191a",
+      "sha256": "cc2df0ccc16f2b5c8323723598153fb3f8afd490af206091c26b4f8075fce90b",
+      "zip": "script.tvguide.fullscreen-0.1.2.zip"
+    },
+    {
       "lanes": [
         "nexus",
         "omega"
       ],
-      "review_record": "tvguide-0.1.2-review-v2-nexus-omega.json",
-      "review_record_sha256": "6221b9c1eaab1ce59b5655945e3423b51577a895ac23769f49592a15d444c130",
-      "sha256": "cc2df0ccc16f2b5c8323723598153fb3f8afd490af206091c26b4f8075fce90b",
-      "zip": "script.tvguide.fullscreen-0.1.2.zip"
+      "review_record": "tvguide-0.1.3-review-v2-nexus-omega.json",
+      "review_record_sha256": "c7cac7f700bb5258c0538726e30a4b3105cc5b0d2182b21052a2e1117f61c27b",
+      "sha256": "b5d9e9e6a402a051f6b4e59b904973a87ff715bff5567abe1a75fb8acb7bc339",
+      "zip": "script.tvguide.fullscreen-0.1.3.zip"
     }
   ],
   "retained_installers": [

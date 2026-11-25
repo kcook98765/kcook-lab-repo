@@ -17,6 +17,9 @@ ROOT_BINDING = {'version': '0.1.1', 'source_commit': 'f936c0a514e0de126e62e24fd3
 TVGUIDE_012 = {'version': '0.1.2',
                'source_commit': '8fe6ede7c84cabd4d7d699335ed4e739a542b7d4',
                'package_sha256': 'cc2df0ccc16f2b5c8323723598153fb3f8afd490af206091c26b4f8075fce90b'}
+TVGUIDE_013 = {'version': '0.1.3',
+               'source_commit': '079b1cff0e5385c2a5f79ec288519a737ac5add0',
+               'package_sha256': 'b5d9e9e6a402a051f6b4e59b904973a87ff715bff5567abe1a75fb8acb7bc339'}
 # From exact 20.5-Nexus addons/ manifests, acquired with provenance.
 CORE = {'xbmc.core': ('0.1.0', '0.1'), 'xbmc.python': ('3.0.1', '3.0.0'),
         'script.module.pil': ('5.1.0', None)}
@@ -48,7 +51,7 @@ def resolve(manifests, builtins, external_dependencies, incoming_root, lane, bin
         isinstance(k, str) and parsing.ID.fullmatch(k) and k not in CORE for k in allow), 'invalid official allowlist')
     for version in allow.values(): parsing._parts(version)
     release = spec['roots'].get(ROOT_ID) if isinstance(spec['roots'], dict) else None
-    require(spec['roots'] == {ROOT_ID: release} and release in (ROOT_BINDING, TVGUIDE_012), 'only exact frozen TV Guide beta is enrolled')
+    require(spec['roots'] == {ROOT_ID: release} and release in (ROOT_BINDING, TVGUIDE_012, TVGUIDE_013), 'only exact frozen TV Guide beta is enrolled')
     raw = parsing._read_snapshot(incoming_root, spec['snapshot'])
     require(hashlib.sha256(raw).hexdigest() == spec['snapshot_sha256'], 'snapshot checksum mismatch')
     require(b'\0' not in raw, 'only UTF-8 snapshot XML is accepted')

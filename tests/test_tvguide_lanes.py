@@ -120,6 +120,36 @@ class TVGuideLanes(unittest.TestCase):
             self.reject(lane, 'exact frozen')
             spec['roots'][TV]['source_commit'] = release['source_commit']
 
+    def test_exact_013_enrollment_is_nexus_omega_only_and_rejects_rebinding(self):
+        release = {
+            'version': '0.1.3',
+            'source_commit': '079b1cff0e5385c2a5f79ec288519a737ac5add0',
+            'package_sha256': 'b5d9e9e6a402a051f6b4e59b904973a87ff715bff5567abe1a75fb8acb7bc339',
+        }
+        original = copy.deepcopy(self.bindings[TV])
+        previous = {lane: self.direct(pair[0], lane) for lane, pair in PAIRS.items()}
+        self.roots[TV].set('version', '0.1.3')
+        self.bindings[TV] = {**original, **{k: release[k] for k in ('package_sha256', 'source_commit')}}
+        for lane, pair in PAIRS.items():
+            spec = self.specs['official_' + lane]
+            prior_pin = spec['roots'][TV]
+            spec['roots'][TV] = copy.deepcopy(release)
+            if lane == 'matrix':
+                self.reject(lane, 'exact frozen')
+                spec['roots'][TV] = prior_pin
+                continue
+            direct = [self.direct(module, lane) for module in pair]
+            self.assertEqual(*direct)
+            self.assertEqual(direct[0], {**previous[lane], 'roots': spec['roots']})
+            for consumer in (repository, audit_candidate):
+                self.assertEqual(self.consumer(consumer, lane)['roots'][TV], release)
+            self.bindings[TV]['package_sha256'] = original['package_sha256']
+            self.reject(lane, 'artifact/source binding')
+            self.bindings[TV]['package_sha256'] = release['package_sha256']
+            spec['roots'][TV]['source_commit'] = original['source_commit']
+            self.reject(lane, 'exact frozen')
+            spec['roots'][TV]['source_commit'] = release['source_commit']
+
     def test_retained_real_catalogs_both_reconstructions(self):
         for lane in ('matrix', 'omega'):
             actual = [self.direct(module, lane) for module in PAIRS[lane]]
