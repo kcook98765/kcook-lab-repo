@@ -45,7 +45,7 @@
       </assets>
     </extension>
   </addon>
-  <addon id="script.tvguide.fullscreen" name="TV Guide Fullscreen" version="0.1.1" provider-name="primaeval">
+  <addon id="script.tvguide.fullscreen" name="TV Guide Fullscreen" version="0.1.2" provider-name="primaeval">
     <requires>
       <import addon="xbmc.python" version="3.0.0" />
       <import addon="script.module.requests" version="2.31.0" />
@@ -59,8 +59,8 @@
     </extension>
     <extension point="xbmc.service" library="service.py" />
     <extension point="xbmc.addon.metadata">
-      <summary lang="en_GB">Fullscreen XMLTV guide — artwork-only Beta successor; runtime unchanged.</summary>
-      <description lang="en_GB">Maintained modernization Beta of TV Guide Fullscreen: XMLTV listings, stream mappings, search, reminders and ordinary AutoPlay. Bounded Nexus 20.5 core evidence is reused for unchanged code; audio, timer delivery and broader compatibility remain limited. Thanks for the major contributions from: iainmacleod, im85288, RayW1986, bluezed, andy, Zomboided, tycoo, kjb86, Doctor-Eggs</description>
+      <summary lang="en_GB">Fullscreen XMLTV programme guide with channel and stream mapping.</summary>
+      <description lang="en_GB">Maintained modernization Beta of TV Guide Fullscreen: XMLTV listings, stream mappings, search, reminders and ordinary AutoPlay. Stream Setup tabs show their contents in Default, Dark and CatBar, including Browse and Addons. Thanks for the major contributions from: iainmacleod, im85288, RayW1986, bluezed, andy, Zomboided, tycoo, kjb86, Doctor-Eggs</description>
       <disclaimer lang="en_GB">Based on the original TV Guide addon by twinther, FTV Guide and Midraal's fork.</disclaimer>
       <platform>all</platform>
       <license>GPLv2</license>
@@ -68,7 +68,7 @@
       <source>https://github.com/kcook98765/script.tvguide.fullscreen</source>
       <website>https://github.com/kcook98765/script.tvguide.fullscreen</website>
       <email>primaeval</email>
-      <news>0.1.1 Beta: artwork-only successor; runtime unchanged. Original geometric icon/fanart replace inherited Earth images; four promotional screenshots omitted, channel-management capture retained. Reuses bounded Nexus 20.5 code evidence, not new native ZIP/upgrade/repository UI acceptance. Audio UNTESTED; optional timed notification and actual timer-fired AutoPlay UNOBSERVED; logs non-clean. Inherited static gate FAIL; other beta lanes deferred. See the maintained fork README for status and artwork provenance.</news>
+      <news>0.1.2 Beta: restores Stream Setup tab visibility and navigation in Default, Dark and CatBar. Browse and Addons show their contents again. See release notes for Kodi version coverage and the unresolved Matrix startup limitation.</news>
       <assets>
         <icon>icon.png</icon>
         <fanart>fanart.jpg</fanart>
