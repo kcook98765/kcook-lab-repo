@@ -173,13 +173,20 @@
       "zip": "script.tvguide.fullscreen-0.1.3.zip"
     },
     {
+      "lanes": [],
+      "review_record": "hub-0.1.3-retained-review.json",
+      "review_record_sha256": "99399afa8d2c42d0a47817de99809c63966dffeebac6fd595c74efe418b5a0df",
+      "sha256": "5b17b883933718397fded0616dc2c0aa599a86481f30d53cd030b4f57a980403",
+      "zip": "script.channelsdvr.hub-0.1.3.zip"
+    },
+    {
       "lanes": [
         "omega"
       ],
-      "review_record": "hub-0.1.3-approved-admission-review.json",
-      "review_record_sha256": "8c1a8b68a2400d7c0d1a72f51c217b03e4f643ae1ea996bfd5c465769d9ae85a",
-      "sha256": "5b17b883933718397fded0616dc2c0aa599a86481f30d53cd030b4f57a980403",
-      "zip": "script.channelsdvr.hub-0.1.3.zip"
+      "review_record": "hub-0.1.4-approved-admission-review.json",
+      "review_record_sha256": "8974fc2a90eb92b9a98b25d83ef167b38ac3e185d2cf7a7f2cd8740c300d757b",
+      "sha256": "4cd531a6319e805dc554591d7414509c34d10e809d57fd8bb3a619c64f5a4e79",
+      "zip": "script.channelsdvr.hub-0.1.4.zip"
     }
   ],
   "retained_installers": [

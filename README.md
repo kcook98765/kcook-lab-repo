@@ -22,7 +22,7 @@ https://kcook98765.github.io/kcook-lab-repo/
    approved installer shown there).
 4. After the installed notification, open **Install from repository → kcook-lab-repo**.
 5. Browse the normal Kodi categories and install the desired compatible add-on.
-   Omega publishes **Aura 2.1.1 ALPHA**, **Tastemade 0.1.0**, **Channels DVR Hub 0.1.3 ALPHA**
+   Omega publishes **Aura 2.1.1 ALPHA**, **Tastemade 0.1.0**, **Channels DVR Hub 0.1.4 ALPHA**
    and **TV Guide Fullscreen 0.1.3 Beta**. Nexus offers the same TV Guide update.
    Existing Nexus and Omega users can update in place after Kodi refreshes the catalog.
    Matrix retains 0.1.1 while native qualification is blocked by an

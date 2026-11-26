@@ -49,6 +49,11 @@
       "id": "script.channelsdvr.hub",
       "sha256": "5b17b883933718397fded0616dc2c0aa599a86481f30d53cd030b4f57a980403",
       "version": "0.1.3"
+    },
+    {
+      "id": "script.channelsdvr.hub",
+      "sha256": "4cd531a6319e805dc554591d7414509c34d10e809d57fd8bb3a619c64f5a4e79",
+      "version": "0.1.4"
     }
   ],
   "schema": 1
