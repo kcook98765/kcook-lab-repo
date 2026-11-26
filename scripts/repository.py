@@ -451,9 +451,14 @@ def production_packages(config, profile='production'):
                 'aura-cast-fix-2.1.1-v1' else 'original_assets')
             material.destination(json.loads((ROOT/'config/repository.json').read_text())
                                  if 'candidate_context' in config else config)
+        read_evidence = lambda name: safe_path(ROOT/'incoming', name).read_bytes()
+        predecessor = None
+        if record.get('approval_policy') == approval_contract.SUCCESSOR_POLICY:
+            predecessor = approval_contract.successor_predecessor(
+                record, inputs['packages'], read_evidence, inspect_zip)
         approval = approval_contract.assess(record, item['lanes'],
             package_identity=(manifest.get('id'), manifest.get('version')), release_history=ledger['packages'],
-            package_manifest=manifest)
+            package_manifest=manifest, predecessor=predecessor, read_evidence=read_evidence)
         approval['review_record_sha256'] = item['review_record_sha256']
         approval['package_sha256'] = sha(blob)
         blockers = approval['release_blockers']
@@ -676,6 +681,10 @@ def build(profile):
                       if r.get('approval', {}).get('schema_version') == 3)
     notices += ''.join('<section data-skin-alpha-package="'+r['id']+'-'+r['version']+'"><h2>'+r['id']+' '+r['version']+' ALPHA</h2><pre>'+skin_alpha_notice(r['approval'])+'</pre></section>'
                        for r in records if r.get('approval', {}).get('schema_version') in (4, 5))
+    notices += ''.join('<section data-incremental-alpha-package="'+r['id']+'-'+r['version']+'"><h2>'
+                       +r['id']+' '+r['version']+' ALPHA coverage</h2><pre>'
+                       +escape(approval_contract.successor_notice(r['approval']['incremental_alpha']))
+                       +'</pre></section>' for r in records if 'incremental_alpha' in r.get('approval', {}))
     if profile == 'fixture':
         page = ('<!doctype html><title>kcook-lab-repo: local draft</title>'
                 '<p>Not published. Fixture artifacts must never be deployed.</p><ul>'+links+'</ul>\n')

@@ -604,8 +604,18 @@ def reviewed_inputs(config, profile):
         if patch_policy:
             aura_patch_gate(record, manifest, history, config, files, profile == 'production')
         material_actions = original_assets_gate(record, config) if record.get('schema_version') == 5 and not patch_policy else None
+        successor_policy = record.get('approval_policy') == approval_contract.SUCCESSOR_POLICY
+        read_evidence = lambda name: path(ROOT/'incoming', name).read_bytes()
+        predecessor = None
+        if successor_policy:
+            predecessor = approval_contract.successor_predecessor(
+                record, inputs['packages'], read_evidence, archive_files)
+            _, _, prior_files = predecessor
+            assert record['incremental_alpha']['changed_files'] == sorted(
+                name for name in prior_files.keys() | files.keys() if prior_files.get(name) != files.get(name))
         approval = approval_contract.assess(record, item['lanes'],
-            package_identity=(manifest.get('id'), manifest.get('version')), release_history=history, package_manifest=manifest)
+            package_identity=(manifest.get('id'), manifest.get('version')), release_history=history,
+            package_manifest=manifest, predecessor=predecessor, read_evidence=read_evidence)
         approval['review_record_sha256'] = digest(raw)
         approval['package_sha256'] = digest(blob)
         if record.get('schema_version') == 5 and not patch_policy:
@@ -626,7 +636,7 @@ def reviewed_inputs(config, profile):
             assert not approval['release_blockers'], 'Outstanding approval gates'
             for lane in item['lanes']:
                 accepted = record['compatibility'][lane]
-                assert accepted['static_accepted'] and (accepted['runtime_accepted'] or initial_policy or skin_policy or patch_policy) and accepted['evidence']
+                assert accepted['static_accepted'] and (accepted['runtime_accepted'] or initial_policy or skin_policy or patch_policy or successor_policy) and accepted['evidence']
             if record.get('schema_version', 1) not in (3, 5):
                 assert record['rights_approved']
             if record.get('schema_version', 1) in (2, 3, 4, 5):
@@ -634,17 +644,29 @@ def reviewed_inputs(config, profile):
                 assert record['release_decision']['status'] == 'approved'
             if record.get('schema_version', 1) == 2:
                 assert record['rights_review']['status'] == 'verified'
-                assert not record['unresolved_risks']
-                assert all(record['compatibility'][lane]['runtime_test']['status'] == 'passed' for lane in item['lanes'])
+                if not successor_policy:
+                    assert not record['unresolved_risks']
+                    assert all(record['compatibility'][lane]['runtime_test']['status'] == 'passed' for lane in item['lanes'])
+            if successor_policy:
+                value = record['incremental_alpha']
+                assert approval['runtime_admission'] == 'incremental_alpha_scoped'
+                assert approval['publication_authorized'] is False
+                assert record['release_decision']['successor_sha256'] == approval_contract.successor_digest(record)
+                for lane in value['lanes']:
+                    runtime = record['compatibility'][lane]
+                    deferred = [scenario['id'] for scenario in value['deferred'] if scenario['lane'] == lane]
+                    assert sorted(runtime['runtime_test']['outstanding_tests']) == sorted(deferred)
+                    assert runtime['runtime_accepted'] is (not deferred)
+                assert all(item['status'] != 'failed' for item in value['observed'])
             if skin_policy:
                 skin_alpha_gate(record, manifest, history, approval, material_actions=material_actions)
             if record.get('schema_version') == 3:
-                assert record['approval_policy'] in ('unofficial-integration-v1', 'unofficial-integration-initial-release-v1')
+                assert successor_policy or record['approval_policy'] in ('unofficial-integration-v1', 'unofficial-integration-initial-release-v1')
                 assert set(record['approval_lanes']) == set(item['lanes'])
                 assert record['rights_approved'] is False and record['rights_review'] == {'status': 'pending'}
                 risks = record['unresolved_risks']
                 ids = {r['id'] for r in risks if r['category'] == 'provider_terms'}
-                assert ids and all(r['category'] == 'provider_terms' or (initial_policy and r['category'] == 'runtime') for r in risks)
+                assert ids and all(r['category'] == 'provider_terms' or ((initial_policy or successor_policy) and r['category'] == 'runtime') for r in risks)
                 value = record['unofficial_integration']
                 package = value['package_distribution_review']; service = value['service_use_review']
                 owner = value['owner_distribution_decision']; ack = record['owner_acknowledgment']
@@ -689,7 +711,7 @@ def reviewed_inputs(config, profile):
                     assert approval['runtime_exception_active'] is True
                     assert approval['runtime_admission'] == 'owner_accepted_runtime_limitations'
                     assert approval['runtime_acceptance_exception'] == record['runtime_acceptance_exception']
-                for lane in ([] if initial_policy else scope):
+                for lane in ([] if initial_policy or successor_policy else scope):
                     accepted = record['compatibility'][lane]; test = accepted['runtime_test']
                     assert accepted['static_accepted'] and accepted['runtime_accepted'] and accepted['evidence']
                     assert test['status'] == 'passed' and test['outstanding_tests'] == []
@@ -973,6 +995,20 @@ def audit(profile='fixture'):
             public['accepted_technical_findings'] = {k:v for k,v in material['technical_findings'].items() if k != 'evidence'}
         text = escape('Omega skin ALPHA; incomplete formal coverage.\n' + json.dumps(public,sort_keys=True,ensure_ascii=True))
         notices.append('<section data-skin-alpha-package="'+key[0]+'-'+key[1]+'"><h2>'+key[0]+' '+key[1]+' ALPHA</h2><pre>'+text+'</pre></section>')
+    for key, item in expected.items():
+        record = item.get('provenance', {})
+        if record.get('approval_policy') != approval_contract.SUCCESSOR_POLICY:
+            continue
+        value = record['incremental_alpha']
+        public = {
+            'deferred': value['deferred'],
+            'observed': [{k: finding[k] for k in ('id', 'lane', 'description', 'status')} for finding in value['observed']],
+            'qualified_scope': [{k: proof[k] for k in ('lane', 'kind', 'scope')} for proof in value['qualification']],
+            'expires_at': value['expires_at'],
+        }
+        notices.append('<section data-incremental-alpha-package="'+key[0]+'-'+key[1]+'"><h2>'
+                       +key[0]+' '+key[1]+' ALPHA coverage</h2><pre>'
+                       +escape(json.dumps(public, sort_keys=True, ensure_ascii=True))+'</pre></section>')
     if profile == 'fixture':
         expected_page = ('<!doctype html><title>kcook-lab-repo: local draft</title>'
                          '<p>Not published. Fixture artifacts must never be deployed.</p><ul>'+links+'</ul>\n')
