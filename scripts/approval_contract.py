@@ -12,6 +12,7 @@ import re
 POLICY = 'strict-v1'
 UNOFFICIAL_POLICY = 'unofficial-integration-v1'
 INITIAL_POLICY = 'unofficial-integration-initial-release-v1'
+SUCCESSOR_POLICY = 'incremental-alpha-successor-v1'
 SKIN_ALPHA_POLICY = 'initial-release-skin-alpha-v1'
 ORIGINAL_ASSETS_POLICY = 'aura-original-assets-alpha-v1'
 DECISION_FIELDS = {'status', 'actor', 'role', 'recorded_at', 'rationale', 'evidence'}
@@ -82,6 +83,287 @@ def utc_now():
 def exception_digest(value):
     return hashlib.sha256(json.dumps(value, sort_keys=True, separators=(',', ':'),
                                      ensure_ascii=True).encode('utf-8')).hexdigest()
+
+
+def successor_digest(record):
+    """Final admission binds the whole record, including current owner actions."""
+    return exception_digest({k: v for k, v in record.items()
+                             if k not in ('release_approved', 'release_decision', 'approval_lanes')})
+
+
+def successor_predecessor(record, inputs, read, inspect):
+    """Load the admitted predecessor through the caller's own path/ZIP checks."""
+    value = record['incremental_alpha']
+    predecessor = value['predecessor']
+    reference = predecessor['review_record']
+    require(pinned_references([reference]), 'predecessor review must be hash-pinned')
+    name, checksum = reference.rsplit(' sha256:', 1)
+    original = read(name)
+    require(hashlib.sha256(original).hexdigest() == checksum, 'predecessor review digest mismatch')
+    old = json.loads(original)
+    candidates = [item for item in inputs if item['sha256'] == predecessor['package_sha256']]
+    require(len(candidates) == 1, 'predecessor must be a unique retained intake')
+    item = candidates[0]
+    retained = read(item['review_record'])
+    require(hashlib.sha256(retained).hexdigest() == item['review_record_sha256'],
+            'retained predecessor review digest mismatch')
+    require({**old, 'approval_lanes': item['lanes']} == {**json.loads(retained), 'approval_lanes': item['lanes']},
+            'original predecessor review differs from retained intake beyond lane selection')
+    blob = read(item['zip'])
+    require(hashlib.sha256(blob).hexdigest() == item['sha256'], 'predecessor ZIP digest mismatch')
+    manifest, files = inspect(blob)
+    require(old['runtime_files'] == {name: hashlib.sha256(data).hexdigest() for name, data in files.items()},
+            'predecessor inventory differs from retained ZIP')
+    return old, manifest, files
+
+
+def alpha_manifest(manifest):
+    return manifest is not None and any(re.search(r'\balpha\b', node.text or '', re.I)
+        for extension in manifest.findall("extension[@point='xbmc.addon.metadata']")
+        for node in extension if node.tag in ('summary', 'description', 'disclaimer'))
+
+
+def successor_qualification(value, old, before, after, verify):
+    scoped = set()
+    for item in value['qualification']:
+        require(isinstance(item, dict) and set(item) == {'lane', 'kind', 'scope', 'evidence', 'unchanged_files'}
+                and item['lane'] in value['lanes'] and isinstance(item['scope'], str) and item['scope'].strip(),
+                'malformed successor qualification')
+        lane, kind = item['lane'], item['kind']
+        verify(item['evidence'])
+        if kind == 'reused':
+            earlier = old['compatibility'][lane]
+            references = earlier['evidence'] + earlier.get('runtime_test', {}).get('evidence', [])
+            references += [ref for prior in old.get('incremental_alpha', {}).get('qualification', [])
+                           if prior['lane'] == lane for ref in prior['evidence']]
+            require(bool(item['unchanged_files']) and all(name in before and before[name] == after.get(name)
+                    for name in item['unchanged_files']) and set(item['evidence']) <= set(references),
+                    'reused evidence must bind unchanged files and previously reviewed lane evidence')
+        else:
+            require(kind in ('native', 'regression') and item['unchanged_files'] == [],
+                    'invalid successor qualification kind')
+            scoped.add((lane, kind))
+    require(scoped == {(lane, kind) for lane in value['lanes'] for kind in ('native', 'regression')},
+            'missing changed-functionality native or affected regression evidence')
+
+
+def successor_decisions(record, value, old, verify, blockers):
+    independent = value['independent_review']
+    owner = value['owner_decision']
+    decision(independent, ('verified', 'pending', 'rejected', 'revoked'))
+    decision(owner, ('accepted', 'pending', 'declined', 'revoked'))
+    require(isinstance(value['expires_at'], str) and re.fullmatch(
+            r'\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z', value['expires_at']), 'successor expiry invalid')
+    expiry = datetime.strptime(value['expires_at'], '%Y-%m-%dT%H:%M:%SZ').replace(tzinfo=timezone.utc)
+    now = utc_now()
+    if independent['status'] == 'verified':
+        require(independent['role'] == 'independent-reviewer', 'successor review requires independent reviewer attribution')
+    active = independent['status'] == 'verified' and owner['status'] == 'accepted' and now < expiry
+    for action in (independent, owner, record['technical_release']):
+        if action['status'] != 'pending':
+            verify(action['evidence'])
+            stamp = datetime.strptime(action['recorded_at'], '%Y-%m-%dT%H:%M:%SZ').replace(tzinfo=timezone.utc)
+            active = active and stamp <= now and stamp < expiry
+    rights = record['rights_review'] if record['schema_version'] == 2 else record['unofficial_integration']['package_distribution_review']
+    if rights['status'] != 'pending':
+        verify(rights['evidence'])
+        stamp = datetime.strptime(rights['recorded_at'], '%Y-%m-%dT%H:%M:%SZ').replace(tzinfo=timezone.utc)
+        active = active and stamp <= now and stamp < expiry
+    if record['schema_version'] == 3:
+        service = record['unofficial_integration']
+        for action in (service['service_use_review'], service['owner_distribution_decision']):
+            if action['status'] != 'pending':
+                verify(action['evidence'])
+                stamp = datetime.strptime(action['recorded_at'], '%Y-%m-%dT%H:%M:%SZ').replace(tzinfo=timezone.utc)
+                active = active and stamp <= now and stamp < expiry
+        provider = service['owner_distribution_decision']
+        if old.get('schema_version') == 3 and provider['status'] == 'accepted':
+            prior = old['unofficial_integration']['owner_distribution_decision']
+            require(provider['recorded_at'] > prior['recorded_at'],
+                    'provider risk decision must be renewed after predecessor decision')
+    if owner['status'] == 'accepted':
+        require(owner['role'] == 'owner', 'successor coverage requires owner acceptance')
+        reviewers = (independent, record['technical_release'], rights)
+        require(all(x.get('actor', '').strip().casefold() != owner['actor'].strip().casefold()
+                    for x in reviewers), 'successor reviewers must be independent of owner')
+    ack = record['owner_acknowledgment']
+    if record['unresolved_risks']:
+        active = active and ack['status'] == 'acknowledged' and ack.get('actor') == owner.get('actor')
+        if ack['status'] == 'acknowledged':
+            verify(ack['evidence'])
+            stamp = datetime.strptime(ack['recorded_at'], '%Y-%m-%dT%H:%M:%SZ').replace(tzinfo=timezone.utc)
+            active = active and stamp <= now and stamp < expiry
+    if not active:
+        blockers.append('Current independent successor review and owner coverage acceptance required')
+    if record['release_approved']:
+        final = record['release_decision']
+        require(final['role'] == 'owner' and final['actor'] == owner.get('actor')
+                and final.get('successor_sha256') == successor_digest(record), 'final approval must bind exact successor record')
+        verify(final['evidence'])
+        stamp = datetime.strptime(final['recorded_at'], '%Y-%m-%dT%H:%M:%SZ').replace(tzinfo=timezone.utc)
+        prior_actions = [independent, owner, record['technical_release'], rights, ack]
+        if record['schema_version'] == 3:
+            prior_actions += [record['unofficial_integration'][key] for key in
+                              ('owner_distribution_decision', 'service_use_review')]
+        require(stamp <= now and stamp < expiry and all(
+            x.get('recorded_at', '') <= final['recorded_at'] for x in prior_actions), 'final successor approval date invalid')
+    return active
+
+
+def successor_runtime(record, lanes, identity, history, manifest, predecessor, read, blockers):
+    value = record['incremental_alpha']
+    require(isinstance(value, dict) and set(value) == {
+        'predecessor', 'lanes', 'changed_files', 'qualification', 'deferred', 'resolved',
+        'observed', 'independent_review', 'owner_decision', 'expires_at'}, 'malformed incremental ALPHA record')
+    require(predecessor is not None and identity is not None and isinstance(history, list),
+            'incremental ALPHA requires verified predecessor inputs')
+    old, old_manifest, _ = predecessor
+    old_ref = value['predecessor']
+    require(isinstance(old_ref, dict) and set(old_ref) == {
+        'version', 'package_sha256', 'source_commit', 'review_record'}, 'malformed predecessor identity')
+    aid, version = identity
+    require(alpha_manifest(manifest) and alpha_manifest(old_manifest), 'both artifacts must identify as ALPHA')
+    require(old_manifest.get('id') == aid and old_manifest.get('version') == old_ref['version']
+            and old_ref['source_commit'] == old['source_commit']
+            and old_ref['package_sha256'] == old['package_sha256']
+            and old['source_repository'] == record['source_repository']
+            and old['source_commit'] != record['source_commit'] and old['release_approved'] is True
+            and old['fixture_only'] is False, 'predecessor source/package identity or admission mismatch')
+    require(tuple(map(int, old_ref['version'].split('.'))) < tuple(map(int, version.split('.'))),
+            'successor version must increase')
+    published = [(row['version'], row['sha256']) for row in history if row['id'] == aid]
+    current = (version, record['package_sha256'])
+    if current in published:
+        require(published.count(current) == 1 and (not lanes or published[-1] == current),
+                'successor is not the latest ledger entry')
+        published = published[:published.index(current)]
+    else:
+        require(bool(lanes), 'only a published successor can be retained without lanes')
+    require(bool(published) and published[-1] == (old_ref['version'], old_ref['package_sha256']),
+            'predecessor is not the immediate published ALPHA')
+    require(exact_risks(value['lanes'], record['compatibility'])
+            and (not lanes or set(lanes) == set(value['lanes']))
+            and set(value['lanes']) <= set(old.get('approval_lanes', old['compatibility']))
+            and all(old['compatibility'][lane]['static_accepted'] for lane in value['lanes']),
+            'successor lanes must already be admitted on predecessor')
+    require(all(old['compatibility'][lane].get('runtime_test', {'status': 'passed'})['status']
+                in ('passed', 'deferred') for lane in value['lanes']),
+            'failed or pending predecessor runtime cannot be deferred')
+    if old.get('approval_policy', POLICY) in (POLICY, UNOFFICIAL_POLICY):
+        require(all(old['compatibility'][lane]['runtime_accepted'] for lane in value['lanes']),
+                'strict predecessor must have originally accepted its runtime lanes')
+    require(all(risk in record['unresolved_risks'] for risk in old.get('unresolved_risks', [])
+                if risk['category'] != 'runtime'), 'unresolved predecessor findings must be retained')
+    require(all(item in record.get('limitations', []) for item in old.get('limitations', [])),
+            'recorded predecessor limitations must be retained')
+    if old.get('schema_version') == 3:
+        require(record['schema_version'] == 3, 'predecessor provider findings require schema 3')
+        prior_service = old['unofficial_integration']['service_use_review']
+        service = record['unofficial_integration']['service_use_review']
+        if prior_service['status'] == 'authorization_unverified' and service['status'] != 'pending':
+            require(service['status'] == 'authorization_unverified'
+                    and service['upstream_provider'] == prior_service['upstream_provider'],
+                    'predecessor provider-authorization finding requires renewal')
+
+    before = old['runtime_files']
+    after = record['runtime_files']
+    changed = sorted(name for name in before.keys() | after.keys() if before.get(name) != after.get(name))
+    require(value['changed_files'] == changed, 'review does not cover exact package delta')
+
+    def verify(references):
+        require(read is not None and pinned_references(references), 'successor evidence must be hash-pinned')
+        for reference in references:
+            name, checksum = reference.rsplit(' sha256:', 1)
+            require(hashlib.sha256(read(name)).hexdigest() == checksum, 'successor evidence digest mismatch')
+
+    require(all(isinstance(value[key], list) for key in
+                ('qualification', 'deferred', 'resolved', 'observed')), 'invalid successor evidence lists')
+    successor_qualification(value, old, before, after, verify)
+
+    deferred = {}
+    resolved = {}
+    prior_deferred = (old.get('incremental_alpha', {}).get('deferred', [])
+                      + old.get('runtime_acceptance_exception', {}).get('scenarios', []))
+    prior_observed = [item for item in old.get('incremental_alpha', {}).get('observed', [])
+                      if item['lane'] in value['lanes']]
+    prior_descriptions = {(item['lane'], item['id']): item['description'] for item in prior_deferred + prior_observed}
+    for field, items in (('risk_id', value['deferred']), ('evidence', value['resolved'])):
+        for item in items:
+            fields = {'id', 'lane', 'description', field}
+            if field == 'risk_id':
+                fields.add('observation')
+            require(isinstance(item, dict) and set(item) == fields
+                    and item['lane'] in value['lanes'] and isinstance(item['id'], str) and item['id'].strip()
+                    and isinstance(item['description'], str) and item['description'].strip(),
+                    'malformed successor scenario')
+            key = (item['lane'], item['id'])
+            require(key not in deferred and key not in resolved, 'duplicate successor scenario')
+            if field == 'risk_id':
+                require(item['observation'] in ('not_observed', 'unavailable'),
+                        'only unobserved or unavailable scenarios may be deferred')
+                deferred[key] = item
+                continue
+            verify(item['evidence'])
+            require(item['description'] == prior_descriptions.get(key, item['description'])
+                    and set(item['evidence']) <= {ref for proof in value['qualification']
+                    if proof['lane'] == item['lane'] and proof['kind'] == 'native' for ref in proof['evidence']},
+                    'prior scenario closure requires original description and current native evidence')
+            resolved[key] = item
+    for item in prior_deferred:
+        key = (item['lane'], item['id'])
+        if item['lane'] in value['lanes'] and key not in resolved:
+            require(key in deferred and all(item[field] == deferred[key][field]
+                    for field in ('description', 'risk_id', 'observation')), 'predecessor deferred scenario changed or omitted')
+    prior_outstanding = {(lane, test) for lane in value['lanes'] for test in
+                         old['compatibility'][lane].get('runtime_test', {}).get('outstanding_tests', [])}
+    prior_observed_keys = {(item['lane'], item['id']) for item in prior_observed}
+    require(prior_outstanding <= deferred.keys() | resolved.keys()
+            and resolved.keys() <= prior_outstanding | prior_observed_keys,
+            'predecessor outstanding tests must be retained or verified')
+    require(all(item in value['observed'] or (item['lane'], item['id']) in resolved for item in prior_observed),
+            'previous observed findings must be retained or verified as resolved')
+    observed_ids = set()
+    for item in value['observed']:
+        key = (item['lane'], item['id'])
+        require(set(item) == {'id', 'lane', 'description', 'evidence', 'status'}
+                and item['lane'] in value['lanes'] and item['id'].strip() and item['description'].strip()
+                and key not in deferred and key not in resolved and key not in observed_ids
+                and item['status'] in ('compatibility_limitation', 'failed'), 'invalid observed finding')
+        observed_ids.add(key)
+        verify(item['evidence'])
+        if item['status'] == 'failed':
+            blockers.append('Observed functionality failure: ' + item['id'])
+    runtime_ids = {risk['id'] for risk in record['unresolved_risks'] if risk['category'] == 'runtime'}
+    prior_scenario_risks = {item['risk_id'] for item in prior_deferred}
+    require(all(risk in record['unresolved_risks'] for risk in old.get('unresolved_risks', [])
+                if risk['category'] == 'runtime'
+                and (risk['id'] in runtime_ids or risk['id'] not in prior_scenario_risks)),
+            'unresolved predecessor runtime findings must be retained')
+    require(runtime_ids == {item['risk_id'] for item in deferred.values()},
+            'deferred scenarios must name all and only unresolved coverage risks')
+    for lane in value['lanes']:
+        expected = {key[1] for key in deferred if key[0] == lane}
+        static = record['compatibility'][lane]
+        test = static['runtime_test']
+        require(static['static_accepted'] and static['evidence']
+                and test['status'] == ('deferred' if expected else 'passed')
+                and len(test['outstanding_tests']) == len(expected) and set(test['outstanding_tests']) == expected,
+                'successor runtime must show exact outstanding scenarios and static acceptance')
+        verify(static['evidence'])
+        verify(test['evidence'])
+    for finding in record['unresolved_risks']:
+        verify(finding['evidence'])
+
+    return successor_decisions(record, value, old, verify, blockers), runtime_ids
+
+
+def successor_notice(value):
+    result = {key: [{k: v for k, v in item.items() if k != 'evidence'}
+                    for item in value[key]] for key in ('deferred', 'observed')}
+    result['qualified_scope'] = [{key: item[key] for key in ('lane', 'kind', 'scope')}
+                                 for item in value['qualification']]
+    result['expires_at'] = value['expires_at']
+    return json.dumps(result, sort_keys=True, ensure_ascii=True)
 
 
 def runtime_exception(record, lanes, risks, ack, identity, history, blockers):
@@ -483,7 +765,8 @@ def skin_alpha(record, lanes, risks, ack, identity, history, manifest, blockers,
     return active, risk_ids
 
 
-def assess(record, lanes, package_identity=None, release_history=None, package_manifest=None):
+def assess(record, lanes, package_identity=None, release_history=None, package_manifest=None,
+           *, predecessor=None, read_evidence=None):
     """Validate versioned assertions and return an honest, JSON-safe report.
 
     Unversioned and explicit v1 records keep the old boolean contract. New
@@ -492,6 +775,8 @@ def assess(record, lanes, package_identity=None, release_history=None, package_m
     """
     version = record.get('schema_version', 1)
     require(type(version) is int and version in (1, 2, 3, 4, 5), 'unsupported schema_version')
+    successor = version in (2, 3) and record.get('approval_policy') == SUCCESSOR_POLICY
+    require(successor == ('incremental_alpha' in record), 'incremental evidence requires explicit successor policy')
     patch_policy = version == 5 and record.get('approval_policy') == 'aura-cast-fix-2.1.1-v1'
     require(patch_policy or 'aura_patch_admission' not in record, 'Aura patch evidence requires its exact policy')
     if patch_policy:
@@ -519,7 +804,7 @@ def assess(record, lanes, package_identity=None, release_history=None, package_m
     runtime = {}
     # No active lanes is retained history only. Preserve acceptance over the
     # recorded compatibility scope; both consumers separately require the ledger.
-    acceptance_lanes = lanes or (list(record['compatibility']) if version in (3, 4, 5) else [])
+    acceptance_lanes = (record['incremental_alpha']['lanes'] if successor else lanes) or (list(record['compatibility']) if version in (3, 4, 5) else [])
     if version in (3, 4, 5) and not acceptance_lanes:
         blockers.append('Original runtime acceptance scope missing')
     for lane in acceptance_lanes:
@@ -542,7 +827,7 @@ def assess(record, lanes, package_identity=None, release_history=None, package_m
 
     require(V2_FIELDS <= set(record), 'v2 fields missing')
     policy = record['approval_policy']
-    require(policy in ((UNOFFICIAL_POLICY, INITIAL_POLICY) if version == 3 else
+    require(successor or policy in ((UNOFFICIAL_POLICY, INITIAL_POLICY) if version == 3 else
                        (SKIN_ALPHA_POLICY,) if version == 4 else
                        (ORIGINAL_ASSETS_POLICY,) if version == 5 else (POLICY,)), 'unsupported approval_policy')
     require(isinstance(record['approval_lanes'], list) and
@@ -554,6 +839,7 @@ def assess(record, lanes, package_identity=None, release_history=None, package_m
                           ('release_decision', ('approved', 'pending', 'rejected', 'revoked'))]:
         extras = (('original_assets_admission_sha256', 'skin_alpha_evidence_sha256') if material_policy else
                   ('runtime_exception_sha256',) if initial_policy else
+                  ('successor_sha256',) if successor else
                   ('skin_alpha_evidence_sha256',) if skin_policy else ()) if key == 'release_decision' else ()
         decision(record[key], statuses, extra=extras)
     require(record['rights_approved'] is (record['rights_review']['status'] == 'verified'),
@@ -631,7 +917,22 @@ def assess(record, lanes, package_identity=None, release_history=None, package_m
             for lane in acceptance_lanes:
                 removable.update(('Per-lane acceptance missing: ' + lane, 'Runtime testing deferred: ' + lane))
             blockers = [b for b in blockers if b not in removable]
+    if successor:
+        runtime_active, runtime_ids = successor_runtime(record, lanes, package_identity, release_history,
+            package_manifest, predecessor, read_evidence, blockers)
+        accepted_runtime_ids = runtime_ids
+        if runtime_active:
+            removable = {'Unresolved risk: ' + rid for rid in runtime_ids}
+            for lane in acceptance_lanes:
+                removable.update(('Per-lane acceptance missing: ' + lane, 'Runtime testing deferred: ' + lane))
+            blockers = [b for b in blockers if b not in removable]
     alternative = unofficial(record, risks, ack, blockers, package_identity, accepted_runtime_ids) if version == 3 else {}
+    if successor:
+        alternative.update(incremental_alpha=record['incremental_alpha'],
+                           successor_sha256=successor_digest(record),
+                           runtime_admission='incremental_alpha_scoped' if runtime_active else 'blocked',
+                           publication_authorized=False)
+
     if initial_policy:
         alternative.update(runtime_acceptance_exception=record['runtime_acceptance_exception'],
                            runtime_exception_active=runtime_active,
@@ -668,7 +969,7 @@ def assess(record, lanes, package_identity=None, release_history=None, package_m
                 material_rights_admission='owner_directed_exact_package_exception' if material_active else 'blocked',
                 third_party_permission_established=False, distribution_package_native_accepted=False,
                 accepted_technical_findings=record['original_assets_admission']['technical_findings'])
-    if version in (3, 4, 5):
+    if successor or version in (3, 4, 5):
         alternative['package_distribution_eligible'] = not any(b != 'release_approved' for b in blockers)
     require(not record['release_approved'] or not blockers,
             'final release approval contradicts outstanding gates')

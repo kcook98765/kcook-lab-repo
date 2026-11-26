@@ -232,3 +232,15 @@ false/pending rights and all original adverse findings. Its implementation
 approval is not package admission or publication. Keep the real checker failures
 and scoped owner-reported native use. No native action is required or authorized.
 All other policies and immutable release/installer retention remain unchanged.
+
+### Incremental ALPHA updates
+
+Use the [opt-in incremental ALPHA successor
+contract](APPROVAL-CONTRACT.md#incremental-alpha-successor-admission) for an
+eligible already admitted ALPHA. Retain the original predecessor ZIP and
+review bytes. Prepare the source/archive delta and evidence in private intake
+and obtain the exact new provider decision if applicable. Keep coverage and
+admission pending until the owner makes those decisions. Use the normal
+production build, auditor, qualifier and publication preflight once the
+record is ready. The release plan's admission and coverage reports do not
+authorize external publication.

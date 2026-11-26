@@ -560,3 +560,63 @@ schema-5 inputs. Legacy fixed-tool candidates do not load this policy module or
 require its files; their permissions and copier stay unchanged. Final publication
 remains a later authorization against the complete qualified production-site
 digest and exact source/Release/Pages actions.
+
+## Incremental ALPHA successor admission
+
+Select `approval_policy="incremental-alpha-successor-v1"` explicitly in a
+new schema-2 or schema-3 record. Use the schema-2 verified package-rights
+path when applicable or the existing schema-3 unofficial integration gates
+for provider terms and unverified provider authorization. The runtime
+coverage policy changes neither of those rights paths. Existing policy
+selectors and historical records retain their meaning.
+
+- Admit a numerically newer ALPHA from the same add-on and source repository,
+  with the original lane scope or a subset. Both manifests identify the
+  add-on as ALPHA in human-facing metadata. The previous release must be the
+  immediate predecessor in the immutable per-add-on ledger. The private
+  intake holds its exact ZIP and original review record. If the predecessor
+  leaves the catalog, use a separate record with only the selected lanes
+  changed and retain the original review unchanged.
+- Set `incremental_alpha.predecessor` to the old version, ZIP digest, source
+  commit and hash-pinned original review. Sort `changed_files` by relative
+  member path and include every added, removed or modified ZIP member.
+  Independently review the source delta, the actual before/after packages,
+  the effect of shared code/dependency changes, and continued distribution
+  and service-use eligibility. The `independent_review` verifies those
+  findings and the extent of the retained evidence. The operator verifies the
+  substance of the evidence, release history and the identities of actors.
+- Record fresh native coverage of changed functionality and affected
+  regressions in `qualification`, for every selected lane. Previously
+  reviewed evidence can supplement the exact-successor evidence with
+  `kind="reused"`, named unchanged ZIP members and the same lane's evidence
+  references. Independent review confirms that the described environment,
+  dependencies and behavior still make the earlier evidence applicable.
+  A matching file hash by itself establishes no runtime outcome.
+- Keep outstanding scenario IDs, original descriptions and unresolved risks.
+  Each `deferred` entry identifies a lane, scenario, runtime risk and
+  whether the scenario was unobserved or unavailable. Update
+  the original ID's disposition through `resolved` only with exact successor
+  native evidence for that scenario and independent confirmation of its full
+  scope. Retain predecessor receipts and pending subcases. Runtime acceptance
+  stays false in any lane with outstanding tests.
+- Put observed compatibility limitations and failed behavior under
+  `observed`. A recorded `failed` result blocks admission. An independently
+  confirmed optional compatibility limitation can remain visible with its
+  evidence and release-impact rationale. Required broken behavior, material
+  rights, security and other blocking findings cannot enter a coverage
+  exception. Always preserve the rationale and precedent for classification.
+- Obtain a separate, finite owner coverage decision and any applicable
+  all-risk acknowledgment. The schema-3 owner service decision must be fresh
+  and the provider-authorization exception, when required, must bind the new
+  ZIP, provider, ID and version. Technical, distribution and coverage
+  reviewers must be independent of the accepting owner. The final owner
+  package decision binds `successor_sha256`, the canonical complete review
+  record except `release_approved`, `release_decision` and catalog
+  `approval_lanes`. The original scope is pinned separately by
+  `incremental_alpha.lanes`. Only a ledger member can be retained with no
+  catalog lanes. Evidence, findings and decisions remain pinned.
+- Require unexpired evidence and approvals at production preflight under the
+  current production intake rules, including retained inputs. Renew by
+  reviewed successor records and preserve original receipts. The plan and
+  site disclose scoped outcomes, observations and deferred tests, without
+  evidence paths. Final site publication remains separately authorized.

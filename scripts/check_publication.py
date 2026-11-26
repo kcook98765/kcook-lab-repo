@@ -82,8 +82,9 @@ def source_audit():
 def site_audit(plan):
     # Reassess real inputs and both exception expiries now; cached plan flags
     # never replace the shared contract or independent production conjunction.
-    repo.require(plan.get('profile') == 'production' and not plan.get('release_blockers'),
-                 'Only an approved production plan can pass publication preflight')
+    repo.require(plan.get('profile') == 'production' and not plan.get('release_blockers')
+                 and plan.get('publication_authorized') is False,
+                 'Only an approved production plan with no embedded publication authority can pass preflight')
     repo.verify('production')
     repo.require(plan == json.loads((ROOT/'dist/production/release-plan.json').read_text()),
                  'Plan differs from verified on-disk production plan')

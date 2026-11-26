@@ -146,7 +146,7 @@ def qualify(profile='fixture'):
     # Fresh audited inputs retain exact runtime limitations; site mechanics do
     # not exercise or upgrade any of the add-on's unobserved runtime scenarios.
     result = {'status':'PASS','profile':profile,'artifact_validation':repo.verify(profile),
-            'independent_audit':audit_candidate.audit(profile),
+            'independent_audit':audit_candidate.audit(profile), 'publication_authorized':False,
             'whole_site_reproducible':True,'historical_versions_retained':retained,
             'url_validation':urls(profile), 'build':before}
     if profile == 'fixture':
