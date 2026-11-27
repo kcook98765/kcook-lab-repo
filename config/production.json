@@ -180,13 +180,20 @@
       "zip": "script.channelsdvr.hub-0.1.3.zip"
     },
     {
+      "lanes": [],
+      "review_record": "hub-0.1.4-retained-review.json",
+      "review_record_sha256": "d6091f3fab35e5547a7f94a2579ff319cf15959d672b06ba344a4e8808d6c958",
+      "sha256": "4cd531a6319e805dc554591d7414509c34d10e809d57fd8bb3a619c64f5a4e79",
+      "zip": "script.channelsdvr.hub-0.1.4.zip"
+    },
+    {
       "lanes": [
         "omega"
       ],
-      "review_record": "hub-0.1.4-approved-admission-review.json",
-      "review_record_sha256": "8974fc2a90eb92b9a98b25d83ef167b38ac3e185d2cf7a7f2cd8740c300d757b",
-      "sha256": "4cd531a6319e805dc554591d7414509c34d10e809d57fd8bb3a619c64f5a4e79",
-      "zip": "script.channelsdvr.hub-0.1.4.zip"
+      "review_record": "hub-0.2.0-approved-admission-review.json",
+      "review_record_sha256": "cfef4bc5d7bd35efaa147b2dab861ce00ef63ad5e1f0f6368aac3e5274de298c",
+      "sha256": "bcf1f85a44b2428e676517757e76de8b348108045400a57618f2f5eec14bce42",
+      "zip": "script.channelsdvr.hub-0.2.0.zip"
     }
   ],
   "retained_installers": [
